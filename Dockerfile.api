@@ -26,24 +26,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install pnpm for production install and db commands
+# Install pnpm
 RUN npm install -g pnpm
 
-# Copy package.json and install all deps (need drizzle-kit for migrations)
+# Copy package.json and install production deps
 COPY packages/api/package.json ./
-RUN pnpm install
+RUN pnpm install --prod
 
-# Copy built files and drizzle config
+# Copy built files
 COPY --from=builder /app/packages/api/dist ./dist
-COPY --from=builder /app/packages/api/src/db ./src/db
-COPY --from=builder /app/packages/api/drizzle.config.ts ./
 
-# Create startup script that pushes schema then starts
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'echo "Pushing database schema..."' >> /app/start.sh && \
-    echo 'pnpm db:push || echo "Schema push failed, continuing..."' >> /app/start.sh && \
-    echo 'echo "Starting API..."' >> /app/start.sh && \
-    echo 'node dist/index.js' >> /app/start.sh && \
-    chmod +x /app/start.sh
-
-CMD ["/app/start.sh"]
+# Run the API
+CMD ["node", "dist/index.js"]
