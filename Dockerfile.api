@@ -1,0 +1,35 @@
+# MachineMachine API - Build from repo root
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy monorepo files
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY packages/api/package.json ./packages/api/
+
+# Install dependencies
+RUN pnpm install
+
+# Copy API source
+COPY packages/api ./packages/api
+
+# Build API
+WORKDIR /app/packages/api
+RUN pnpm build
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy built files
+COPY --from=builder /app/packages/api/dist ./dist
+COPY --from=builder /app/packages/api/package.json ./
+COPY --from=builder /app/packages/api/node_modules ./node_modules
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
