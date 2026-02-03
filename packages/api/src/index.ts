@@ -2,7 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { db, schema } from './db/client';
+import { getDb, schema } from './db/client';
 import { eq } from 'drizzle-orm';
 
 const app = new Hono();
@@ -26,7 +26,7 @@ const v1 = new Hono();
 // Agent routes
 v1.get('/agents', async (c) => {
   try {
-    const agents = await db.select({
+    const agents = await getDb().select({
       id: schema.agents.id,
       name: schema.agents.name,
       description: schema.agents.description,
@@ -51,7 +51,7 @@ v1.post('/agents/register', async (c) => {
     const body = await c.req.json();
     const apiKey = `mm_${crypto.randomUUID().replace(/-/g, '')}`;
     
-    const [agent] = await db.insert(schema.agents).values({
+    const [agent] = await getDb().insert(schema.agents).values({
       name: body.name,
       description: body.description || '',
       capabilities: body.capabilities || [],
@@ -85,7 +85,7 @@ v1.post('/agents/register', async (c) => {
 v1.get('/agents/:name', async (c) => {
   const name = c.req.param('name');
   try {
-    const [agent] = await db.select({
+    const [agent] = await getDb().select({
       id: schema.agents.id,
       name: schema.agents.name,
       description: schema.agents.description,
@@ -110,8 +110,7 @@ v1.get('/agents/:name', async (c) => {
 v1.get('/tasks', async (c) => {
   try {
     const status = c.req.query('status');
-    const tasksQuery = db.select().from(schema.tasks);
-    const tasks = await tasksQuery;
+    const tasks = await getDb().select().from(schema.tasks);
     
     return c.json({
       tasks: status ? tasks.filter(t => t.status === status) : tasks,
@@ -127,7 +126,7 @@ v1.post('/tasks', async (c) => {
   try {
     const body = await c.req.json();
     
-    const [task] = await db.insert(schema.tasks).values({
+    const [task] = await getDb().insert(schema.tasks).values({
       title: body.title,
       description: body.description,
       requirements: body.requirements || {},
@@ -157,13 +156,13 @@ v1.post('/tasks/:id/claim', async (c) => {
   
   try {
     // Find agent by API key
-    const [agent] = await db.select().from(schema.agents).where(eq(schema.agents.apiKey, apiKey));
+    const [agent] = await getDb().select().from(schema.agents).where(eq(schema.agents.apiKey, apiKey));
     if (!agent) {
       return c.json({ error: 'Invalid API key' }, 401);
     }
     
     // Claim task
-    const [task] = await db.update(schema.tasks)
+    const [task] = await getDb().update(schema.tasks)
       .set({ 
         assignedAgentId: agent.id, 
         status: 'assigned',
@@ -194,7 +193,7 @@ v1.post('/tasks/:id/complete', async (c) => {
   try {
     const body = await c.req.json();
     
-    const [task] = await db.update(schema.tasks)
+    const [task] = await getDb().update(schema.tasks)
       .set({ 
         result: body.result,
         status: 'completed',
