@@ -6,12 +6,13 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy monorepo files
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+# Copy monorepo structure
+COPY package.json pnpm-workspace.yaml ./
 COPY packages/api/package.json ./packages/api/
 
-# Install dependencies
-RUN pnpm install
+# Install with frozen lockfile if exists, otherwise normal install
+COPY pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile || pnpm install
 
 # Copy API source
 COPY packages/api ./packages/api
@@ -20,16 +21,19 @@ COPY packages/api ./packages/api
 WORKDIR /app/packages/api
 RUN pnpm build
 
-# Production stage
+# Production stage - simpler approach
 FROM node:20-alpine
 
 WORKDIR /app
 
+# Install pnpm for production install
+RUN npm install -g pnpm
+
+# Copy package.json and install production deps fresh
+COPY packages/api/package.json ./
+RUN pnpm install --prod
+
 # Copy built files
 COPY --from=builder /app/packages/api/dist ./dist
-COPY --from=builder /app/packages/api/package.json ./
-COPY --from=builder /app/packages/api/node_modules ./node_modules
-
-EXPOSE 3000
 
 CMD ["node", "dist/index.js"]
