@@ -1,3 +1,4 @@
+# MachineMachine API - Standalone build
 FROM node:20-alpine
 
 WORKDIR /app
@@ -5,11 +6,11 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
+# Copy package files (no lockfile needed)
+COPY package.json ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm install
 
 # Copy source
 COPY . .
