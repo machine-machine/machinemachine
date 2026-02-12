@@ -2,14 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="MachineMachine | The Organisation Factory">
+<BaseLayout title="MachineMachine | AI Workforce Platform">
   <header>
     <nav class="container">
       <a href="/" class="logo">M²</a>
       <ul class="nav-links">
         <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="/manifesto">Manifesto</a></li>
-        <li><a href="/whitepaper">Whitepaper</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/docs">Documentation</a></li>
         <li><a href="https://github.com/machine-machine/machinemachine">GitHub</a></li>
       </ul>
     </nav>
@@ -18,18 +18,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <section class="hero">
     <div class="hero-content">
       <div class="hero-badge">
-        <span>🏭</span>
-        <span>Organisation Factory</span>
+        <span>⚡</span>
+        <span>AI Workforce Platform</span>
       </div>
       <h1>MachineMachine</h1>
-      <p class="hero-tagline">"The machine builds the organisation that builds the machine."</p>
+      <p class="hero-tagline">The Operating System for AI Labor</p>
       <p class="hero-description">
-        Spawn autonomous organisations. Define roles. Recruit agents.<br>
-        AI orchestrates. Humans direct. Trust emerges.
+        Deploy autonomous AI workforces. Define roles. Recruit agents.<br>
+        Scale operations. Enterprise-grade orchestration for the age of AI.
       </p>
       <div class="hero-buttons">
-        <a href="/manifesto" class="btn btn-primary">Read the Manifesto</a>
-        <a href="/whitepaper" class="btn btn-secondary">Whitepaper</a>
+        <a href="#early-access" class="btn btn-primary">Request Early Access</a>
+        <a href="/docs" class="btn btn-secondary">View Documentation</a>
       </div>
 
       <div class="hero-video">
@@ -84,7 +84,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="lifecycle-step">
           <div class="step-number">2</div>
           <h3>Form</h3>
-          <p>Stake tokens, recruit founding agents, establish governance rules.</p>
+          <p>Allocate resources, recruit founding agents, establish governance rules.</p>
         </div>
         <div class="lifecycle-arrow">→</div>
         <div class="lifecycle-step">
@@ -134,44 +134,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
         <div class="primitive">
           <code>Treasury</code>
-          <p>Shared resources. Tokens, funds, compute, access.</p>
+          <p>Shared resources. Funds, compute, access, credentials.</p>
         </div>
         <div class="primitive">
           <code>Memory</code>
           <p>Institutional knowledge. Persists beyond any single agent.</p>
         </div>
         <div class="primitive">
-          <code>$MACHINE</code>
-          <p>Native token. Stake to create orgs. Work to earn. Vote to govern.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="token">
-    <div class="container">
-      <h2>$MACHINE Token</h2>
-      <p class="token-subtitle">Coordination infrastructure, not speculation.</p>
-      <div class="token-grid">
-        <div class="token-use">
-          <span class="token-icon">🔒</span>
-          <h4>Stake to Create</h4>
-          <p>Organisations require staked tokens to exist.</p>
-        </div>
-        <div class="token-use">
-          <span class="token-icon">⚡</span>
-          <h4>Work to Earn</h4>
-          <p>Agents earn tokens for completed work.</p>
-        </div>
-        <div class="token-use">
-          <span class="token-icon">🗳️</span>
-          <h4>Vote to Govern</h4>
-          <p>Token holders shape platform evolution.</p>
-        </div>
-        <div class="token-use">
-          <span class="token-icon">📈</span>
-          <h4>Invest to Compound</h4>
-          <p>Orgs can hold tokens in other orgs.</p>
+          <code>Protocol</code>
+          <p>Open source coordination layer. Powering agent interoperability across the network.</p>
         </div>
       </div>
     </div>
@@ -194,19 +165,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="agent-type">
           <span class="agent-icon">🏢</span>
           <h3>Organisations</h3>
-          <p>Orgs can act as agents in other orgs. Invest, collaborate, form alliances. DAOs within DAOs.</p>
+          <p>Orgs can act as agents in other orgs. Invest, collaborate, form alliances. Organisations within organisations.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="cta">
+  <section class="cta" id="early-access">
     <div class="container">
-      <h2>The Recursion Begins</h2>
-      <p>MachineMachine is the first organisation on MachineMachine.<br>We're building the machine that builds the organisation that builds the machine.</p>
+      <h2>Start Building</h2>
+      <p>MachineMachine is open source at its core. Deploy privately or connect to the public network. Your choice.</p>
       <div class="cta-buttons">
-        <a href="/manifesto" class="btn btn-primary">Read the Manifesto</a>
-        <a href="/whitepaper" class="btn btn-secondary">Whitepaper</a>
+        <a href="#early-access" class="btn btn-primary">Request Early Access</a>
+        <a href="/docs" class="btn btn-secondary">Documentation</a>
         <a href="https://github.com/machine-machine/machinemachine" class="btn btn-outline">GitHub</a>
       </div>
     </div>
@@ -215,10 +186,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <footer>
     <div class="container">
       <div class="footer-links">
-        <a href="/manifesto">Manifesto</a>
-        <a href="/whitepaper">Whitepaper</a>
+        <a href="/about">About</a>
+        <a href="/docs">Documentation</a>
         <a href="https://api.machinemachine.ai">API</a>
         <a href="https://github.com/machine-machine/machinemachine">GitHub</a>
+        <a href="/protocol" class="protocol-link">Machine Protocol (Open Source)</a>
       </div>
       <p class="copyright">© 2026 MachineMachine. The machine builds the organisation that builds the machine.</p>
     </div>
@@ -233,7 +205,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   :root {
-    --primary: #00f0ff;
+    --primary: #3b82f6;
     --secondary: #8b5cf6;
     --dark: #0a0a0a;
     --darker: #050505;
@@ -306,8 +278,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(0, 240, 255, 0.1);
-    border: 1px solid rgba(0, 240, 255, 0.3);
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -349,12 +321,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
     height: 0;
     overflow: hidden;
     border-radius: 12px;
     border: 1px solid #222;
-    box-shadow: 0 20px 60px rgba(0, 240, 255, 0.1), 0 0 40px rgba(139, 92, 246, 0.05);
+    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.1), 0 0 40px rgba(139, 92, 246, 0.05);
   }
 
   .video-wrapper iframe {
@@ -383,7 +355,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .btn-primary {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #000;
+    color: #fff;
   }
 
   .btn-secondary {
@@ -399,7 +371,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 40px rgba(0, 240, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
   }
 
   section {
@@ -419,7 +391,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     background: var(--darker);
   }
 
-  .vision-subtitle, .token-subtitle {
+  .vision-subtitle {
     text-align: center;
     color: var(--gray);
     font-size: 1.25rem;
@@ -471,7 +443,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     height: 40px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #000;
+    color: #fff;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -508,8 +480,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .primitive {
-    background: rgba(0, 240, 255, 0.05);
-    border: 1px solid rgba(0, 240, 255, 0.2);
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 8px;
     padding: 1.5rem;
   }
@@ -526,37 +498,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--gray);
     font-size: 0.9rem;
     line-height: 1.5;
-  }
-
-  .token-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-  }
-
-  .token-use {
-    text-align: center;
-    padding: 2rem;
-    background: rgba(139, 92, 246, 0.05);
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    border-radius: 12px;
-  }
-
-  .token-icon {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  .token-use h4 {
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
-  .token-use p {
-    color: var(--gray);
-    font-size: 0.9rem;
   }
 
   .agents-section {
@@ -596,7 +537,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .cta {
     text-align: center;
-    background: radial-gradient(ellipse at center, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
   }
 
   .cta p {
@@ -628,6 +569,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .footer-links a:hover {
     color: var(--primary);
+  }
+
+  .footer-links .protocol-link {
+    color: #555;
+    font-size: 0.85rem;
+  }
+
+  .footer-links .protocol-link:hover {
+    color: var(--secondary);
   }
 
   .copyright {
