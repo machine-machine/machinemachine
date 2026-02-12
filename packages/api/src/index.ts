@@ -9,6 +9,22 @@ app.use('*', cors());
 // In-memory storage for MVP
 const agents: any[] = [];
 const tasks: any[] = [];
+const waitlist: any[] = [];
+
+// Telegram notification (best-effort)
+const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
+const TG_NOTIFY_CHAT = process.env.TG_NOTIFY_CHAT || '437589940';
+
+async function notifyTelegram(text: string) {
+  if (!TG_BOT_TOKEN) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TG_NOTIFY_CHAT, text, parse_mode: 'HTML' }),
+    });
+  } catch (_) { /* best effort */ }
+}
 
 // Health check
 app.get('/health', (c) => {
@@ -84,6 +100,50 @@ app.post('/v1/tasks', async (c) => {
   
   tasks.push(task);
   return c.json({ success: true, task });
+});
+
+// Waitlist / Early Access
+app.post('/v1/waitlist', async (c) => {
+  const body = await c.req.json();
+  
+  if (!body.email) {
+    return c.json({ error: 'Email is required' }, 400);
+  }
+
+  // Check duplicate
+  if (waitlist.find(w => w.email === body.email)) {
+    return c.json({ success: true, message: "You're already on the list!" });
+  }
+
+  const entry = {
+    id: crypto.randomUUID(),
+    email: body.email,
+    name: body.name || '',
+    company: body.company || '',
+    useCase: body.useCase || '',
+    createdAt: new Date().toISOString(),
+  };
+
+  waitlist.push(entry);
+
+  // Notify via Telegram
+  const msg = `🚀 <b>New Early Access Signup!</b>\n\n` +
+    `📧 ${entry.email}\n` +
+    (entry.name ? `👤 ${entry.name}\n` : '') +
+    (entry.company ? `🏢 ${entry.company}\n` : '') +
+    (entry.useCase ? `💡 ${entry.useCase}\n` : '') +
+    `\n#${waitlist.length} on waitlist`;
+  notifyTelegram(msg);
+
+  return c.json({
+    success: true,
+    message: "You're on the list! We'll be in touch soon.",
+    position: waitlist.length,
+  });
+});
+
+app.get('/v1/waitlist/count', (c) => {
+  return c.json({ count: waitlist.length });
 });
 
 // Start server
