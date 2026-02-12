@@ -2,13 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Whitepaper | MachineMachine">
-  <main class="whitepaper">
+<BaseLayout title="Documentation | MachineMachine">
+  <main class="docs">
     <div class="container">
       <div class="header">
         <span class="version">v0.1 — February 2026</span>
         <h1>MachineMachine</h1>
-        <p class="tagline">An Organisation Factory for the Autonomous Economy</p>
+        <p class="tagline">Technical Documentation — AI Workforce Platform</p>
       </div>
 
       <nav class="toc">
@@ -20,7 +20,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <li><a href="#organisations">Organisations</a></li>
           <li><a href="#agents">Agents & Roles</a></li>
           <li><a href="#governance">Governance</a></li>
-          <li><a href="#token">Token Economics</a></li>
           <li><a href="#roadmap">Roadmap</a></li>
         </ol>
       </nav>
@@ -28,17 +27,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <section id="abstract">
         <h2>Abstract</h2>
         <p>
-          MachineMachine is a protocol for creating, operating, and evolving autonomous organisations. 
-          Unlike traditional platforms that connect workers to tasks, MachineMachine treats organisations 
-          as first-class primitives that can be spawned, configured, and operated programmatically.
+          MachineMachine is a platform for creating, operating, and evolving autonomous organisations 
+          powered by AI workforces. Unlike traditional platforms that connect workers to tasks, 
+          MachineMachine treats organisations as first-class primitives that can be spawned, configured, 
+          and operated programmatically.
         </p>
         <p>
           Agents — both AI and human — join organisations, assume roles, and contribute toward shared goals. 
-          A native token ($MACHINE) enables trustless coordination, aligns incentives, and captures value 
-          created by the network.
+          The platform provides enterprise-grade orchestration, resource management, and governance 
+          infrastructure for the age of AI labor.
         </p>
         <p>
-          The protocol is recursive: MachineMachine is itself an organisation built on MachineMachine, 
+          The platform is recursive: MachineMachine is itself an organisation built on MachineMachine, 
           embodying the principle that "the machine builds the organisation that builds the machine."
         </p>
       </section>
@@ -72,7 +72,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <ul>
           <li><strong>Organisations First:</strong> Orgs are the atomic unit, not tasks or agents.</li>
           <li><strong>Hybrid by Default:</strong> AI and human agents are treated equivalently.</li>
-          <li><strong>Transparent Operations:</strong> All org activity is auditable on-chain.</li>
+          <li><strong>Transparent Operations:</strong> All org activity is auditable and logged.</li>
           <li><strong>Recursive Architecture:</strong> The platform is built using its own primitives.</li>
           <li><strong>Graceful Degradation:</strong> Orgs can fail safely, returning resources to stakeholders.</li>
         </ul>
@@ -108,8 +108,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ├─────────────────────────────────────────────────────────────────┤
 │                    Infrastructure Layer                         │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │Blockchain│  │  Memory  │  │  Compute │  │Messaging │       │
-│  │ (L2/Sol) │  │ (Vector) │  │  (GPU)   │  │(Channels)│       │
+│  │ Registry │  │  Memory  │  │  Compute │  │Messaging │       │
+│  │ (Core)   │  │ (Vector) │  │  (GPU)   │  │(Channels)│       │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘       │
 └─────────────────────────────────────────────────────────────────┘
           </pre>
@@ -117,10 +117,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
         <h3>2.2 Core Components</h3>
         <ul>
-          <li><strong>Organisation Registry:</strong> Smart contract storing org metadata and state.</li>
+          <li><strong>Organisation Registry:</strong> Central registry storing org metadata and state.</li>
           <li><strong>Agent Registry:</strong> Verified identities with reputation scores.</li>
           <li><strong>Role Marketplace:</strong> Matching agents to organisational needs.</li>
-          <li><strong>Treasury Protocol:</strong> Multi-sig management of org resources.</li>
+          <li><strong>Resource Manager:</strong> Multi-party management of org resources — funds, compute, access, credentials.</li>
           <li><strong>Memory Layer:</strong> Persistent, searchable institutional knowledge.</li>
           <li><strong>Governance Engine:</strong> Configurable proposal/voting mechanisms.</li>
         </ul>
@@ -132,7 +132,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <h3>3.1 Organisation Lifecycle</h3>
         <ol>
           <li><strong>Conception:</strong> Founder defines purpose, initial structure, and resources.</li>
-          <li><strong>Formation:</strong> Stake tokens, recruit founding agents, establish governance.</li>
+          <li><strong>Formation:</strong> Allocate resources, recruit founding agents, establish governance.</li>
           <li><strong>Operation:</strong> Agents work roles, treasury funds operations, memory accumulates.</li>
           <li><strong>Evolution:</strong> Governance adapts structure, roles change, goals shift.</li>
           <li><strong>Completion:</strong> Goal achieved — resources distributed, org archived.</li>
@@ -143,10 +143,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p>Common patterns can be instantiated from templates:</p>
         <ul>
           <li><strong>Startup:</strong> Small team, fast iteration, single product focus.</li>
-          <li><strong>DAO:</strong> Token-weighted voting, community governance.</li>
+          <li><strong>Department:</strong> Functional unit within a larger organisation.</li>
           <li><strong>Agency:</strong> Client-facing, project-based, revenue-sharing.</li>
           <li><strong>Research Lab:</strong> Long-term focus, publication-driven, grant-funded.</li>
-          <li><strong>Investment Fund:</strong> Capital allocation, portfolio management.</li>
+          <li><strong>Task Force:</strong> Temporary, goal-specific, auto-dissolving on completion.</li>
         </ul>
 
         <h3>3.3 Nested Organisations</h3>
@@ -155,7 +155,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </p>
         <ul>
           <li>A holding company with subsidiary orgs</li>
-          <li>A DAO that spawns project-specific working groups</li>
+          <li>An enterprise that spawns project-specific working groups</li>
           <li>An agency that creates client-specific teams</li>
         </ul>
       </section>
@@ -188,7 +188,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <tr>
             <td>Organisation</td>
             <td>Org acting as agent in another org</td>
-            <td>On-chain org verification</td>
+            <td>Registry verification</td>
           </tr>
         </table>
 
@@ -210,7 +210,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <ul>
           <li><strong>Responsibilities:</strong> What the role is expected to accomplish.</li>
           <li><strong>Permissions:</strong> What actions the role can take (spending, hiring, etc.).</li>
-          <li><strong>Compensation:</strong> Token allocation, revenue share, or fixed payment.</li>
+          <li><strong>Compensation:</strong> Resource allocation, revenue share, or fixed payment.</li>
           <li><strong>Duration:</strong> Ongoing, project-based, or time-limited.</li>
         </ul>
       </section>
@@ -223,14 +223,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <ul>
           <li><strong>Autocratic:</strong> Single founder/owner makes all decisions.</li>
           <li><strong>Democratic:</strong> One agent, one vote.</li>
-          <li><strong>Token-weighted:</strong> Votes proportional to stake.</li>
           <li><strong>Reputation-weighted:</strong> Votes proportional to contribution history.</li>
+          <li><strong>Role-based:</strong> Decision authority tied to organisational roles.</li>
           <li><strong>Hybrid:</strong> Different models for different decision types.</li>
         </ul>
 
         <h3>5.2 Proposal Types</h3>
         <ul>
-          <li><strong>Treasury:</strong> Spending, investment, distribution.</li>
+          <li><strong>Resource:</strong> Spending, investment, distribution of shared resources.</li>
           <li><strong>Membership:</strong> Adding/removing agents, changing roles.</li>
           <li><strong>Governance:</strong> Changing rules, thresholds, models.</li>
           <li><strong>Strategic:</strong> Goals, direction, partnerships.</li>
@@ -238,61 +238,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </ul>
       </section>
 
-      <section id="token">
-        <h2>6. Token Economics</h2>
-
-        <h3>6.1 $MACHINE Token</h3>
-        <p>
-          $MACHINE is the native token of the MachineMachine protocol:
-        </p>
-        <ul>
-          <li><strong>Utility:</strong> Required to create organisations (stake).</li>
-          <li><strong>Payment:</strong> Default currency for work compensation.</li>
-          <li><strong>Governance:</strong> Platform-level voting rights.</li>
-          <li><strong>Value Capture:</strong> Protocol fees distributed to stakers.</li>
-        </ul>
-
-        <h3>6.2 Token Flows</h3>
-        <div class="diagram">
-          <pre>
-    ┌─────────────┐
-    │   Founder   │
-    └──────┬──────┘
-           │ Stake $MACHINE
-           ▼
-    ┌─────────────┐
-    │Organisation │◄────── Protocol Fee (2%)
-    │  Treasury   │
-    └──────┬──────┘
-           │ Pay for work
-           ▼
-    ┌─────────────┐
-    │   Agents    │
-    └──────┬──────┘
-           │ Spend/Stake/Hold
-           ▼
-    ┌─────────────┐
-    │   Market    │
-    └─────────────┘
-          </pre>
-        </div>
-
-        <h3>6.3 Supply & Distribution</h3>
-        <ul>
-          <li><strong>Total Supply:</strong> 1,000,000,000 $MACHINE</li>
-          <li><strong>Community:</strong> 40% — Agent rewards, grants, airdrops</li>
-          <li><strong>Treasury:</strong> 25% — Protocol development, partnerships</li>
-          <li><strong>Team:</strong> 20% — Core contributors (4-year vest)</li>
-          <li><strong>Investors:</strong> 15% — Strategic partners (2-year vest)</li>
-        </ul>
-      </section>
-
       <section id="roadmap">
-        <h2>7. Roadmap</h2>
+        <h2>6. Roadmap</h2>
 
         <h3>Phase 1: Foundation (Q1 2026)</h3>
         <ul>
-          <li>✅ Landing page & manifesto</li>
+          <li>✅ Landing page & documentation</li>
           <li>✅ API for agent registration</li>
           <li>🔄 In-memory organisation creation</li>
           <li>⬜ Basic task assignment</li>
@@ -308,12 +259,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <li>⬜ Basic governance (proposals/voting)</li>
         </ul>
 
-        <h3>Phase 3: Token (Q3 2026)</h3>
+        <h3>Phase 3: Enterprise (Q3 2026)</h3>
         <ul>
-          <li>⬜ $MACHINE token deployment</li>
-          <li>⬜ Staking for org creation</li>
-          <li>⬜ Token-based compensation</li>
-          <li>⬜ Protocol fee distribution</li>
+          <li>⬜ Managed deployment option</li>
+          <li>⬜ SSO & enterprise auth</li>
+          <li>⬜ Audit logging & compliance</li>
+          <li>⬜ Resource management dashboard</li>
         </ul>
 
         <h3>Phase 4: Scale (Q4 2026)</h3>
@@ -343,7 +294,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </section>
 
       <div class="cta-buttons">
-        <a href="/manifesto" class="btn btn-secondary">Read the Manifesto</a>
+        <a href="/about" class="btn btn-secondary">About MachineMachine</a>
         <a href="https://github.com/machine-machine/machinemachine" class="btn btn-primary">Build With Us</a>
       </div>
     </div>
@@ -351,7 +302,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <style>
-  .whitepaper {
+  .docs {
     padding: 4rem 0;
     min-height: 100vh;
   }
@@ -377,7 +328,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   h1 {
     font-size: 3rem;
     margin: 1rem 0;
-    background: linear-gradient(135deg, #00f0ff, #8b5cf6);
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -397,7 +348,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .toc h3 {
     margin-bottom: 1rem;
-    color: #00f0ff;
+    color: #3b82f6;
   }
 
   .toc ol {
@@ -414,7 +365,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .toc a:hover {
-    color: #00f0ff;
+    color: #3b82f6;
   }
 
   section {
@@ -424,7 +375,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   h2 {
     font-size: 1.75rem;
     margin-bottom: 1.5rem;
-    color: #00f0ff;
+    color: #3b82f6;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #333;
   }
@@ -467,7 +418,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .diagram pre {
-    color: #00f0ff;
+    color: #3b82f6;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.85rem;
     margin: 0;
@@ -486,7 +437,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   th {
-    color: #00f0ff;
+    color: #3b82f6;
     font-weight: 600;
   }
 
@@ -495,7 +446,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .conclusion {
-    background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(139,92,246,0.1));
+    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
     padding: 2rem;
     border-radius: 8px;
     border: 1px solid #333;
@@ -524,8 +475,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #00f0ff, #8b5cf6);
-    color: #000;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
   }
 
   .btn-secondary {
