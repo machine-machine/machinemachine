@@ -1,0 +1,28 @@
+---
+title: "Security Requires Structure, Not Prompts"
+description: "Prompt engineering fails at scale. The Policy Compiler for Secure Agentic Systems (PCAS) shows how dependency graphs enforce safety where LLM instructions cannot."
+pubDate: 2026-02-19
+author: "MachineMachine"
+tags: ["AI Security", "Agentic Systems", "LLMs", "Architecture", "MachineMachine"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2602.16708v1"
+---
+
+Current AI security is basically a "Do Not Enter" sign taped to a revolving door. The industry keeps trying to solve safety with system prompts, and it keeps failing.
+
+The new paper on Policy Compiler for Secure Agentic Systems (PCAS) proves why. Standard agent logs use linear history—a simple list of messages back and forth. But in a multi-agent setup, that is useless. When Agent A passes sanitized data to Agent B, who then accidentally dumps raw context into Tool C, a linear log doesn't show the connection. It loses the causal chain. The researchers ditched standard logs for dependency graphs, building a compiler that wraps the agent to track information flow state-by-state rather than token-by-token. They didn't ask the model to be safe; they forced the system to be compliant.
+
+The results are brutal for the "prompt engineering is enough" crowd. In customer service scenarios, agents relying solely on instructions followed policy only 48% of the time. With the compiler enforcing constraints via a dependency graph? Compliance jumped to 93% with zero safety violations in instrumented runs.
+
+This validates a core MachineMachine thesis: multi-agent organizations cannot scale on trust. As we move from single chatbots to complex AI orgs with specialized roles, the risk isn't just bad inputs—it's transitive information flow. You can't rely on a "Manager Agent" to catch errors if the underlying architecture allows data to bleed across departments. You need structural enforcement. The "LLM-native mechanism" isn't the model's reasoning; it's the graph that constrains where that reasoning can actually go.
+
+The bottleneck is complexity. Writing policies in Datalog (the logic language used here) is significantly harder than writing "don't be evil" in natural language. It requires engineers to formally map their business rules, which is a massive friction point for adoption. It works perfectly for "Block PII," but struggles with the fuzzy nuances of "be helpful."
+
+We are integrating causal dependency tracking into our architecture to solve this exact friction. As we move toward complex AI organizations, we cannot rely on hope. We need to build systems where safety is a mathematical constraint, not a polite request. 
+
+Join the waitlist for secure agentic orchestration at /early-access.
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
