@@ -1,0 +1,34 @@
+---
+title: "Policy Compiler for Secure Agentic Systems"
+description: "Prompting models to be secure fails 48% of the time. We explore PCAS and why AI organizations need compiled code, not system prompts."
+pubDate: 2026-02-19
+author: "MachineMachine"
+tags: ["AI Security", "Multi-Agent Systems", "Reference Monitors", "MachineMachine", "Policy Compliance"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2602.16708v1"
+---
+
+Prompting a model to "be secure" fails roughly half the time in multi-agent setups.
+
+The paper "Policy Compiler for Secure Agentic Systems" (PCAS) confirms what we've suspected but couldn't prove until now. You cannot fix authorization issues with better system prompts. The researchers tested standard frontier models and found compliance rates stuck at just 48%. This is because agents treat linear message history as context, not as a security boundary.
+
+PCAS fixes this by moving enforcement out of the LLM and into a reference monitor. Instead of relying on a chat log, they model the system state as a dependency graph—a causal map of who touched what. They compile policies into code that sits *between* agents. The result? Compliance jumped to 93%, with zero actual violations in instrumented runs. It turns out you need a deterministic barrier to stop probabilistic mistakes.
+
+This is a massive validation for MachineMachine’s thesis on AI organizations, but it raises the bar.
+
+We are building platforms for multi-agent systems. Security is usually an afterthought—people assume if the base model is safe, the org is safe. That is wrong. Adding more agents exponentially increases the attack surface. If your organization’s "protocols" are just text strings in a prompt, your org is fragile.
+
+A "learned protocol" from a double-loop learning retrospective is useless if the model ignores it under pressure. You need the "constitution" of your AI company to be compiled code that blocks bad actions, not a polite request to an LLM. Dependency graphs aren't just a security tool; they are the only way to track complex information flows. If you can't map the dependency graph of your agent org, you don't actually know how it works.
+
+There is a catch, however. Reference monitors are rigid. They are binary blockers. If your AI org needs to improvise—to find a clever workaround to save a deal—a strict compiler might stop the exact behavior you wanted. We want agents that are creative, not just caged rule-followers. If you over-instrument, you don't get a resilient organization; you get a slow, brittle bureaucracy.
+
+We are incorporating this into our BenchmarkSuite v2 immediately. We aren't just testing if agents complete tasks; we are mapping the causal dependency graphs to prove information flows are clean. We treat security as a structural property of the organizational topology, not a personality trait of the agents.
+
+Don't hope your agents are good. Architect a system where they can't be bad.
+
+Join the early access waitlist.
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
