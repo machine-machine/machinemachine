@@ -2,6 +2,8 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import Anthropic from '@anthropic-ai/sdk';
+import fs from 'fs';
+import path from 'path';
 
 const app = new Hono();
 
@@ -24,7 +26,30 @@ interface PitchSubmission {
   url?: string;
   html?: string;
 }
-const pitches = new Map<string, PitchSubmission>();
+// --- Pitch file store (survives container restarts) ---
+const PITCHES_FILE = process.env.PITCHES_FILE || '/data/pitches.json';
+
+function loadPitches(): Map<string, PitchSubmission> {
+  try {
+    const raw = fs.readFileSync(PITCHES_FILE, 'utf8');
+    const entries: [string, PitchSubmission][] = JSON.parse(raw);
+    return new Map(entries);
+  } catch {
+    return new Map(); // file missing or corrupt → start fresh
+  }
+}
+
+function savePitches(): void {
+  try {
+    fs.mkdirSync(path.dirname(PITCHES_FILE), { recursive: true });
+    fs.writeFileSync(PITCHES_FILE, JSON.stringify([...pitches.entries()]), 'utf8');
+  } catch (e) {
+    console.error('savePitches failed:', e);
+  }
+}
+
+const pitches = loadPitches();
+console.log(`📂 Loaded ${pitches.size} pitch(es) from ${PITCHES_FILE}`);
 
 // Telegram notification (best-effort)
 const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
@@ -267,10 +292,12 @@ Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
     pitch.status = 'ready';
     pitch.html = htmlContent;
     pitch.url = `https://machinemachine.ai/pitch/${uuid}`;
+    savePitches();
 
     notifyTelegram(`✅ Pitch ready for ${pitch.email}: machinemachine.ai/pitch/${uuid}`);
   } catch (err) {
     pitch.status = 'error';
+    savePitches();
     notifyTelegram(
       `❌ Pitch generation failed for ${pitch.email}: ${err instanceof Error ? err.message : String(err)}`,
     );
@@ -342,6 +369,7 @@ app.post('/v1/pitch/submit', async (c) => {
   };
 
   pitches.set(uuid, pitch);
+  savePitches();
 
   // Fire-and-forget background generation
   generatePitch(uuid);
