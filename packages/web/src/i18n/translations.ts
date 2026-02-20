@@ -102,8 +102,8 @@ export const translations = {
     control3_p: "You see what the system does, why it makes decisions, and can intervene at any time.",
 
     // Pitch CTA
-    pitch_h2: "Let us generate your personal pitch",
-    pitch_sub: "Tell us about your organisation. We'll generate a personalised pitch in 30 minutes.",
+    pitch_h2: "What would your team look like with AI reinforcement?",
+    pitch_sub: "Tell us what you do. In 60 seconds, get a personalised picture of how AI agents would change your workflow — built specifically for your business, not a generic demo.",
 
     // Form
     form_audio_label: "Tell us about your organisation",
@@ -138,7 +138,7 @@ export const translations = {
     pitch_loading_sub: "One moment please.",
     pitch_generating: "Your pitch is being created...",
     pitch_generating_sub: "We're almost done. This page refreshes automatically.",
-    pitch_generating_hint: "Usually takes about 30 minutes.",
+    pitch_generating_hint: "Usually takes less than a minute.",
     pitch_error_title: "Something went wrong",
     pitch_error_msg: "We couldn't load your pitch. Please try again later.",
     pitch_error_back: "Back to homepage",
@@ -257,8 +257,8 @@ export const translations = {
     control3_p: "Ihr seht, was das System tut, warum es Entscheidungen trifft, und könnt jederzeit eingreifen.",
 
     // Pitch CTA
-    pitch_h2: "Lass uns deinen persönlichen Pitch generieren",
-    pitch_sub: "Erzähl uns von deiner Organisation. Wir generieren in 30 Minuten einen maßgeschneiderten Pitch.",
+    pitch_h2: "Wie würde dein Team mit KI-Verstärkung aussehen?",
+    pitch_sub: "Erzähl uns, was du tust. In 60 Sekunden erhältst du ein maßgeschneidertes Bild davon, wie KI-Agenten deinen Workflow verändern würden — speziell für dein Unternehmen, kein generisches Demo.",
 
     // Form
     form_audio_label: "Erzähl uns von deiner Organisation",
@@ -293,7 +293,7 @@ export const translations = {
     pitch_loading_sub: "Einen Moment bitte.",
     pitch_generating: "Dein Pitch wird gerade erstellt...",
     pitch_generating_sub: "Wir sind fast fertig. Diese Seite aktualisiert sich automatisch.",
-    pitch_generating_hint: "Normalerweise dauert es ca. 30 Minuten.",
+    pitch_generating_hint: "Dauert normalerweise weniger als eine Minute.",
     pitch_error_title: "Etwas ist schiefgelaufen",
     pitch_error_msg: "Wir konnten deinen Pitch nicht laden. Bitte versuch es später erneut.",
     pitch_error_back: "Zurück zur Startseite",
@@ -412,8 +412,8 @@ export const translations = {
     control3_p: "Widzicie, co system robi, dlaczego podejmuje decyzje, i możecie w każdej chwili interweniować.",
 
     // Pitch CTA
-    pitch_h2: "Wygenerujmy twój osobisty pitch",
-    pitch_sub: "Opowiedz nam o swojej organizacji. W 30 minut wygenerujemy spersonalizowaną prezentację.",
+    pitch_h2: "Jak wyglądałby Twój zespół ze wzmocnieniem AI?",
+    pitch_sub: "Powiedz nam, co robisz. W 60 sekund otrzymasz spersonalizowany obraz tego, jak agenci AI zmieniliby Twój workflow — stworzony specjalnie dla Twojej firmy, nie ogólne demo.",
 
     // Form
     form_audio_label: "Opowiedz nam o swojej organizacji",
@@ -448,7 +448,7 @@ export const translations = {
     pitch_loading_sub: "Chwileczkę.",
     pitch_generating: "Twój pitch jest tworzony...",
     pitch_generating_sub: "Prawie gotowe. Ta strona odświeży się automatycznie.",
-    pitch_generating_hint: "Zwykle zajmuje to ok. 30 minut.",
+    pitch_generating_hint: "Zwykle zajmuje to mniej niż minutę.",
     pitch_error_title: "Coś poszło nie tak",
     pitch_error_msg: "Nie udało się załadować twojego pitcha. Spróbuj ponownie później.",
     pitch_error_back: "Wróć na stronę główną",
