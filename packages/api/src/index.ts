@@ -129,6 +129,90 @@ async function trackLead(opts: {
   }
 }
 
+// ─── Confirmation Email ───────────────────────────────────────────────────────
+const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'hello@machinemachine.ai';
+const BREVO_SENDER_NAME  = process.env.BREVO_SENDER_NAME  || 'Machine.Machine';
+
+async function sendConfirmationEmail(pitch: PitchSubmission) {
+  if (!BREVO_API_KEY) return;
+
+  const firstName = pitch.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const sourceUrl = pitch.links?.[0] || '';
+  const context   = [pitch.text, pitch.audioTranscript, sourceUrl].filter(Boolean).join('\n').slice(0, 600);
+
+  // Generate a short personalized email body with AI
+  const prompt = `You are writing a short, warm, personal email on behalf of Machine.Machine (an AI team-building company).
+
+A potential client just submitted a pitch request. Here's what they shared:
+${context || '(only a URL provided)'}
+
+Their email: ${pitch.email}
+Their pitch is ready at: ${pitch.url}
+
+Write a short confirmation email (4–6 sentences max). Requirements:
+- Address them by first name: ${firstName}
+- Reference something specific from what they shared (their industry, problem, or domain)
+- Tell them their personalised pitch is ready and link to it
+- End with a warm, low-pressure invitation to reply if they have questions
+- Tone: sharp, human, not corporate, not salesy
+- Language: match the language of their submission (default English)
+- Output ONLY the email body HTML (no subject, no greeting header — just the <p> tags)`;
+
+  let emailHtml = '';
+  try {
+    if (process.env.ANTHROPIC_API_KEY) {
+      const anthropic = new Anthropic();
+      const msg = await anthropic.messages.create({
+        model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929',
+        max_tokens: 400,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      emailHtml = msg.content
+        .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+        .map((b: Anthropic.TextBlock) => b.text)
+        .join('');
+    } else {
+      emailHtml = await generateWithCerebras('You write short warm confirmation emails.', prompt);
+    }
+  } catch (_) {
+    // Fallback to simple template
+    emailHtml = `<p>Hi ${firstName},</p>
+<p>Your personalised Machine.Machine pitch is ready. We built it specifically around what you shared — take a look and let us know what you think.</p>
+<p><a href="${pitch.url}" style="color:#7C3AED;font-weight:bold;">View your pitch →</a></p>
+<p>If anything feels off or you have questions, just reply to this email. We're here.</p>`;
+  }
+
+  // Wrap in minimal branded shell
+  const fullHtml = `<!DOCTYPE html><html><body style="font-family:Inter,sans-serif;background:#f9f9f9;padding:40px 0;">
+<div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:40px;color:#1a1a2e;line-height:1.7;">
+  <div style="font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;">M²</div>
+  ${emailHtml}
+  <hr style="border:none;border-top:1px solid #eee;margin:32px 0;">
+  <p style="font-size:0.8rem;color:#aaa;">Machine.Machine · <a href="https://machinemachine.ai" style="color:#aaa;">machinemachine.ai</a></p>
+</div></body></html>`;
+
+  // Determine subject line language hint from pitch text
+  const isGerman  = /\b(wir|und|die|das|der|ist|für|sie|mit)\b/i.test(pitch.text || '');
+  const isPolish  = /\b(jest|dla|się|jako|przez|tego|który)\b/i.test(pitch.text || '');
+  const subject   = isGerman  ? `Dein Machine.Machine Pitch ist bereit ✨` :
+                    isPolish  ? `Twój pitch Machine.Machine jest gotowy ✨` :
+                                `Your Machine.Machine pitch is ready ✨`;
+
+  await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': BREVO_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender:      { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+      to:          [{ email: pitch.email }],
+      subject,
+      htmlContent: fullHtml,
+    }),
+  });
+}
+
 // Health check
 app.get('/health', (c) => {
   return c.json({
@@ -368,6 +452,9 @@ Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
     savePitches();
 
     notifyTelegram(`✅ Pitch ready for ${pitch.email}: machinemachine.ai/pitch/${uuid}`);
+
+    // Send personalized confirmation email via Brevo
+    sendConfirmationEmail(pitch).catch(() => {/* best effort */});
   } catch (err) {
     clearInterval(progressTimer);
     pitch.progress = 0;
