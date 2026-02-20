@@ -91,8 +91,8 @@ const { locale } = Astro.props;
   </div>
 </div>
 
-<script define:vars={{ locale, formErrorMic: t(locale, 'form_error_mic'), formErrorEmail: t(locale, 'form_error_email'), formErrorGeneric: t(locale, 'form_error_generic'), formSending: t(locale, 'form_sending'), formSubmit: t(locale, 'form_submit'), formLinksPlaceholder: t(locale, 'form_links_placeholder'), formLinksRemoveAria: t(locale, 'form_links_remove_aria') }}>
-  window.__mm_form_i18n = { locale, formErrorMic, formErrorEmail, formErrorGeneric, formSending, formSubmit, formLinksPlaceholder, formLinksRemoveAria };
+<script define:vars={{ locale, formErrorMic: t(locale, 'form_error_mic'), formErrorEmail: t(locale, 'form_error_email'), formErrorText: t(locale, 'form_error_text'), formErrorGeneric: t(locale, 'form_error_generic'), formSending: t(locale, 'form_sending'), formSubmit: t(locale, 'form_submit'), formLinksPlaceholder: t(locale, 'form_links_placeholder'), formLinksRemoveAria: t(locale, 'form_links_remove_aria') }}>
+  window.__mm_form_i18n = { locale, formErrorMic, formErrorEmail, formErrorText, formErrorGeneric, formSending, formSubmit, formLinksPlaceholder, formLinksRemoveAria };
 </script>
 
 <script>
@@ -205,6 +205,12 @@ const { locale } = Astro.props;
 
     if (!email) {
       formError.textContent = i18n.formErrorEmail;
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    if (!text) {
+      formError.textContent = i18n.formErrorText;
       formError.classList.remove('hidden');
       return;
     }

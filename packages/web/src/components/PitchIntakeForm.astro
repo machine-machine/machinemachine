@@ -197,6 +197,12 @@
       return;
     }
 
+    if (!text) {
+      formError.textContent = 'Bitte beschreibe kurz, was deine Organisation macht.';
+      formError.classList.remove('hidden');
+      return;
+    }
+
     btnSubmit.disabled = true;
     btnSubmit.textContent = 'Wird gesendet...';
 

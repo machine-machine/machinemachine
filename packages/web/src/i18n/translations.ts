@@ -124,6 +124,7 @@ export const translations = {
     form_sending: "Sending...",
     form_error_mic: "Microphone access was denied. Please allow access and try again.",
     form_error_email: "Please enter your email address.",
+    form_error_text: "Please describe what your organisation does.",
     form_error_generic: "Something went wrong. Please try again.",
 
     // Form result
@@ -279,6 +280,7 @@ export const translations = {
     form_sending: "Wird gesendet...",
     form_error_mic: "Mikrofon-Zugriff wurde verweigert. Bitte erlaube den Zugriff und versuch es erneut.",
     form_error_email: "Bitte gib deine Email-Adresse ein.",
+    form_error_text: "Bitte beschreibe kurz, was deine Organisation macht.",
     form_error_generic: "Etwas ist schiefgelaufen. Bitte versuch es erneut.",
 
     // Form result
@@ -434,6 +436,7 @@ export const translations = {
     form_sending: "Wysyłanie...",
     form_error_mic: "Odmówiono dostępu do mikrofonu. Zezwól na dostęp i spróbuj ponownie.",
     form_error_email: "Podaj swój adres email.",
+    form_error_text: "Opisz krótko, czym zajmuje się Twoja organizacja.",
     form_error_generic: "Coś poszło nie tak. Spróbuj ponownie.",
 
     // Form result
