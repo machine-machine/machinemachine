@@ -26,7 +26,45 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
       <!-- Generating State -->
       <div id="state-generating" class="pitch-state hidden">
         <a href={homeHref} class="logo-link">M&sup2;</a>
-        <div class="spinner"></div>
+
+        <!-- Rotating Gears SVG -->
+        <div class="gears-wrap">
+          <svg class="gears-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Large gear (left, clockwise) -->
+            <g class="gear-large" transform-origin="72 80">
+              <circle cx="72" cy="80" r="34" stroke="#3b82f6" stroke-width="6" fill="none" opacity="0.15"/>
+              <circle cx="72" cy="80" r="14" stroke="#3b82f6" stroke-width="4" fill="none"/>
+              <!-- Teeth -->
+              <rect x="68" y="38" width="8" height="14" rx="2" fill="#3b82f6"/>
+              <rect x="68" y="108" width="8" height="14" rx="2" fill="#3b82f6"/>
+              <rect x="30" y="76" width="14" height="8" rx="2" fill="#3b82f6"/>
+              <rect x="100" y="76" width="14" height="8" rx="2" fill="#3b82f6"/>
+              <rect x="44" y="47" width="14" height="8" rx="2" transform="rotate(45 51 51)" fill="#3b82f6"/>
+              <rect x="94" y="97" width="14" height="8" rx="2" transform="rotate(45 101 101)" fill="#3b82f6"/>
+              <rect x="44" y="97" width="14" height="8" rx="2" transform="rotate(-45 51 101)" fill="#3b82f6"/>
+              <rect x="94" y="47" width="14" height="8" rx="2" transform="rotate(-45 101 51)" fill="#3b82f6"/>
+              <!-- Center dot -->
+              <circle cx="72" cy="80" r="5" fill="#3b82f6"/>
+            </g>
+            <!-- Small gear (right, counter-clockwise) -->
+            <g class="gear-small" transform-origin="136 60">
+              <circle cx="136" cy="60" r="22" stroke="#8b5cf6" stroke-width="5" fill="none" opacity="0.15"/>
+              <circle cx="136" cy="60" r="9" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+              <!-- Teeth -->
+              <rect x="132" y="30" width="8" height="10" rx="2" fill="#8b5cf6"/>
+              <rect x="132" y="80" width="8" height="10" rx="2" fill="#8b5cf6"/>
+              <rect x="106" y="56" width="10" height="8" rx="2" fill="#8b5cf6"/>
+              <rect x="156" y="56" width="10" height="8" rx="2" fill="#8b5cf6"/>
+              <rect x="114" y="38" width="10" height="8" rx="2" transform="rotate(45 119 43)" fill="#8b5cf6"/>
+              <rect x="148" y="72" width="10" height="8" rx="2" transform="rotate(45 153 77)" fill="#8b5cf6"/>
+              <rect x="114" y="72" width="10" height="8" rx="2" transform="rotate(-45 119 77)" fill="#8b5cf6"/>
+              <rect x="148" y="38" width="10" height="8" rx="2" transform="rotate(-45 153 43)" fill="#8b5cf6"/>
+              <!-- Center dot -->
+              <circle cx="136" cy="60" r="4" fill="#8b5cf6"/>
+            </g>
+          </svg>
+        </div>
+
         <h1>{t(locale, 'pitch_generating')}</h1>
         <p id="generating-status-msg">{t(locale, 'pitch_generating_sub')}</p>
         <div class="progress-bar-wrap">
@@ -34,6 +72,7 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
         </div>
         <div id="progress-pct" class="progress-pct">0%</div>
         <div class="progress-hint">{t(locale, 'pitch_generating_hint')}</div>
+        <div id="refresh-countdown" class="refresh-hint">🔄 Auto-refreshes every 20s</div>
       </div>
 
       <!-- Ready State -->
@@ -90,6 +129,31 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
     if (msg) statusMsg.textContent = msg[1];
   }
 
+  // 20s hard reload countdown — fallback if API poll fails
+  let reloadTimer: ReturnType<typeof setTimeout> | null = null;
+  let countdownInterval: ReturnType<typeof setInterval> | null = null;
+  const refreshHint = document.getElementById('refresh-countdown') as HTMLElement;
+
+  function startReloadCountdown() {
+    if (reloadTimer) return; // already started
+    let secs = 20;
+    if (refreshHint) refreshHint.textContent = `🔄 Refreshing in ${secs}s`;
+    countdownInterval = setInterval(() => {
+      secs--;
+      if (refreshHint) refreshHint.textContent = `🔄 Refreshing in ${secs}s`;
+      if (secs <= 0) {
+        clearInterval(countdownInterval!);
+        window.location.reload();
+      }
+    }, 1000);
+    reloadTimer = setTimeout(() => window.location.reload(), 20000);
+  }
+
+  function cancelReloadCountdown() {
+    if (reloadTimer) { clearTimeout(reloadTimer); reloadTimer = null; }
+    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+  }
+
   function showState(state: string) {
     [stateLoading, stateGenerating, stateReady, stateError, stateNotfound].forEach(el => {
       el.classList.add('hidden');
@@ -123,11 +187,13 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
       if (data.status === 'generating' || data.status === 'pending' || data.status === 'queued') {
         showState('generating');
         updateProgress(data.progress ?? 0);
+        startReloadCountdown();
         setTimeout(() => checkStatus(uuid), 3000);
         return;
       }
 
       if (data.status === 'ready' || data.status === 'completed' || data.status === 'done') {
+        cancelReloadCountdown();
         await loadPitch(uuid);
         return;
       }
@@ -237,6 +303,47 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
     color: var(--gray);
     opacity: 0.7;
     margin-top: 0.5rem;
+  }
+
+  .refresh-hint {
+    font-size: 0.85rem;
+    color: var(--primary);
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* Gears */
+  .gears-wrap {
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .gears-svg {
+    width: 180px;
+    height: 144px;
+    overflow: visible;
+  }
+
+  .gear-large {
+    animation: spin-cw 4s linear infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .gear-small {
+    animation: spin-ccw 2.67s linear infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @keyframes spin-cw {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  @keyframes spin-ccw {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
   }
 
   .progress-bar-wrap {
