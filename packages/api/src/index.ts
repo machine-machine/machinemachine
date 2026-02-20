@@ -68,6 +68,67 @@ async function notifyTelegram(text: string) {
   } catch (_) { /* best effort */ }
 }
 
+// ─── CRM / Lead Tracking ─────────────────────────────────────────────────────
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
+const BREVO_LIST_ID = parseInt(process.env.BREVO_LIST_ID || '0', 10); // Brevo contact list ID
+const TWENTY_API_URL = process.env.TWENTY_API_URL || ''; // e.g. http://crm.machinemachine.ai
+const TWENTY_API_KEY = process.env.TWENTY_API_KEY || '';
+
+async function trackLead(opts: {
+  email: string;
+  text: string;
+  links: string[];
+  pitchUrl: string;
+}) {
+  const { email, text, links, pitchUrl } = opts;
+  const sourceUrl = links[0] || '';
+  const textSnippet = text?.slice(0, 200) || '';
+
+  // 1. Brevo — create/update contact + add to list for automated sequence
+  if (BREVO_API_KEY) {
+    try {
+      await fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers: {
+          'api-key': BREVO_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          updateEnabled: true,
+          listIds: BREVO_LIST_ID ? [BREVO_LIST_ID] : [],
+          attributes: {
+            PITCH_URL: pitchUrl,
+            SOURCE_URL: sourceUrl,
+            DESCRIPTION: textSnippet,
+            SUBMITTED_AT: new Date().toISOString(),
+          },
+        }),
+      });
+    } catch (_) { /* best effort */ }
+  }
+
+  // 2. Twenty CRM — create person record
+  if (TWENTY_API_URL && TWENTY_API_KEY) {
+    try {
+      await fetch(`${TWENTY_API_URL}/api/people`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${TWENTY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: { firstName: email.split('@')[0], lastName: '' },
+          emails: { primaryEmail: email },
+          city: '',
+          jobTitle: '',
+          // Store pitch context in a note via the API separately if needed
+        }),
+      });
+    } catch (_) { /* best effort */ }
+  }
+}
+
 // Health check
 app.get('/health', (c) => {
   return c.json({
@@ -390,8 +451,9 @@ app.post('/v1/pitch/submit', async (c) => {
   pitches.set(uuid, pitch);
   savePitches();
 
-  // Fire-and-forget background generation
+  // Fire-and-forget background generation + CRM tracking
   generatePitch(uuid);
+  trackLead({ email, text, links, pitchUrl: `https://machinemachine.ai/pitch/${uuid}` });
 
   const truncatedText = text.length > 100 ? text.slice(0, 100) + '...' : text;
   notifyTelegram(
