@@ -22,9 +22,11 @@ interface PitchSubmission {
   audioTranscript?: string;
   audioBase64?: string;
   status: 'generating' | 'ready' | 'error';
+  progress: number; // 0-100
   createdAt: string;
   url?: string;
   html?: string;
+  error?: string;
 }
 // --- Pitch file store (survives container restarts) ---
 const PITCHES_FILE = process.env.PITCHES_FILE || '/data/pitches.json';
@@ -241,6 +243,14 @@ async function generatePitch(uuid: string) {
   const pitch = pitches.get(uuid);
   if (!pitch) return;
 
+  // Increment progress smoothly during generation (5→85 over ~60s)
+  pitch.progress = 5;
+  const progressTimer = setInterval(() => {
+    const p = pitches.get(uuid);
+    if (!p || p.status !== 'generating') { clearInterval(progressTimer); return; }
+    if (p.progress < 85) { p.progress = Math.min(85, p.progress + 2); }
+  }, 1500);
+
   try {
     const useAnthropic = !!process.env.ANTHROPIC_API_KEY;
     const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
@@ -289,6 +299,8 @@ Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
       htmlContent = await generateWithCerebras(systemPrompt, userPrompt);
     }
 
+    clearInterval(progressTimer);
+    pitch.progress = 100;
     pitch.status = 'ready';
     pitch.html = htmlContent;
     pitch.url = `https://machinemachine.ai/pitch/${uuid}`;
@@ -296,7 +308,10 @@ Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
 
     notifyTelegram(`✅ Pitch ready for ${pitch.email}: machinemachine.ai/pitch/${uuid}`);
   } catch (err) {
+    clearInterval(progressTimer);
+    pitch.progress = 0;
     pitch.status = 'error';
+    pitch.error = err instanceof Error ? err.message : String(err);
     savePitches();
     notifyTelegram(
       `❌ Pitch generation failed for ${pitch.email}: ${err instanceof Error ? err.message : String(err)}`,
@@ -364,6 +379,7 @@ app.post('/v1/pitch/submit', async (c) => {
     audioTranscript,
     audioBase64,
     status: 'generating',
+    progress: 0,
     createdAt: new Date().toISOString(),
     url: `https://machinemachine.ai/pitch/${uuid}`,
   };
@@ -382,9 +398,8 @@ app.post('/v1/pitch/submit', async (c) => {
   return c.json({
     uuid,
     url: `https://machinemachine.ai/pitch/${uuid}`,
-    eta_minutes: 30,
-    message:
-      'Dein persönlicher Pitch wird generiert. Komm in ~30 Minuten zurück.',
+    progress: 0,
+    message: 'Your pitch is being generated. This page will update automatically.',
   });
 });
 
@@ -394,12 +409,17 @@ app.get('/v1/pitch/:uuid/status', (c) => {
   const pitch = pitches.get(uuid);
   if (!pitch) return c.json({ error: 'Pitch not found' }, 404);
 
+  const elapsed = Date.now() - new Date(pitch.createdAt).getTime();
+  const etaSec = pitch.status === 'ready' ? 0 : Math.max(0, 60 - Math.floor(elapsed / 1000));
+
   return c.json({
     uuid: pitch.uuid,
     status: pitch.status,
+    progress: pitch.progress ?? 0,
     url: pitch.url,
     createdAt: pitch.createdAt,
-    eta_minutes: 30,
+    eta_seconds: etaSec,
+    ...(pitch.error ? { error: pitch.error } : {}),
   });
 });
 
