@@ -197,8 +197,8 @@
       return;
     }
 
-    if (!text) {
-      formError.textContent = 'Bitte beschreibe kurz, was deine Organisation macht.';
+    if (!text && links.length === 0 && !audioBase64) {
+      formError.textContent = 'Bitte füge eine Beschreibung, einen Link oder eine Sprachaufnahme hinzu.';
       formError.classList.remove('hidden');
       return;
     }

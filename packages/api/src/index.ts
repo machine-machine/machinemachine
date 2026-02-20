@@ -291,8 +291,8 @@ Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
       });
       htmlContent =
         message.content
-          .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-          .map((b) => b.text)
+          .filter((b: Anthropic.ContentBlock): b is Anthropic.TextBlock => b.type === 'text')
+          .map((b: Anthropic.TextBlock) => b.text)
           .join('') || '';
     } else {
       // Cerebras fallback (OpenAI-compatible, lightning fast)
@@ -360,9 +360,12 @@ app.post('/v1/pitch/submit', async (c) => {
   }
 
   if (!email) return c.json({ error: 'email is required' }, 400);
-  if (!text) return c.json({ error: 'text is required' }, 400);
 
   const links = parseLinks(linksRaw);
+
+  if (!text && links.length === 0 && !audioBase64) {
+    return c.json({ error: 'Please provide a description, at least one link, or a voice recording.' }, 400);
+  }
   const uuid = crypto.randomUUID();
 
   // Transcribe audio if provided

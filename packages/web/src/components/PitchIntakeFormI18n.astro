@@ -209,7 +209,7 @@ const { locale } = Astro.props;
       return;
     }
 
-    if (!text) {
+    if (!text && links.length === 0 && !audioBase64) {
       formError.textContent = i18n.formErrorText;
       formError.classList.remove('hidden');
       return;
