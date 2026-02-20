@@ -186,12 +186,38 @@ async function transcribeAudio(base64Audio: string): Promise<string> {
   }
 }
 
+async function generateWithCerebras(systemPrompt: string, userPrompt: string): Promise<string> {
+  const apiKey = process.env.CEREBRAS_API_KEY || '';
+  const model = process.env.CEREBRAS_MODEL || 'zai-glm-4.7';
+  const baseUrl = process.env.CEREBRAS_BASE_URL || 'https://api.cerebras.ai/v1';
+
+  const res = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 16000,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!res.ok) throw new Error(`Cerebras API error: ${res.status} ${await res.text()}`);
+  const data = (await res.json()) as any;
+  return data.choices?.[0]?.message?.content || '';
+}
+
 async function generatePitch(uuid: string) {
   const pitch = pitches.get(uuid);
   if (!pitch) return;
 
   try {
-    const anthropic = new Anthropic(); // uses ANTHROPIC_API_KEY env
+    const useAnthropic = !!process.env.ANTHROPIC_API_KEY;
     const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
 
     const userPrompt = `Generate a personalised pitch deck in German OR English (match the language of the submission) for the following team/company:
@@ -215,19 +241,28 @@ End with: "Bereit? → machinemachine.ai" CTA.
 
 Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
 
-    const message = await anthropic.messages.create({
-      model,
-      max_tokens: 16000,
-      system:
-        'You are a pitch deck generator. Generate a complete, self-contained HTML pitch deck for this company/team, using the exact design system described. Output ONLY the complete HTML document, no explanation.',
-      messages: [{ role: 'user', content: userPrompt }],
-    });
+    const systemPrompt =
+      'You are a pitch deck generator. Generate a complete, self-contained HTML pitch deck for this company/team, using the exact design system described. Output ONLY the complete HTML document, no explanation.';
 
-    const htmlContent =
-      message.content
-        .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-        .map((b) => b.text)
-        .join('') || '';
+    let htmlContent = '';
+
+    if (useAnthropic) {
+      const anthropic = new Anthropic();
+      const message = await anthropic.messages.create({
+        model,
+        max_tokens: 16000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      });
+      htmlContent =
+        message.content
+          .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+          .map((b) => b.text)
+          .join('') || '';
+    } else {
+      // Cerebras fallback (OpenAI-compatible, lightning fast)
+      htmlContent = await generateWithCerebras(systemPrompt, userPrompt);
+    }
 
     pitch.status = 'ready';
     pitch.html = htmlContent;
