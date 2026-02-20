@@ -1,0 +1,961 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PitchIntakeFormI18n from './PitchIntakeFormI18n.astro';
+import type { Locale } from '../i18n/translations';
+import { t } from '../i18n/translations';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const homeHref = locale === 'en' ? '/' : `/${locale}`;
+const blogHref = locale === 'en' ? '/blog' : `/${locale}/blog`;
+const docsHref = locale === 'en' ? '/docs' : `/${locale}/docs`;
+const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
+---
+
+<BaseLayout title={t(locale, 'meta_title')} description={t(locale, 'meta_description')}>
+  <header>
+    <nav class="container">
+      <a href={homeHref} class="logo">M&sup2;</a>
+      <div class="lang-switcher">
+        <a href="/" class="lang-flag" data-lang="en" title="English">🇬🇧</a>
+        <a href="/de" class="lang-flag" data-lang="de" title="Deutsch">🇩🇪</a>
+        <a href="/pl" class="lang-flag" data-lang="pl" title="Polski">🇵🇱</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#problem">{t(locale, 'nav_problem')}</a></li>
+        <li><a href="#how-it-works">{t(locale, 'nav_how')}</a></li>
+        <li><a href="#use-cases">{t(locale, 'nav_usecases')}</a></li>
+        <li><a href="#pitch-form">{t(locale, 'nav_pitch')}</a></li>
+        <li><a href="/blog">{t(locale, 'nav_blog')}</a></li>
+        <li><a href="/docs">{t(locale, 'nav_docs')}</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- 1. Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>{t(locale, 'hero_badge')}</span>
+      </div>
+      <h1 set:html={t(locale, 'hero_h1')} />
+      <p class="hero-description" set:html={t(locale, 'hero_sub')} />
+      <div class="hero-buttons">
+        <a href="#pitch-form" class="btn btn-primary">{t(locale, 'hero_cta_primary')} &darr;</a>
+        <a href="#problem" class="btn btn-secondary">{t(locale, 'hero_cta_secondary')} &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. The real problem -->
+  <section class="problem-section" id="problem">
+    <div class="container">
+      <h2 set:html={t(locale, 'problem_h2')} />
+      <div class="problem-cards">
+        <div class="problem-card">
+          <div class="problem-icon">&#x1F4AD;</div>
+          <h3>{t(locale, 'problem1_h3')}</h3>
+          <p>{t(locale, 'problem1_p')}</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#x1F501;</div>
+          <h3>{t(locale, 'problem2_h3')}</h3>
+          <p>{t(locale, 'problem2_p')}</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#x23F3;</div>
+          <h3>{t(locale, 'problem3_h3')}</h3>
+          <p>{t(locale, 'problem3_p')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. What changes (before/after) -->
+  <section class="transformation" id="transformation">
+    <div class="container">
+      <h2>{t(locale, 'transform_h2')}</h2>
+      <p class="section-subtitle">{t(locale, 'transform_sub')}</p>
+      <div class="comparison-table">
+        <div class="comparison-column before">
+          <h3>{t(locale, 'transform_before_h3')}</h3>
+          <div class="comparison-items">
+            <div class="comparison-item">{t(locale, 'transform_before_1')}</div>
+            <div class="comparison-item">{t(locale, 'transform_before_2')}</div>
+            <div class="comparison-item">{t(locale, 'transform_before_3')}</div>
+            <div class="comparison-item">{t(locale, 'transform_before_4')}</div>
+            <div class="comparison-item">{t(locale, 'transform_before_5')}</div>
+          </div>
+        </div>
+        <div class="comparison-column after">
+          <h3>{t(locale, 'transform_after_h3')}</h3>
+          <div class="comparison-items">
+            <div class="comparison-item">{t(locale, 'transform_after_1')}</div>
+            <div class="comparison-item">{t(locale, 'transform_after_2')}</div>
+            <div class="comparison-item">{t(locale, 'transform_after_3')}</div>
+            <div class="comparison-item">{t(locale, 'transform_after_4')}</div>
+            <div class="comparison-item">{t(locale, 'transform_after_5')}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. How it works (4 layers) -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <h2>{t(locale, 'how_h2')}</h2>
+      <p class="section-subtitle">{t(locale, 'how_sub')}</p>
+      <div class="layers-grid">
+        <div class="layer-card">
+          <div class="layer-number">1</div>
+          <div class="layer-content">
+            <h3>{t(locale, 'layer1_h3')}</h3>
+            <p class="layer-technical">{t(locale, 'layer1_tech')}</p>
+            <p>{t(locale, 'layer1_p')}</p>
+          </div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-number">2</div>
+          <div class="layer-content">
+            <h3>{t(locale, 'layer2_h3')}</h3>
+            <p class="layer-technical">{t(locale, 'layer2_tech')}</p>
+            <p>{t(locale, 'layer2_p')}</p>
+          </div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-number">3</div>
+          <div class="layer-content">
+            <h3>{t(locale, 'layer3_h3')}</h3>
+            <p class="layer-technical">{t(locale, 'layer3_tech')}</p>
+            <p>{t(locale, 'layer3_p')}</p>
+          </div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-number">4</div>
+          <div class="layer-content">
+            <h3>{t(locale, 'layer4_h3')}</h3>
+            <p class="layer-technical">{t(locale, 'layer4_tech')}</p>
+            <p>{t(locale, 'layer4_p')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Proof (benchmark numbers) -->
+  <section class="proof-section" id="proof">
+    <div class="container">
+      <h2>{t(locale, 'proof_h2')}</h2>
+      <p class="section-subtitle">{t(locale, 'proof_sub')}</p>
+      <div class="proof-stats">
+        <div class="proof-stat">
+          <div class="stat-number">&minus;17</div>
+          <div class="stat-label" set:html={t(locale, 'proof_stat1_label')} />
+        </div>
+        <div class="proof-stat highlight">
+          <div class="stat-number">+11</div>
+          <div class="stat-label" set:html={t(locale, 'proof_stat2_label')} />
+        </div>
+        <div class="proof-stat">
+          <div class="stat-number">6</div>
+          <div class="stat-label" set:html={t(locale, 'proof_stat3_label')} />
+        </div>
+        <div class="proof-stat">
+          <div class="stat-number">0</div>
+          <div class="stat-label" set:html={t(locale, 'proof_stat4_label')} />
+        </div>
+      </div>
+      <p class="proof-footnote">{t(locale, 'proof_footnote')}</p>
+    </div>
+  </section>
+
+  <!-- 6. What your AI team does (3 use cases) -->
+  <section class="use-cases" id="use-cases">
+    <div class="container">
+      <h2>{t(locale, 'usecases_h2')}</h2>
+      <p class="section-subtitle">{t(locale, 'usecases_sub')}</p>
+      <div class="use-case-grid">
+        <div class="use-case">
+          <div class="use-case-icon">&#x1F4C4;</div>
+          <h3>{t(locale, 'usecase1_h3')}</h3>
+          <p>{t(locale, 'usecase1_p')}</p>
+          <div class="use-case-example">
+            <span>{t(locale, 'usecase_example_label')}</span> {t(locale, 'usecase1_example')}
+          </div>
+        </div>
+        <div class="use-case">
+          <div class="use-case-icon">&#x1F50D;</div>
+          <h3>{t(locale, 'usecase2_h3')}</h3>
+          <p>{t(locale, 'usecase2_p')}</p>
+          <div class="use-case-example">
+            <span>{t(locale, 'usecase_example_label')}</span> {t(locale, 'usecase2_example')}
+          </div>
+        </div>
+        <div class="use-case">
+          <div class="use-case-icon">&#x1F4EC;</div>
+          <h3>{t(locale, 'usecase3_h3')}</h3>
+          <p>{t(locale, 'usecase3_p')}</p>
+          <div class="use-case-example">
+            <span>{t(locale, 'usecase_example_label')}</span> {t(locale, 'usecase3_example')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. It learns -->
+  <section class="learning-section">
+    <div class="container">
+      <div class="learning-content">
+        <h2>{t(locale, 'learning_h2')}</h2>
+        <p class="learning-headline" set:html={t(locale, 'learning_headline')} />
+        <p class="learning-body">{t(locale, 'learning_body')}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Your control -->
+  <section class="control-section">
+    <div class="container">
+      <h2>{t(locale, 'control_h2')}</h2>
+      <p class="section-subtitle">{t(locale, 'control_sub')}</p>
+      <div class="control-grid">
+        <div class="control-card">
+          <h4>{t(locale, 'control1_h4')}</h4>
+          <p>{t(locale, 'control1_p')}</p>
+        </div>
+        <div class="control-card">
+          <h4>{t(locale, 'control2_h4')}</h4>
+          <p>{t(locale, 'control2_p')}</p>
+        </div>
+        <div class="control-card">
+          <h4>{t(locale, 'control3_h4')}</h4>
+          <p>{t(locale, 'control3_p')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Intake form / main CTA -->
+  <section class="pitch-cta" id="pitch-form">
+    <div class="container">
+      <h2>{t(locale, 'pitch_h2')}</h2>
+      <p class="section-subtitle">{t(locale, 'pitch_sub')}</p>
+      <PitchIntakeFormI18n locale={locale} />
+    </div>
+  </section>
+
+  <!-- 10. Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="/about">{t(locale, 'footer_about')}</a>
+        <a href="/docs">{t(locale, 'footer_docs')}</a>
+        <a href="/blog">{t(locale, 'footer_blog')}</a>
+        <a href="https://github.com/machine-machine/machinemachine">{t(locale, 'footer_github')}</a>
+      </div>
+      <p class="copyright">{t(locale, 'footer_copyright')}</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<script>
+  // Mark active language
+  const path = window.location.pathname;
+  const lang = path.startsWith('/de') ? 'de' : path.startsWith('/pl') ? 'pl' : 'en';
+  document.querySelectorAll('.lang-flag').forEach(el => {
+    if (el.getAttribute('data-lang') === lang) el.classList.add('active');
+  });
+
+  // Browser language auto-detect on first visit
+  const stored = localStorage.getItem('mm_lang');
+  if (!stored) {
+    const browserLang = navigator.language.slice(0, 2).toLowerCase();
+    localStorage.setItem('mm_lang', browserLang);
+    if (browserLang === 'de' && !path.startsWith('/de')) {
+      window.location.href = '/de' + (path === '/' ? '' : path);
+    } else if (browserLang === 'pl' && !path.startsWith('/pl')) {
+      window.location.href = '/pl' + (path === '/' ? '' : path);
+    }
+  }
+</script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary: #3b82f6;
+    --secondary: #8b5cf6;
+    --accent: #06d6a0;
+    --dark: #0a0a0f;
+    --darker: #050508;
+    --gray: #6b7280;
+    --light: #e5e7eb;
+    --border: #1f2937;
+    --surface: rgba(255, 255, 255, 0.02);
+  }
+
+  body {
+    background-color: var(--dark);
+    color: var(--light);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* Header */
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(5, 5, 8, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+
+  /* Language Switcher */
+  .lang-switcher {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 16px;
+  }
+
+  .lang-flag {
+    font-size: 20px;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+
+  .lang-flag:hover, .lang-flag.active {
+    opacity: 1;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover {
+    color: var(--primary);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.3);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--light);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--light);
+    border-color: var(--primary);
+  }
+
+  /* Section Styling */
+  section {
+    padding: 5rem 0;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--light), var(--gray));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--gray);
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* 1. Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff, #a0a0a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-description {
+    font-size: 1.3rem;
+    color: var(--gray);
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* 2. Problem Section */
+  .problem-section {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .problem-section h2 {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 3rem;
+    line-height: 1.3;
+  }
+
+  .problem-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .problem-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .problem-card:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .problem-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .problem-card h3 {
+    color: var(--light);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .problem-card p {
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  /* 3. Transformation / Before-After */
+  .transformation {
+    padding: 6rem 0;
+  }
+
+  .comparison-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .comparison-column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  .comparison-column.after {
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+  }
+
+  .comparison-column h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--light);
+  }
+
+  .comparison-column.after h3 {
+    color: var(--primary);
+  }
+
+  .comparison-items {
+    margin-bottom: 0;
+  }
+
+  .comparison-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--gray);
+  }
+
+  .comparison-item:last-child {
+    border-bottom: none;
+  }
+
+  .comparison-column.before .comparison-item::before {
+    content: "\2717  ";
+    color: rgba(239, 68, 68, 0.6);
+  }
+
+  .comparison-column.after .comparison-item::before {
+    content: "\2713  ";
+    color: var(--accent);
+  }
+
+  /* 4. How It Works / Layers */
+  .how-it-works {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .layers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .layer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+  }
+
+  .layer-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.08);
+  }
+
+  .layer-number {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .layer-content h3 {
+    color: var(--light);
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .layer-technical {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .layer-content p:last-child {
+    color: var(--gray);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* 5. Proof / Benchmarks */
+  .proof-section {
+    padding: 6rem 0;
+  }
+
+  .proof-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .proof-stat {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .proof-stat.highlight {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(6, 214, 160, 0.1);
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .proof-stat.highlight .stat-number {
+    background: linear-gradient(135deg, var(--accent), #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .proof-footnote {
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.95rem;
+    margin-top: 2rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-style: italic;
+  }
+
+  /* 6. Use Cases */
+  .use-cases {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .use-case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+
+  .use-case {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .use-case:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.1);
+  }
+
+  .use-case-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .use-case h3 {
+    color: var(--light);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .use-case p {
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .use-case-example {
+    padding: 0.75rem 1rem;
+    background: rgba(59, 130, 246, 0.06);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  .use-case-example span {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* 7. Learning Section */
+  .learning-section {
+    padding: 6rem 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+  }
+
+  .learning-content {
+    text-align: center;
+    max-width: 750px;
+    margin: 0 auto;
+  }
+
+  .learning-headline {
+    font-size: 1.5rem;
+    color: var(--light);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .learning-body {
+    color: var(--gray);
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+
+  /* 8. Control Section */
+  .control-section {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .control-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  .control-card h4 {
+    color: var(--light);
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .control-card p {
+    color: var(--gray);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* 9. Pitch CTA */
+  .pitch-cta {
+    padding: 6rem 0;
+    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  }
+
+  .pitch-cta h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .pitch-cta .section-subtitle {
+    margin-bottom: 3rem;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--darker);
+    padding: 3rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    color: var(--gray);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover {
+    color: var(--primary);
+  }
+
+  .copyright {
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .hero-description {
+      font-size: 1.1rem;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+    }
+
+    .comparison-table {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .nav-links {
+      display: none;
+    }
+
+    .hero-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 340px;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .problem-cards,
+    .use-case-grid,
+    .control-grid,
+    .layers-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .proof-stats {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .layer-card {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+
+    .learning-headline {
+      font-size: 1.25rem;
+    }
+  }
+</style>

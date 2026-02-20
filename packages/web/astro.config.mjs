@@ -6,5 +6,12 @@ export default defineConfig({
   integrations: [mdx()],
   build: {
     assets: '_assets'
+  },
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'de', 'pl'],
+    routing: {
+      prefixDefaultLocale: false
+    }
   }
 });

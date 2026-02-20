@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { Locale } from '../i18n/translations';
+import { t } from '../i18n/translations';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const homeHref = locale === 'en' ? '/' : `/${locale}`;
+const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`;
+---
+
+<BaseLayout title={t(locale, 'pitch_page_title')} description={t(locale, 'pitch_page_desc')}>
+  <div class="pitch-page">
+    <div class="pitch-container">
+      <!-- Loading State -->
+      <div id="state-loading" class="pitch-state">
+        <a href={homeHref} class="logo-link">M&sup2;</a>
+        <div class="spinner"></div>
+        <h1>{t(locale, 'pitch_loading')}</h1>
+        <p>{t(locale, 'pitch_loading_sub')}</p>
+      </div>
+
+      <!-- Generating State -->
+      <div id="state-generating" class="pitch-state hidden">
+        <a href={homeHref} class="logo-link">M&sup2;</a>
+        <div class="spinner"></div>
+        <h1>{t(locale, 'pitch_generating')}</h1>
+        <p>{t(locale, 'pitch_generating_sub')}</p>
+        <div class="progress-hint">{t(locale, 'pitch_generating_hint')}</div>
+      </div>
+
+      <!-- Ready State -->
+      <div id="state-ready" class="pitch-state hidden">
+        <!-- Content will be injected here -->
+      </div>
+
+      <!-- Error State -->
+      <div id="state-error" class="pitch-state hidden">
+        <a href={homeHref} class="logo-link">M&sup2;</a>
+        <div class="error-icon">&#x26A0;&#xFE0F;</div>
+        <h1>{t(locale, 'pitch_error_title')}</h1>
+        <p id="error-message">{t(locale, 'pitch_error_msg')}</p>
+        <a href={homeHref} class="btn btn-primary">{t(locale, 'pitch_error_back')}</a>
+      </div>
+
+      <!-- Not Found State -->
+      <div id="state-notfound" class="pitch-state hidden">
+        <a href={homeHref} class="logo-link">M&sup2;</a>
+        <h1>{t(locale, 'pitch_notfound_title')}</h1>
+        <p>{t(locale, 'pitch_notfound_msg')}</p>
+        <a href={pitchFormHref} class="btn btn-primary">{t(locale, 'pitch_notfound_cta')}</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const API_URL = (import.meta as any).env.PUBLIC_API_URL || 'https://api.machinemachine.ai';
+
+  const stateLoading = document.getElementById('state-loading')!;
+  const stateGenerating = document.getElementById('state-generating')!;
+  const stateReady = document.getElementById('state-ready')!;
+  const stateError = document.getElementById('state-error')!;
+  const stateNotfound = document.getElementById('state-notfound')!;
+  const errorMessage = document.getElementById('error-message')!;
+
+  function showState(state: string) {
+    [stateLoading, stateGenerating, stateReady, stateError, stateNotfound].forEach(el => {
+      el.classList.add('hidden');
+    });
+    const el = document.getElementById(`state-${state}`);
+    if (el) el.classList.remove('hidden');
+  }
+
+  function getUuid(): string | null {
+    const pathMatch = window.location.pathname.match(/\/pitch\/([a-zA-Z0-9_-]+)/);
+    if (pathMatch) return pathMatch[1];
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+  }
+
+  async function checkStatus(uuid: string) {
+    try {
+      const res = await fetch(`${API_URL}/v1/pitch/${uuid}/status`);
+
+      if (res.status === 404) {
+        showState('notfound');
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`Status ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      if (data.status === 'generating' || data.status === 'pending' || data.status === 'queued') {
+        showState('generating');
+        setTimeout(() => checkStatus(uuid), 30000);
+        return;
+      }
+
+      if (data.status === 'ready' || data.status === 'completed' || data.status === 'done') {
+        await loadPitch(uuid);
+        return;
+      }
+
+      if (data.status === 'error' || data.status === 'failed') {
+        if (data.message) errorMessage.textContent = data.message;
+        showState('error');
+        return;
+      }
+
+      showState('generating');
+      setTimeout(() => checkStatus(uuid), 30000);
+    } catch (err) {
+      showState('error');
+    }
+  }
+
+  async function loadPitch(uuid: string) {
+    try {
+      const res = await fetch(`${API_URL}/v1/pitch/${uuid}/html`);
+      if (!res.ok) throw new Error(`Failed to load pitch: ${res.status}`);
+
+      const html = await res.text();
+      stateReady.innerHTML = html;
+      showState('ready');
+
+      const pitchPage = document.querySelector('.pitch-page') as HTMLElement;
+      if (pitchPage) {
+        pitchPage.style.padding = '0';
+      }
+      const pitchContainer = document.querySelector('.pitch-container') as HTMLElement;
+      if (pitchContainer) {
+        pitchContainer.style.maxWidth = 'none';
+        pitchContainer.style.padding = '0';
+      }
+    } catch (err) {
+      showState('error');
+    }
+  }
+
+  const uuid = getUuid();
+  if (!uuid) {
+    showState('notfound');
+  } else {
+    checkStatus(uuid);
+  }
+</script>
+
+<style>
+  :root {
+    --primary: #3b82f6;
+    --secondary: #8b5cf6;
+    --dark: #0a0a0f;
+    --gray: #6b7280;
+    --light: #e5e7eb;
+    --border: #1f2937;
+  }
+
+  .pitch-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark);
+    padding: 2rem;
+  }
+
+  .pitch-container {
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .pitch-state {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .logo-link {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+    margin-bottom: 1rem;
+  }
+
+  .pitch-state h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--light);
+    line-height: 1.3;
+  }
+
+  .pitch-state p {
+    color: var(--gray);
+    font-size: 1.1rem;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+
+  .progress-hint {
+    font-size: 0.9rem;
+    color: var(--gray);
+    opacity: 0.7;
+    margin-top: 0.5rem;
+  }
+
+  .error-icon {
+    font-size: 3rem;
+  }
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.3);
+    color: white;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+</style>
