@@ -28,7 +28,11 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
         <a href={homeHref} class="logo-link">M&sup2;</a>
         <div class="spinner"></div>
         <h1>{t(locale, 'pitch_generating')}</h1>
-        <p>{t(locale, 'pitch_generating_sub')}</p>
+        <p id="generating-status-msg">{t(locale, 'pitch_generating_sub')}</p>
+        <div class="progress-bar-wrap">
+          <div id="progress-bar" class="progress-bar-fill" style="width:0%"></div>
+        </div>
+        <div id="progress-pct" class="progress-pct">0%</div>
         <div class="progress-hint">{t(locale, 'pitch_generating_hint')}</div>
       </div>
 
@@ -66,6 +70,25 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
   const stateError = document.getElementById('state-error')!;
   const stateNotfound = document.getElementById('state-notfound')!;
   const errorMessage = document.getElementById('error-message')!;
+  const progressBar = document.getElementById('progress-bar')!;
+  const progressPct = document.getElementById('progress-pct')!;
+  const statusMsg = document.getElementById('generating-status-msg')!;
+
+  const STATUS_MESSAGES: [number, string][] = [
+    [0,  'Analyzing your input...'],
+    [20, 'Crafting your narrative...'],
+    [40, 'Building slide structure...'],
+    [60, 'Polishing the deck...'],
+    [80, 'Almost ready...'],
+    [99, 'Finishing touches...'],
+  ];
+
+  function updateProgress(pct: number) {
+    progressBar.style.width = `${pct}%`;
+    progressPct.textContent = `${pct}%`;
+    const msg = [...STATUS_MESSAGES].reverse().find(([threshold]) => pct >= threshold);
+    if (msg) statusMsg.textContent = msg[1];
+  }
 
   function showState(state: string) {
     [stateLoading, stateGenerating, stateReady, stateError, stateNotfound].forEach(el => {
@@ -99,7 +122,8 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
 
       if (data.status === 'generating' || data.status === 'pending' || data.status === 'queued') {
         showState('generating');
-        setTimeout(() => checkStatus(uuid), 30000);
+        updateProgress(data.progress ?? 0);
+        setTimeout(() => checkStatus(uuid), 3000);
         return;
       }
 
@@ -213,6 +237,30 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
     color: var(--gray);
     opacity: 0.7;
     margin-top: 0.5rem;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 400px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+
+  .progress-pct {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-top: 0.25rem;
   }
 
   .error-icon {
