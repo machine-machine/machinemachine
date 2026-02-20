@@ -27,14 +27,7 @@ FROM nginx:alpine
 # Copy built static files
 COPY --from=build /app/packages/web/dist /usr/share/nginx/html
 
-# Simple nginx config for SPA with clean URLs
-RUN echo 'server { \
-    listen 80; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    location / { \
-        try_files $uri $uri/ $uri.html /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Copy nginx config (handles /pitch/{uuid} SPA routing)
+COPY packages/web/nginx.conf /etc/nginx/conf.d/default.conf
 
 CMD ["nginx", "-g", "daemon off;"]
