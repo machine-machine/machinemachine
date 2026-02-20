@@ -1,8 +1,8 @@
 export const translations = {
   en: {
     // Meta
-    meta_title: "MachineMachine | Your Team. With AI Reinforcement.",
-    meta_description: "Machine.Machine gives small teams the capacity of large ones. Without new hires. AI reinforcement for documentation, research, and client communication.",
+    meta_title: "MachineMachine | AI Teams for Knowledge Organisations.",
+    meta_description: "Machine.Machine builds AI teams that handle the transferable 80% — so your experts focus on the 20% that actually requires them.",
 
     // Nav
     nav_problem: "Problem",
@@ -13,20 +13,20 @@ export const translations = {
     nav_docs: "Docs",
 
     // Hero
-    hero_badge: "AI reinforcement for small teams",
-    hero_h1: "Your Team.<br/>With AI Reinforcement.",
-    hero_sub: "Machine.Machine gives small teams the capacity of large ones.<br/>Without new hires.",
-    hero_cta_primary: "Apply now — get your pitch generated",
-    hero_cta_secondary: "Learn more",
+    hero_badge: "AI teams for knowledge organisations",
+    hero_h1: "Your experts shouldn't be<br/>doing clerk work.",
+    hero_sub: "Machine.Machine builds AI teams that handle the transferable 80%&thinsp;—<br/>so your people focus on the 20% that actually requires them.",
+    hero_cta_primary: "Build your AI team",
+    hero_cta_secondary: "See how it works",
 
     // Problem
-    problem_h2: "Your team does great work.<br/>And then you spend hours on the report.",
-    problem1_h3: "Knowledge gets lost",
-    problem1_p: "Someone leaves the team — and takes half your know-how with them. None of it was documented.",
-    problem2_h3: "Every project from scratch",
-    problem2_p: "You've done the same thing three times — but each time you start from zero because nobody can find the old results.",
-    problem3_h3: "Capacity is always the limit",
-    problem3_p: "The ideas are there. The team is good. But the day only has 8 hours — and half of them go to admin.",
+    problem_h2: "Your organisation runs on expertise.<br/>But expertise is buried in busywork.",
+    problem1_h3: "The expertise trap",
+    problem1_p: "You hired specialists for their judgment. They spend 60% of their time on documentation, formatting, and coordination.",
+    problem2_h3: "The knowledge silo",
+    problem2_p: "Every expert carries institutional knowledge in their head. When they're busy, that knowledge is unavailable. When they leave, it's gone.",
+    problem3_h3: "The capacity ceiling",
+    problem3_p: "You could take on more. But you can't — not without hiring, not without burning out the people you have.",
 
     // Transformation
     transform_h2: "What changes",
@@ -71,21 +71,24 @@ export const translations = {
 
     // Use cases
     usecases_h2: "What your AI team actually does",
-    usecases_sub: "Three areas where it creates capacity immediately.",
-    usecase1_h3: "Documentation & Reports",
-    usecase1_p: "Sustainability reports, grant applications, project documentation — your AI team writes them in your style. Not generic, but the way you want it.",
-    usecase1_example: "An 8-person team now creates sustainability reports in half the time.",
-    usecase2_h3: "Research & Analysis",
-    usecase2_p: "Market analyses, competitor research, regulatory updates — your AI team researches thoroughly and summarises what's relevant for you.",
-    usecase2_example: "Instead of 2 days of research — a structured briefing the next morning.",
-    usecase3_h3: "Client Communication",
-    usecase3_p: "Proposals, support replies, follow-ups — in your tone, with your knowledge. Not like a chatbot, but like a team member.",
-    usecase3_example: "Client enquiries answered in minutes — consistently and personally.",
+    usecases_sub: "Four domains where it creates capacity immediately.",
+    usecase1_h3: "Environmental & Planning",
+    usecase1_p: "Species assessments, impact studies, compliance reports. AI drafts the structure, your ecologists judge the edge cases.",
+    usecase1_example: "An 8-person consultancy now delivers species assessments in half the time.",
+    usecase2_h3: "Legal & Compliance",
+    usecase2_p: "Case research, filing prep, regulatory cross-checks. AI handles the lookup and formatting, your lawyers handle the argument.",
+    usecase2_example: "Instead of 2 days of case research — a structured brief the next morning.",
+    usecase3_h3: "Healthcare & Clinical",
+    usecase3_p: "Patient documentation, protocol adherence, reporting. AI captures and structures, your clinicians decide and care.",
+    usecase3_example: "Clinical documentation completed in minutes — consistent and accurate.",
+    usecase4_h3: "Finance & Analysis",
+    usecase4_p: "Report generation, data synthesis, audit prep. AI assembles the picture, your analysts interpret it.",
+    usecase4_example: "Quarterly reports assembled overnight — your team reviews, not rewrites.",
     usecase_example_label: "Example:",
 
     // Learning
     learning_h2: "It learns.",
-    learning_headline: "After 50 projects it knows your standards.<br/>After 200 it knows your market.",
+    learning_headline: "After 50 cases it knows your standards.<br/>After 200 it knows your field.",
     learning_body: "Every project, every feedback, every correction makes your AI team better. Not theoretically — measurably. That's the difference to tools that forget everything every day.",
 
     // Control
@@ -100,11 +103,11 @@ export const translations = {
 
     // Pitch CTA
     pitch_h2: "Let us generate your personal pitch",
-    pitch_sub: "Tell us about your team. In 30 minutes you'll get a tailored presentation.",
+    pitch_sub: "Tell us about your organisation. We'll generate a personalised pitch in 30 minutes.",
 
     // Form
-    form_audio_label: "Tell us about your team",
-    form_audio_hint: "Record up to 3 minutes. What does your team do? Where would AI help?",
+    form_audio_label: "Tell us about your organisation",
+    form_audio_hint: "Record up to 3 minutes. What does your team do? Where does the overhead slow you down?",
     form_record_start: "Start recording",
     form_record_stop: "Stop",
     form_record_retake: "Record again",
@@ -113,8 +116,8 @@ export const translations = {
     form_links_placeholder: "https://...",
     form_links_add: "+ Add link",
     form_links_remove_aria: "Remove link",
-    form_text_label: "Briefly describe what your team does and where AI could help",
-    form_text_placeholder: "e.g. We're an 8-person team creating sustainability reports...",
+    form_text_label: "Briefly describe what your organisation does and where AI could help",
+    form_text_placeholder: "What does your team do? Where does the paperwork or coordination overhead slow you down?",
     form_email_label: "Where should we notify you?",
     form_email_placeholder: "name@company.com",
     form_submit: "Generate pitch",
@@ -148,13 +151,13 @@ export const translations = {
     footer_docs: "Documentation",
     footer_blog: "Blog",
     footer_github: "GitHub",
-    footer_copyright: "© 2026 MachineMachine. AI reinforcement for small teams.",
+    footer_copyright: "© 2026 MachineMachine. AI teams for knowledge organisations.",
   },
 
   de: {
     // Meta
-    meta_title: "MachineMachine | Dein Team. Mit KI-Verstärkung.",
-    meta_description: "Machine.Machine gibt kleinen Teams die Kapazität von großen. Ohne neue Mitarbeiter. KI-Verstärkung für Documentation, Research und Kundenkommunikation.",
+    meta_title: "MachineMachine | KI-Teams für Wissensorganisationen.",
+    meta_description: "Machine.Machine baut KI-Teams die den übertragbaren Teil übernehmen — damit deine Experten sich auf das konzentrieren, was wirklich sie braucht.",
 
     // Nav
     nav_problem: "Problem",
@@ -165,20 +168,20 @@ export const translations = {
     nav_docs: "Docs",
 
     // Hero
-    hero_badge: "KI-Verstärkung für kleine Teams",
-    hero_h1: "Dein Team.<br/>Mit KI-Verstärkung.",
-    hero_sub: "Machine.Machine gibt kleinen Teams die Kapazität von großen.<br/>Ohne neue Mitarbeiter.",
-    hero_cta_primary: "Jetzt bewerben — Pitch generieren lassen",
-    hero_cta_secondary: "Mehr erfahren",
+    hero_badge: "KI-Teams für Wissensorganisationen",
+    hero_h1: "Deine Experten sollten<br/>keine Sachbearbeiter sein.",
+    hero_sub: "Machine.Machine baut KI-Teams die den übertragbaren Teil übernehmen&thinsp;—<br/>damit deine Leute sich auf das konzentrieren, was wirklich sie braucht.",
+    hero_cta_primary: "Dein KI-Team aufbauen",
+    hero_cta_secondary: "So funktioniert's",
 
     // Problem
-    problem_h2: "Dein Team macht tolle Arbeit.<br/>Und dann sitzt du stundenlang am Bericht.",
-    problem1_h3: "Wissen geht verloren",
-    problem1_p: "Jemand verlässt das Team — und nimmt die Hälfte eures Know-hows mit. Nichts davon wurde dokumentiert.",
-    problem2_h3: "Jedes Projekt von vorn",
-    problem2_p: "Ihr habt das Gleiche schon dreimal gemacht — aber jedes Mal fangt ihr bei Null an, weil niemand die alten Ergebnisse findet.",
-    problem3_h3: "Kapazität ist immer das Limit",
-    problem3_p: "Die Ideen sind da. Das Team ist gut. Aber der Tag hat nur 8 Stunden — und die Hälfte davon geht für Admin drauf.",
+    problem_h2: "Deine Organisation lebt von Expertise.<br/>Aber Expertise erstickt in Routinearbeit.",
+    problem1_h3: "Die Expertise-Falle",
+    problem1_p: "Du hast Spezialisten für ihr Urteilsvermögen eingestellt. Sie verbringen 60% ihrer Zeit mit Dokumentation, Formatierung und Koordination.",
+    problem2_h3: "Das Wissens-Silo",
+    problem2_p: "Jeder Experte trägt institutionelles Wissen im Kopf. Wenn sie beschäftigt sind, ist dieses Wissen nicht verfügbar. Wenn sie gehen, ist es weg.",
+    problem3_h3: "Die Kapazitätsgrenze",
+    problem3_p: "Ihr könntet mehr übernehmen. Aber ihr könnt nicht — nicht ohne einzustellen, nicht ohne die Leute die ihr habt auszubrennen.",
 
     // Transformation
     transform_h2: "Was sich ändert",
@@ -223,21 +226,24 @@ export const translations = {
 
     // Use cases
     usecases_h2: "Was dein KI-Team konkret macht",
-    usecases_sub: "Drei Bereiche, in denen es sofort Kapazität schafft.",
-    usecase1_h3: "Dokumentation & Berichte",
-    usecase1_p: "Nachhaltigkeitsberichte, Förderanträge, Projektdokumentationen — euer KI-Team schreibt sie in eurem Stil. Nicht generisch, sondern so wie ihr es wollt.",
-    usecase1_example: "Ein 8-Personen-Team erstellt Nachhaltigkeitsberichte jetzt in der Hälfte der Zeit.",
-    usecase2_h3: "Research & Analyse",
-    usecase2_p: "Marktanalysen, Wettbewerber-Recherche, regulatorische Updates — euer KI-Team recherchiert gründlich und fasst zusammen, was für euch relevant ist.",
-    usecase2_example: "Statt 2 Tage Recherche — ein strukturiertes Briefing am nächsten Morgen.",
-    usecase3_h3: "Kundenkommunikation",
-    usecase3_p: "Angebotstexte, Support-Antworten, Follow-ups — in eurem Ton, mit eurem Wissen. Nicht wie ein Chatbot, sondern wie ein Teammitglied.",
-    usecase3_example: "Kundenanfragen werden in Minuten beantwortet — konsistent und persönlich.",
+    usecases_sub: "Vier Bereiche, in denen es sofort Kapazität schafft.",
+    usecase1_h3: "Umwelt & Planung",
+    usecase1_p: "Artenschutzgutachten, Umweltverträglichkeitsstudien, Compliance-Berichte. KI erstellt die Struktur, eure Ökologen beurteilen die Grenzfälle.",
+    usecase1_example: "Ein 8-Personen-Gutachterbüro liefert Artenschutzgutachten jetzt in der Hälfte der Zeit.",
+    usecase2_h3: "Recht & Compliance",
+    usecase2_p: "Fallrecherche, Schriftsatzvorbereitung, regulatorische Abgleiche. KI übernimmt Recherche und Formatierung, eure Anwälte die Argumentation.",
+    usecase2_example: "Statt 2 Tage Fallrecherche — ein strukturiertes Briefing am nächsten Morgen.",
+    usecase3_h3: "Gesundheitswesen & Klinik",
+    usecase3_p: "Patientendokumentation, Protokolleinhaltung, Berichtswesen. KI erfasst und strukturiert, eure Kliniker entscheiden und behandeln.",
+    usecase3_example: "Klinische Dokumentation in Minuten erledigt — konsistent und genau.",
+    usecase4_h3: "Finanzen & Analyse",
+    usecase4_p: "Berichtserstellung, Datensynthese, Audit-Vorbereitung. KI stellt das Gesamtbild zusammen, eure Analysten interpretieren es.",
+    usecase4_example: "Quartalsberichte über Nacht zusammengestellt — euer Team prüft, statt neu zu schreiben.",
     usecase_example_label: "Beispiel:",
 
     // Learning
     learning_h2: "Es lernt.",
-    learning_headline: "Nach 50 Projekten kennt es eure Standards.<br/>Nach 200 kennt es euren Markt.",
+    learning_headline: "Nach 50 Fällen kennt es eure Standards.<br/>Nach 200 kennt es euer Fachgebiet.",
     learning_body: "Jedes Projekt, jedes Feedback, jede Korrektur macht euer KI-Team besser. Nicht theoretisch — messbar. Das ist der Unterschied zu Tools, die jeden Tag alles vergessen.",
 
     // Control
@@ -252,11 +258,11 @@ export const translations = {
 
     // Pitch CTA
     pitch_h2: "Lass uns deinen persönlichen Pitch generieren",
-    pitch_sub: "Erzähl uns von deinem Team. In 30 Minuten bekommst du eine maßgeschneiderte Präsentation.",
+    pitch_sub: "Erzähl uns von deiner Organisation. Wir generieren in 30 Minuten einen maßgeschneiderten Pitch.",
 
     // Form
-    form_audio_label: "Erzähl uns von deinem Team",
-    form_audio_hint: "Nimm bis zu 3 Minuten auf. Was macht dein Team? Wo wäre KI hilfreich?",
+    form_audio_label: "Erzähl uns von deiner Organisation",
+    form_audio_hint: "Nimm bis zu 3 Minuten auf. Was macht dein Team? Wo bremst euch der Aufwand?",
     form_record_start: "Aufnahme starten",
     form_record_stop: "Stopp",
     form_record_retake: "Neu aufnehmen",
@@ -265,8 +271,8 @@ export const translations = {
     form_links_placeholder: "https://...",
     form_links_add: "+ Link hinzufügen",
     form_links_remove_aria: "Link entfernen",
-    form_text_label: "Beschreib kurz was dein Team macht und wo KI helfen soll",
-    form_text_placeholder: "z.B. Wir sind ein 8-köpfiges Team und erstellen Nachhaltigkeitsberichte...",
+    form_text_label: "Beschreib kurz was deine Organisation macht und wo KI helfen soll",
+    form_text_placeholder: "Was macht dein Team? Wo bremst euch der Papierkram oder Koordinationsaufwand?",
     form_email_label: "Wohin sollen wir dich benachrichtigen?",
     form_email_placeholder: "name@firma.de",
     form_submit: "Pitch generieren lassen",
@@ -300,13 +306,13 @@ export const translations = {
     footer_docs: "Documentation",
     footer_blog: "Blog",
     footer_github: "GitHub",
-    footer_copyright: "© 2026 MachineMachine. KI-Verstärkung für kleine Teams.",
+    footer_copyright: "© 2026 MachineMachine. KI-Teams für Wissensorganisationen.",
   },
 
   pl: {
     // Meta
-    meta_title: "MachineMachine | Twój zespół. Ze wzmocnieniem AI.",
-    meta_description: "Machine.Machine daje małym zespołom możliwości dużych. Bez nowych pracowników. Wzmocnienie AI dla dokumentacji, researchu i komunikacji z klientami.",
+    meta_title: "MachineMachine | Zespoły AI dla organizacji opartych na wiedzy.",
+    meta_description: "Machine.Machine buduje zespoły AI, które przejmują powtarzalną część pracy — żeby twoi eksperci skupili się na tym, co naprawdę wymaga ich.",
 
     // Nav
     nav_problem: "Problem",
@@ -317,20 +323,20 @@ export const translations = {
     nav_docs: "Docs",
 
     // Hero
-    hero_badge: "Wzmocnienie AI dla małych zespołów",
-    hero_h1: "Twój zespół.<br/>Ze wzmocnieniem AI.",
-    hero_sub: "Machine.Machine daje małym zespołom możliwości dużych.<br/>Bez nowych pracowników.",
-    hero_cta_primary: "Aplikuj — wygeneruj swój pitch",
-    hero_cta_secondary: "Dowiedz się więcej",
+    hero_badge: "Zespoły AI dla organizacji opartych na wiedzy",
+    hero_h1: "Twoi eksperci nie powinni<br/>być urzędnikami.",
+    hero_sub: "Machine.Machine buduje zespoły AI, które przejmują powtarzalną część pracy&thinsp;—<br/>żeby twoi ludzie skupili się na tym, co naprawdę wymaga ich.",
+    hero_cta_primary: "Zbuduj swój zespół AI",
+    hero_cta_secondary: "Zobacz jak to działa",
 
     // Problem
-    problem_h2: "Twój zespół robi świetną robotę.<br/>A potem siedzisz godzinami nad raportem.",
-    problem1_h3: "Wiedza się gubi",
-    problem1_p: "Ktoś odchodzi z zespołu — i zabiera połowę waszego know-how. Nic nie było udokumentowane.",
-    problem2_h3: "Każdy projekt od zera",
-    problem2_p: "Robiliście to samo trzy razy — ale za każdym razem zaczynacie od nowa, bo nikt nie znajduje starych wyników.",
-    problem3_h3: "Wydajność to zawsze limit",
-    problem3_p: "Pomysły są. Zespół jest dobry. Ale dzień ma tylko 8 godzin — a połowa idzie na administrację.",
+    problem_h2: "Twoja organizacja żyje z ekspertyzy.<br/>Ale ekspertyza tonie w papierkowej robocie.",
+    problem1_h3: "Pułapka ekspertyzy",
+    problem1_p: "Zatrudniłeś specjalistów dla ich osądu. Spędzają 60% czasu na dokumentacji, formatowaniu i koordynacji.",
+    problem2_h3: "Silos wiedzy",
+    problem2_p: "Każdy ekspert nosi wiedzę instytucjonalną w głowie. Gdy są zajęci, wiedza jest niedostępna. Gdy odchodzą — znika.",
+    problem3_h3: "Sufit wydajności",
+    problem3_p: "Moglibyście wziąć więcej. Ale nie możecie — nie bez zatrudniania, nie bez wypalenia ludzi, których macie.",
 
     // Transformation
     transform_h2: "Co się zmienia",
@@ -375,21 +381,24 @@ export const translations = {
 
     // Use cases
     usecases_h2: "Co twój zespół AI konkretnie robi",
-    usecases_sub: "Trzy obszary, w których od razu tworzy dodatkową wydajność.",
-    usecase1_h3: "Dokumentacja i raporty",
-    usecase1_p: "Raporty zrównoważonego rozwoju, wnioski grantowe, dokumentacje projektowe — wasz zespół AI pisze je w waszym stylu. Nie generycznie, tylko tak jak chcecie.",
-    usecase1_example: "8-osobowy zespół tworzy raporty zrównoważonego rozwoju teraz w połowie czasu.",
-    usecase2_h3: "Research i analiza",
-    usecase2_p: "Analizy rynku, research konkurencji, aktualizacje regulacyjne — wasz zespół AI bada dokładnie i podsumowuje to, co jest dla was istotne.",
-    usecase2_example: "Zamiast 2 dni researchu — strukturalny briefing następnego ranka.",
-    usecase3_h3: "Komunikacja z klientami",
-    usecase3_p: "Oferty, odpowiedzi supportowe, follow-upy — w waszym tonie, z waszą wiedzą. Nie jak chatbot, tylko jak członek zespołu.",
-    usecase3_example: "Zapytania klientów z odpowiedzią w kilka minut — spójnie i osobiście.",
+    usecases_sub: "Cztery dziedziny, w których od razu tworzy dodatkową wydajność.",
+    usecase1_h3: "Środowisko i planowanie",
+    usecase1_p: "Oceny gatunkowe, studia wpływu, raporty zgodności. AI tworzy strukturę, wasi ekolodzy oceniają przypadki graniczne.",
+    usecase1_example: "8-osobowe biuro ekspertyz dostarcza oceny gatunkowe teraz w połowie czasu.",
+    usecase2_h3: "Prawo i compliance",
+    usecase2_p: "Badanie spraw, przygotowanie pism, kontrole regulacyjne. AI zajmuje się wyszukiwaniem i formatowaniem, wasi prawnicy argumentacją.",
+    usecase2_example: "Zamiast 2 dni badania sprawy — strukturalny briefing następnego ranka.",
+    usecase3_h3: "Opieka zdrowotna i klinika",
+    usecase3_p: "Dokumentacja pacjentów, przestrzeganie protokołów, raportowanie. AI rejestruje i strukturyzuje, wasi klinicyści decydują i leczą.",
+    usecase3_example: "Dokumentacja kliniczna gotowa w kilka minut — spójna i dokładna.",
+    usecase4_h3: "Finanse i analiza",
+    usecase4_p: "Generowanie raportów, synteza danych, przygotowanie audytów. AI składa obraz całości, wasi analitycy go interpretują.",
+    usecase4_example: "Raporty kwartalne złożone w ciągu nocy — wasz zespół sprawdza, nie przepisuje.",
     usecase_example_label: "Przykład:",
 
     // Learning
     learning_h2: "Uczy się.",
-    learning_headline: "Po 50 projektach zna wasze standardy.<br/>Po 200 zna wasz rynek.",
+    learning_headline: "Po 50 sprawach zna twoje standardy.<br/>Po 200 zna twoją dziedzinę.",
     learning_body: "Każdy projekt, każdy feedback, każda korekta sprawia, że wasz zespół AI jest lepszy. Nie teoretycznie — mierzalnie. To jest różnica w porównaniu z narzędziami, które codziennie zapominają wszystko.",
 
     // Control
@@ -404,11 +413,11 @@ export const translations = {
 
     // Pitch CTA
     pitch_h2: "Wygenerujmy twój osobisty pitch",
-    pitch_sub: "Opowiedz nam o swoim zespole. W 30 minut dostaniesz prezentację szytą na miarę.",
+    pitch_sub: "Opowiedz nam o swojej organizacji. W 30 minut wygenerujemy spersonalizowaną prezentację.",
 
     // Form
-    form_audio_label: "Opowiedz nam o swoim zespole",
-    form_audio_hint: "Nagraj do 3 minut. Co robi twój zespół? Gdzie AI mogłoby pomóc?",
+    form_audio_label: "Opowiedz nam o swojej organizacji",
+    form_audio_hint: "Nagraj do 3 minut. Co robi twój zespół? Gdzie obciążenie spowalnia pracę?",
     form_record_start: "Rozpocznij nagrywanie",
     form_record_stop: "Stop",
     form_record_retake: "Nagraj ponownie",
@@ -417,8 +426,8 @@ export const translations = {
     form_links_placeholder: "https://...",
     form_links_add: "+ Dodaj link",
     form_links_remove_aria: "Usuń link",
-    form_text_label: "Opisz krótko, co robi twój zespół i gdzie AI mogłoby pomóc",
-    form_text_placeholder: "np. Jesteśmy 8-osobowym zespołem tworzącym raporty zrównoważonego rozwoju...",
+    form_text_label: "Opisz krótko, co robi twoja organizacja i gdzie AI mogłoby pomóc",
+    form_text_placeholder: "Co robi twój zespół? Gdzie dokumentacja lub koszty koordynacji was spowalniają?",
     form_email_label: "Gdzie mamy cię powiadomić?",
     form_email_placeholder: "imie@firma.pl",
     form_submit: "Wygeneruj pitch",
@@ -452,7 +461,7 @@ export const translations = {
     footer_docs: "Dokumentacja",
     footer_blog: "Blog",
     footer_github: "GitHub",
-    footer_copyright: "© 2026 MachineMachine. Wzmocnienie AI dla małych zespołów.",
+    footer_copyright: "© 2026 MachineMachine. Zespoły AI dla organizacji opartych na wiedzy.",
   },
 } as const;
 

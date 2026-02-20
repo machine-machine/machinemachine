@@ -57,17 +57,17 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
       <h2 set:html={t(locale, 'problem_h2')} />
       <div class="problem-cards">
         <div class="problem-card">
-          <div class="problem-icon">&#x1F4AD;</div>
+          <div class="problem-icon">&#x1F3AF;</div>
           <h3>{t(locale, 'problem1_h3')}</h3>
           <p>{t(locale, 'problem1_p')}</p>
         </div>
         <div class="problem-card">
-          <div class="problem-icon">&#x1F501;</div>
+          <div class="problem-icon">&#x1F512;</div>
           <h3>{t(locale, 'problem2_h3')}</h3>
           <p>{t(locale, 'problem2_p')}</p>
         </div>
         <div class="problem-card">
-          <div class="problem-icon">&#x23F3;</div>
+          <div class="problem-icon">&#x1F4C8;</div>
           <h3>{t(locale, 'problem3_h3')}</h3>
           <p>{t(locale, 'problem3_p')}</p>
         </div>
@@ -181,7 +181,7 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
       <p class="section-subtitle">{t(locale, 'usecases_sub')}</p>
       <div class="use-case-grid">
         <div class="use-case">
-          <div class="use-case-icon">&#x1F4C4;</div>
+          <div class="use-case-icon">&#x1F33F;</div>
           <h3>{t(locale, 'usecase1_h3')}</h3>
           <p>{t(locale, 'usecase1_p')}</p>
           <div class="use-case-example">
@@ -189,7 +189,7 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
           </div>
         </div>
         <div class="use-case">
-          <div class="use-case-icon">&#x1F50D;</div>
+          <div class="use-case-icon">&#x2696;</div>
           <h3>{t(locale, 'usecase2_h3')}</h3>
           <p>{t(locale, 'usecase2_p')}</p>
           <div class="use-case-example">
@@ -197,11 +197,19 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
           </div>
         </div>
         <div class="use-case">
-          <div class="use-case-icon">&#x1F4EC;</div>
+          <div class="use-case-icon">&#x1F3E5;</div>
           <h3>{t(locale, 'usecase3_h3')}</h3>
           <p>{t(locale, 'usecase3_p')}</p>
           <div class="use-case-example">
             <span>{t(locale, 'usecase_example_label')}</span> {t(locale, 'usecase3_example')}
+          </div>
+        </div>
+        <div class="use-case">
+          <div class="use-case-icon">&#x1F4CA;</div>
+          <h3>{t(locale, 'usecase4_h3')}</h3>
+          <p>{t(locale, 'usecase4_p')}</p>
+          <div class="use-case-example">
+            <span>{t(locale, 'usecase_example_label')}</span> {t(locale, 'usecase4_example')}
           </div>
         </div>
       </div>
@@ -747,7 +755,7 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
 
   .use-case-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
 
