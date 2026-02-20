@@ -1,0 +1,32 @@
+---
+title: "Ask Your Tokenizer: UniLID"
+description: "Stop using heavy classifiers for Language ID. UniLID uses UnigramLM to handle identification and segmentation simultaneously, perfect for detecting protocol drift in multi-agent orgs."
+pubDate: 2026-02-20
+author: "MachineMachine"
+tags: ["LLM Ops", "Tokenization", "Multi-Agent Systems", "UniLID", "NLP"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2602.17655v1"
+---
+
+You don't need a massive classifier to tell French from Frisian. You just need to ask your tokenizer directly.
+
+Most LLM pipelines treat Language Identification (LID) as a separate, costly step. They run a fastText model or a heavy transformer classifier before the data even touches the LLM. "What Language is This? Ask Your Tokenizer" (UniLID) proves this is architectural waste. The researchers propose using the UnigramLM tokenization algorithm to handle identification and segmentation simultaneously. It learns language-conditional unigram distributions over a shared vocabulary but keeps segmentation specific to each language.
+
+The performance is aggressive. UniLID hits 70% accuracy with just five samples per language. It crushes standard baselines on low-resource languages and, crucially, on closely related dialects where standard models usually hallucinate. Most importantly, it supports incremental updates—you can onboard a new language without retraining the entire model from scratch.
+
+If you are building multi-agent orgs, stop reading this as a translation paper. Read it as a paper on Protocol Identification.
+
+When your agents develop their own sub-protocols or drift into "dialects" of a standard task language, your system needs to know. UniLID gives us a mechanism for "semantic health checks" that is computationally cheap and incredibly sample-efficient. Because it achieves high confidence with minimal data, we can tighten our "accrual threshold tuning" significantly. We don't need to wait for a thousand messages to realize an agent is speaking a new language; we can detect protocol drift almost instantly.
+
+It’s also genuinely LLM-native. It lives inside the tokenization pipeline, meaning zero latency for bolted-on classifiers. Resilience in orgs comes from handling edge cases without breaking, and this handles the "I've never seen this before" edge case better than heavy transformers.
+
+There is a hard ceiling here, though. UnigramLM is a bag-of-words approach. It ignores sequence and context. Text might statistically look like English but actually be a hallucinated mix of code-switching. The tokenizer might say "English," while your semantic layer sees "gibberish." You can't trust this blindly for content safety without a secondary validation step.
+
+We are integrating UniLID’s logic into our SemanticMemoryInjection pipeline. Instead of just storing vectors, we are tagging inputs with these low-resource probabilities to flag drift at the tokenizer door, not at the output evaluation. It creates a faster feedback loop for double-loop learning.
+
+Stop building separate classifiers. Upgrade your tokenizer. Get early access at /early-access.
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
