@@ -1,251 +1,250 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PitchIntakeForm from '../components/PitchIntakeForm.astro';
 ---
 
-<BaseLayout title="MachineMachine | AI Workforce Platform" description="The first platform for autonomous AI organizations. Deploy entire AI departments, not just chatbots. Enterprise-grade infrastructure for the €2T workforce automation market.">
+<BaseLayout title="MachineMachine | Dein Team. Mit KI-Verstaerkung." description="Machine.Machine gibt kleinen Teams die Kapazitaet von grossen. Ohne neue Mitarbeiter. KI-Verstaerkung fuer Documentation, Research und Kundenkommunikation.">
   <header>
     <nav class="container">
-      <a href="/" class="logo">M²</a>
+      <a href="/" class="logo">M&sup2;</a>
       <ul class="nav-links">
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#use-cases">Use Cases</a></li>
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#how-it-works">So funktioniert's</a></li>
+        <li><a href="#use-cases">Anwendungen</a></li>
+        <li><a href="#pitch-form">Pitch anfragen</a></li>
         <li><a href="/blog">Blog</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/docs">Documentation</a></li>
-        <li><a href="https://github.com/machine-machine/machinemachine">GitHub</a></li>
+        <li><a href="/docs">Docs</a></li>
       </ul>
     </nav>
   </header>
 
+  <!-- 1. Hero -->
   <section class="hero">
     <div class="hero-content">
       <div class="hero-badge">
-        <span>AI Workforce Platform</span>
+        <span>KI-Verstaerkung fuer kleine Teams</span>
       </div>
-      <h1>Everyone's building AI for individuals.<br/>We're building AI for organizations.</h1>
+      <h1>Dein Team.<br/>Mit KI-Verstaerkung.</h1>
       <p class="hero-description">
-        Deploy autonomous AI departments that work together, learn continuously, and scale operations. 
-        The infrastructure layer for the €2 trillion enterprise AI transformation.
+        Machine.Machine gibt kleinen Teams die Kapazitaet von grossen.<br/>
+        Ohne neue Mitarbeiter.
       </p>
       <div class="hero-buttons">
-        <a href="/early-access" class="btn btn-primary">Request Early Access</a>
-        <a href="#how-it-works" class="btn btn-secondary">Learn More</a>
+        <a href="#pitch-form" class="btn btn-primary">Jetzt bewerben &mdash; Pitch generieren lassen &darr;</a>
+        <a href="#problem" class="btn btn-secondary">Mehr erfahren &rarr;</a>
       </div>
-      <div class="hero-visual">
-        <div class="gradient-orb"></div>
-        <div class="floating-elements">
-          <div class="floating-card">Agent Spawning</div>
-          <div class="floating-card">Organizational Memory</div>
-          <div class="floating-card">Multi-Agent Coordination</div>
-          <div class="floating-card">Self-Improvement</div>
-          <div class="floating-card">Role-Based Architecture</div>
+    </div>
+  </section>
+
+  <!-- 2. The real problem -->
+  <section class="problem-section" id="problem">
+    <div class="container">
+      <h2>Dein Team macht tolle Arbeit.<br/>Und dann sitzt du stundenlang am Bericht.</h2>
+      <div class="problem-cards">
+        <div class="problem-card">
+          <div class="problem-icon">&#x1F4AD;</div>
+          <h3>Wissen geht verloren</h3>
+          <p>Jemand verlaesst das Team &mdash; und nimmt die Haelfte eures Know-hows mit. Nichts davon wurde dokumentiert.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#x1F501;</div>
+          <h3>Jedes Projekt von vorn</h3>
+          <p>Ihr habt das Gleiche schon dreimal gemacht &mdash; aber jedes Mal fangt ihr bei Null an, weil niemand die alten Ergebnisse findet.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#x23F3;</div>
+          <h3>Kapazitaet ist immer das Limit</h3>
+          <p>Die Ideen sind da. Das Team ist gut. Aber der Tag hat nur 8 Stunden &mdash; und die Haelfte davon geht fuer Admin drauf.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="social-proof">
+  <!-- 3. What changes (before/after) -->
+  <section class="transformation" id="transformation">
     <div class="container">
-      <p class="proof-text">Trusted by forward-thinking enterprises</p>
-      <div class="proof-logos">
-        <div class="proof-placeholder">Enterprise A</div>
-        <div class="proof-placeholder">Enterprise B</div>
-        <div class="proof-placeholder">Enterprise C</div>
-        <div class="proof-placeholder">Enterprise D</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="positioning">
-    <div class="container">
-      <h2>The AI Assistant Market is Commoditizing</h2>
-      <p class="positioning-subtitle">Personal AI tools race to the bottom. Organizational AI creates lasting moats.</p>
-      
+      <h2>Was sich aendert</h2>
+      <p class="section-subtitle">Von einzelnen Tools zu einem KI-Team, das mit euch waechst.</p>
       <div class="comparison-table">
-        <div class="comparison-column personal">
-          <h3>Personal AI Assistants</h3>
+        <div class="comparison-column before">
+          <h3>Heute: Einzelne KI-Tools</h3>
           <div class="comparison-items">
-            <div class="comparison-item">Individual productivity tools</div>
-            <div class="comparison-item">Chat-based interfaces</div>
-            <div class="comparison-item">No persistent memory</div>
-            <div class="comparison-item">Single-user focused</div>
-            <div class="comparison-item">Commoditized market</div>
-            <div class="comparison-item">Consumer pricing pressure</div>
+            <div class="comparison-item">Ein Agent, der isoliert arbeitet</div>
+            <div class="comparison-item">Vergisst alles nach jeder Session</div>
+            <div class="comparison-item">Kein Kontext ueber euer Unternehmen</div>
+            <div class="comparison-item">Jedes Mal von vorn erklaeren</div>
+            <div class="comparison-item">Copy &amp; Paste zwischen Tools</div>
           </div>
-          <div class="comparison-examples">ChatGPT, Claude, Copilot</div>
         </div>
-
-        <div class="comparison-column organizational">
-          <h3>Organizational AI (MachineMachine)</h3>
+        <div class="comparison-column after">
+          <h3>Mit M&sup2;: KI-Organisation</h3>
           <div class="comparison-items">
-            <div class="comparison-item">Enterprise infrastructure platform</div>
-            <div class="comparison-item">Multi-agent orchestration</div>
-            <div class="comparison-item">Institutional knowledge base</div>
-            <div class="comparison-item">Team-wide coordination</div>
-            <div class="comparison-item">Blue ocean opportunity</div>
-            <div class="comparison-item">Enterprise value pricing</div>
+            <div class="comparison-item">Mehrere Agents, die sich koordinieren</div>
+            <div class="comparison-item">Erinnert sich an alles Wichtige</div>
+            <div class="comparison-item">Kennt eure Standards und Sprache</div>
+            <div class="comparison-item">Wird mit jedem Projekt besser</div>
+            <div class="comparison-item">Ein System, das zusammenarbeitet</div>
           </div>
-          <div class="comparison-examples">No direct competitors</div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- 4. How it works (4 layers) -->
   <section class="how-it-works" id="how-it-works">
     <div class="container">
-      <h2>How MachineMachine Works</h2>
-      <p class="section-subtitle">Three simple steps to deploy your AI workforce</p>
-      
-      <div class="workflow-steps">
-        <div class="workflow-step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3>Define Organization</h3>
-            <p>Specify roles, responsibilities, and objectives. Set governance rules and resource allocation. Design your org chart with AI-first thinking.</p>
+      <h2>So funktioniert's</h2>
+      <p class="section-subtitle">Vier Schichten &mdash; einfach erklaert.</p>
+      <div class="layers-grid">
+        <div class="layer-card">
+          <div class="layer-number">1</div>
+          <div class="layer-content">
+            <h3>Grundlage</h3>
+            <p class="layer-technical">Substrate</p>
+            <p>Die Infrastruktur, auf der eure KI-Agents laufen. Sicher, skalierbar, auf euren Servern oder unseren.</p>
           </div>
         </div>
-        
-        <div class="workflow-step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3>Deploy Agents</h3>
-            <p>Spawn specialized AI agents to fill roles. Each agent brings domain expertise and coordinates with teammates through the organizational memory layer.</p>
+        <div class="layer-card">
+          <div class="layer-number">2</div>
+          <div class="layer-content">
+            <h3>Gedaechtnis</h3>
+            <p class="layer-technical">Memory</p>
+            <p>Alles, was eure KI-Organisation lernt, bleibt gespeichert. Eure Standards, eure Sprache, eure Entscheidungen.</p>
           </div>
         </div>
-        
-        <div class="workflow-step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3>Scale Operations</h3>
-            <p>Agents work autonomously, learn from outcomes, and evolve the organization. Add new roles, adjust processes, expand capabilities as needed.</p>
+        <div class="layer-card">
+          <div class="layer-number">3</div>
+          <div class="layer-content">
+            <h3>Faehigkeiten</h3>
+            <p class="layer-technical">Skills</p>
+            <p>Konkrete Aufgaben, die eure Agents beherrschen: Berichte schreiben, recherchieren, Emails beantworten.</p>
+          </div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-number">4</div>
+          <div class="layer-content">
+            <h3>Lernen</h3>
+            <p class="layer-technical">Learning</p>
+            <p>Nach jedem Projekt wird euer KI-Team besser. Automatisch. Ohne dass ihr etwas konfigurieren muesst.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- 5. Proof (benchmark numbers) -->
+  <section class="proof-section" id="proof">
+    <div class="container">
+      <h2>Echte Ergebnisse. Keine Versprechen.</h2>
+      <p class="section-subtitle">Gemessen an realen Projekten &mdash; nicht an Marketing-Demos.</p>
+      <div class="proof-stats">
+        <div class="proof-stat">
+          <div class="stat-number">&minus;17</div>
+          <div class="stat-label">Benchmark-Score<br/>beim ersten Durchlauf</div>
+        </div>
+        <div class="proof-stat highlight">
+          <div class="stat-number">+11</div>
+          <div class="stat-label">Benchmark-Score<br/>nach dem Lernen</div>
+        </div>
+        <div class="proof-stat">
+          <div class="stat-number">6</div>
+          <div class="stat-label">Iterationen<br/>bis zur Verbesserung</div>
+        </div>
+        <div class="proof-stat">
+          <div class="stat-number">0</div>
+          <div class="stat-label">Menschliches Eingreifen<br/>noetig</div>
+        </div>
+      </div>
+      <p class="proof-footnote">Das System hat sich selbst verbessert &mdash; ohne dass jemand eingreifen musste. Von negativ auf positiv in 6 Runden.</p>
+    </div>
+  </section>
+
+  <!-- 6. What your AI team does (3 use cases) -->
   <section class="use-cases" id="use-cases">
     <div class="container">
-      <h2>Enterprise Use Cases</h2>
-      <p class="section-subtitle">Real-world applications driving immediate ROI</p>
-      
+      <h2>Was dein KI-Team konkret macht</h2>
+      <p class="section-subtitle">Drei Bereiche, in denen es sofort Kapazitaet schafft.</p>
       <div class="use-case-grid">
         <div class="use-case">
-          <div class="use-case-icon">📊</div>
-          <h3>Tax Compliance Automation</h3>
-          <p>Deploy a full tax department: research agents monitor regulatory changes, compliance agents ensure adherence, filing agents handle submissions. Reduce compliance costs by 80% while eliminating human error.</p>
-          <div class="use-case-metrics">
-            <span>80% cost reduction</span>
-            <span>99.9% accuracy</span>
+          <div class="use-case-icon">&#x1F4C4;</div>
+          <h3>Dokumentation &amp; Berichte</h3>
+          <p>Nachhaltigkeitsberichte, Foerderantraege, Projektdokumentationen &mdash; euer KI-Team schreibt sie in eurem Stil. Nicht generisch, sondern so wie ihr es wollt.</p>
+          <div class="use-case-example">
+            <span>Beispiel:</span> Ein 8-Personen-Team erstellt Nachhaltigkeitsberichte jetzt in der Haelfte der Zeit.
           </div>
         </div>
-        
         <div class="use-case">
-          <div class="use-case-icon">🎯</div>
-          <h3>Customer Operations</h3>
-          <p>Scale customer success with coordinated agent teams: support agents handle inquiries, account managers nurture relationships, product agents gather feedback. Deliver enterprise-grade service at startup costs.</p>
-          <div class="use-case-metrics">
-            <span>24/7 availability</span>
-            <span>Infinite scalability</span>
+          <div class="use-case-icon">&#x1F50D;</div>
+          <h3>Research &amp; Analyse</h3>
+          <p>Marktanalysen, Wettbewerber-Recherche, regulatorische Updates &mdash; euer KI-Team recherchiert gruendlich und fasst zusammen, was fuer euch relevant ist.</p>
+          <div class="use-case-example">
+            <span>Beispiel:</span> Statt 2 Tage Recherche &mdash; ein strukturiertes Briefing am naechsten Morgen.
           </div>
         </div>
-        
         <div class="use-case">
-          <div class="use-case-icon">⚡</div>
-          <h3>Software Factory</h3>
-          <p>Build an autonomous development organization: architect agents design systems, developer agents write code, QA agents test releases. Ship products 10x faster with consistent quality standards.</p>
-          <div class="use-case-metrics">
-            <span>10x faster delivery</span>
-            <span>Zero technical debt</span>
+          <div class="use-case-icon">&#x1F4EC;</div>
+          <h3>Kundenkommunikation</h3>
+          <p>Angebotstexte, Support-Antworten, Follow-ups &mdash; in eurem Ton, mit eurem Wissen. Nicht wie ein Chatbot, sondern wie ein Teammitglied.</p>
+          <div class="use-case-example">
+            <span>Beispiel:</span> Kundenanfragen werden in Minuten beantwortet &mdash; konsistent und persoenlich.
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="differentiators">
+  <!-- 7. It learns -->
+  <section class="learning-section">
     <div class="container">
-      <h2>Core Technology Differentiators</h2>
-      <div class="differentiator-grid">
-        <div class="differentiator">
-          <h4>Agent Spawning</h4>
-          <p>Spin up entire AI departments instantly. Define roles, spawn agents, begin operations within minutes.</p>
+      <div class="learning-content">
+        <h2>Es lernt.</h2>
+        <p class="learning-headline">Nach 50 Projekten kennt es eure Standards.<br/>Nach 200 kennt es euren Markt.</p>
+        <p class="learning-body">Jedes Projekt, jedes Feedback, jede Korrektur macht euer KI-Team besser. Nicht theoretisch &mdash; messbar. Das ist der Unterschied zu Tools, die jeden Tag alles vergessen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Your control -->
+  <section class="control-section">
+    <div class="container">
+      <h2>Deine Kontrolle. Deine Daten.</h2>
+      <p class="section-subtitle">Kein Lock-in. Kein Vertrauensvorschuss. Ihr bestimmt.</p>
+      <div class="control-grid">
+        <div class="control-card">
+          <h4>Self-Hosted</h4>
+          <p>Laeuft auf euren Servern. Eure Daten verlassen nie euer Netzwerk, wenn ihr das wollt.</p>
         </div>
-        <div class="differentiator">
-          <h4>Organizational Memory</h4>
-          <p>Persistent knowledge that survives individual agents. Institutional learning that compounds over time.</p>
+        <div class="control-card">
+          <h4>Ihr genehmigt alles</h4>
+          <p>Nichts geht raus, was ihr nicht freigegeben habt. Jeder Output wird euch vorgelegt.</p>
         </div>
-        <div class="differentiator">
-          <h4>Multi-Agent Coordination</h4>
-          <p>Agents that work together seamlessly. No siloes, no communication gaps, unified objective pursuit.</p>
-        </div>
-        <div class="differentiator">
-          <h4>Self-Improvement</h4>
-          <p>Organizations that evolve autonomously. Optimize processes, adjust strategies, adapt to changing conditions.</p>
-        </div>
-        <div class="differentiator">
-          <h4>Role-Based Architecture</h4>
-          <p>Fill any role with AI or human interchangeably. Hybrid organizations that leverage the best of both.</p>
-        </div>
-        <div class="differentiator">
-          <h4>Enterprise Security</h4>
-          <p>SOC2-ready infrastructure. Private deployment options. Full audit trails and access controls.</p>
+        <div class="control-card">
+          <h4>Transparent</h4>
+          <p>Ihr seht, was das System tut, warum es Entscheidungen trifft, und koennt jederzeit eingreifen.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="market-opportunity">
+  <!-- 9. Intake form / main CTA -->
+  <section class="pitch-cta" id="pitch-form">
     <div class="container">
-      <h2>Market Opportunity</h2>
-      <div class="market-stats">
-        <div class="market-stat">
-          <div class="stat-number">€2T</div>
-          <div class="stat-label">Total Addressable Market<br/>(Enterprise AI + Workforce Automation)</div>
-        </div>
-        <div class="market-stat">
-          <div class="stat-number">€480B</div>
-          <div class="stat-label">Serviceable Addressable Market<br/>(Fortune 2000 Organizations)</div>
-        </div>
-        <div class="market-stat">
-          <div class="stat-number">Blue Ocean</div>
-          <div class="stat-label">No Direct Competitors<br/>(First-mover Advantage)</div>
-        </div>
-      </div>
+      <h2>Lass uns deinen persoenlichen Pitch generieren</h2>
+      <p class="section-subtitle">Erzaehl uns von deinem Team. In 30 Minuten bekommst du eine massgeschneiderte Praesentation.</p>
+      <PitchIntakeForm />
     </div>
   </section>
 
-  <section class="team">
-    <div class="container">
-      <h2>Founded by Enterprise AI Veterans</h2>
-      <p class="team-subtitle">Deep expertise in large-scale AI deployment and organizational design</p>
-      <div class="team-note">
-        Team details available to qualified investors
-      </div>
-    </div>
-  </section>
-
-  <section class="cta" id="early-access">
-    <div class="container">
-      <h2>Join the AI Workforce Revolution</h2>
-      <p>MachineMachine is in private beta. Early access available to select enterprise partners.</p>
-      <div class="cta-buttons">
-        <a href="/early-access" class="btn btn-primary">Request Early Access</a>
-        <a href="/docs" class="btn btn-secondary">Technical Documentation</a>
-      </div>
-    </div>
-  </section>
-
+  <!-- 10. Footer -->
   <footer>
     <div class="container">
       <div class="footer-links">
         <a href="/about">About</a>
         <a href="/docs">Documentation</a>
-        <a href="https://api.machinemachine.ai">API</a>
+        <a href="/blog">Blog</a>
         <a href="https://github.com/machine-machine/machinemachine">GitHub</a>
-        <a href="/protocol" class="protocol-link">Machine Protocol (Open Source)</a>
       </div>
-      <p class="copyright">© 2026 MachineMachine. The platform for autonomous organizations.</p>
+      <p class="copyright">&copy; 2026 MachineMachine. KI-Verstaerkung fuer kleine Teams.</p>
     </div>
   </footer>
 </BaseLayout>
@@ -329,152 +328,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--primary);
   }
 
-  /* Hero Section */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 8rem 2rem 4rem;
-    position: relative;
-    overflow: hidden;
-    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    color: var(--primary);
-    font-weight: 600;
-    margin-bottom: 2rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .hero h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 700;
-    background: linear-gradient(135deg, #ffffff, #a0a0a0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1.5rem;
-    line-height: 1.1;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-description {
-    font-size: 1.3rem;
-    color: var(--gray);
-    max-width: 700px;
-    margin: 0 auto 3rem;
-    line-height: 1.6;
-  }
-
-  .hero-buttons {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 4rem;
-  }
-
-  .hero-visual {
-    position: relative;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .gradient-orb {
-    width: 400px;
-    height: 300px;
-    background: radial-gradient(ellipse at center, 
-      rgba(59, 130, 246, 0.3) 0%, 
-      rgba(139, 92, 246, 0.2) 40%, 
-      transparent 70%);
-    border-radius: 50%;
-    margin: 0 auto;
-    animation: pulse 4s ease-in-out infinite;
-  }
-
-  .floating-elements {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-
-  .floating-card {
-    position: absolute;
-    padding: 0.75rem 1.25rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--light);
-    backdrop-filter: blur(10px);
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .floating-card:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-  .floating-card:nth-child(2) { top: 10%; right: 15%; animation-delay: 1s; }
-  .floating-card:nth-child(3) { bottom: 30%; left: 5%; animation-delay: 2s; }
-  .floating-card:nth-child(4) { bottom: 20%; right: 10%; animation-delay: 3s; }
-  .floating-card:nth-child(5) { top: 50%; right: 5%; animation-delay: 4s; }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  /* Social Proof */
-  .social-proof {
-    padding: 3rem 0;
-    background: var(--darker);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .proof-text {
-    text-align: center;
-    color: var(--gray);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 2rem;
-  }
-
-  .proof-logos {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    flex-wrap: wrap;
-  }
-
-  .proof-placeholder {
-    padding: 1rem 2rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--gray);
-    font-weight: 600;
-    opacity: 0.6;
-  }
-
   /* Buttons */
   .btn {
     display: inline-flex;
@@ -528,6 +381,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     background: linear-gradient(135deg, var(--light), var(--gray));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    line-height: 1.2;
   }
 
   .section-subtitle {
@@ -540,17 +394,113 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-right: auto;
   }
 
-  /* Positioning Section */
-  .positioning {
-    background: var(--darker);
+  /* 1. Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
   }
 
-  .positioning-subtitle {
-    text-align: center;
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff, #a0a0a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-description {
+    font-size: 1.3rem;
     color: var(--gray);
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* 2. Problem Section */
+  .problem-section {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .problem-section h2 {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 3rem;
+    line-height: 1.3;
+  }
+
+  .problem-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .problem-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .problem-card:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .problem-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .problem-card h3 {
+    color: var(--light);
     font-size: 1.25rem;
-    margin-bottom: 4rem;
-    font-style: italic;
+    margin-bottom: 0.75rem;
+  }
+
+  .problem-card p {
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  /* 3. Transformation / Before-After */
+  .transformation {
+    padding: 6rem 0;
   }
 
   .comparison-table {
@@ -568,7 +518,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     padding: 2rem;
   }
 
-  .comparison-column.organizational {
+  .comparison-column.after {
     border-color: var(--primary);
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
   }
@@ -579,12 +529,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--light);
   }
 
-  .comparison-column.organizational h3 {
+  .comparison-column.after h3 {
     color: var(--primary);
   }
 
   .comparison-items {
-    margin-bottom: 2rem;
+    margin-bottom: 0;
   }
 
   .comparison-item {
@@ -597,64 +547,150 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-bottom: none;
   }
 
-  .comparison-examples {
-    font-size: 0.9rem;
-    color: var(--gray);
-    font-style: italic;
-    text-align: center;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
+  .comparison-column.before .comparison-item::before {
+    content: "\2717  ";
+    color: rgba(239, 68, 68, 0.6);
   }
 
-  /* How It Works */
-  .workflow-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    max-width: 800px;
+  .comparison-column.after .comparison-item::before {
+    content: "\2713  ";
+    color: var(--accent);
+  }
+
+  /* 4. How It Works / Layers */
+  .how-it-works {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .layers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
     margin: 0 auto;
   }
 
-  .workflow-step {
+  .layer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
     display: flex;
+    gap: 1.25rem;
     align-items: flex-start;
-    gap: 2rem;
+    transition: all 0.3s ease;
   }
 
-  .step-number {
-    width: 60px;
-    height: 60px;
+  .layer-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.08);
+  }
+
+  .layer-number {
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
 
-  .step-content h3 {
+  .layer-content h3 {
     color: var(--light);
-    font-size: 1.25rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
   }
 
-  .step-content p {
+  .layer-technical {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .layer-content p:last-child {
     color: var(--gray);
-    line-height: 1.6;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
-  /* Use Cases */
+  /* 5. Proof / Benchmarks */
+  .proof-section {
+    padding: 6rem 0;
+  }
+
+  .proof-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .proof-stat {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .proof-stat.highlight {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(6, 214, 160, 0.1);
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .proof-stat.highlight .stat-number {
+    background: linear-gradient(135deg, var(--accent), #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .proof-footnote {
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.95rem;
+    margin-top: 2rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-style: italic;
+  }
+
+  /* 6. Use Cases */
   .use-cases {
     background: var(--darker);
+    padding: 6rem 0;
   }
 
   .use-case-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 2rem;
   }
 
@@ -689,129 +725,92 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-bottom: 1.5rem;
   }
 
-  .use-case-metrics {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+  .use-case-example {
+    padding: 0.75rem 1rem;
+    background: rgba(59, 130, 246, 0.06);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+    color: var(--gray);
+    line-height: 1.5;
   }
 
-  .use-case-metrics span {
-    padding: 0.5rem 1rem;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    border-radius: 20px;
-    font-size: 0.85rem;
+  .use-case-example span {
     color: var(--primary);
     font-weight: 600;
   }
 
-  /* Differentiators */
-  .differentiator-grid {
+  /* 7. Learning Section */
+  .learning-section {
+    padding: 6rem 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+  }
+
+  .learning-content {
+    text-align: center;
+    max-width: 750px;
+    margin: 0 auto;
+  }
+
+  .learning-headline {
+    font-size: 1.5rem;
+    color: var(--light);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .learning-body {
+    color: var(--gray);
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+
+  /* 8. Control Section */
+  .control-section {
+    background: var(--darker);
+    padding: 6rem 0;
+  }
+
+  .control-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
-    margin-top: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
   }
 
-  .differentiator {
+  .control-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 2rem;
   }
 
-  .differentiator h4 {
+  .control-card h4 {
     color: var(--light);
     font-size: 1.1rem;
     margin-bottom: 0.75rem;
   }
 
-  .differentiator p {
+  .control-card p {
     color: var(--gray);
     font-size: 0.95rem;
     line-height: 1.5;
   }
 
-  /* Market Opportunity */
-  .market-opportunity {
-    background: var(--darker);
-  }
-
-  .market-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 3rem;
-    margin-top: 3rem;
-  }
-
-  .market-stat {
-    text-align: center;
-    padding: 2rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  .stat-number {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-label {
-    color: var(--gray);
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-
-  /* Team */
-  .team {
-    text-align: center;
-  }
-
-  .team-subtitle {
-    color: var(--gray);
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .team-note {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.5rem;
-    color: var(--gray);
-    font-style: italic;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-
-  /* CTA */
-  .cta {
-    text-align: center;
+  /* 9. Pitch CTA */
+  .pitch-cta {
+    padding: 6rem 0;
     background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
   }
 
-  .cta p {
-    color: var(--gray);
-    font-size: 1.25rem;
-    margin-bottom: 2.5rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+  .pitch-cta h2 {
+    margin-bottom: 0.75rem;
   }
 
-  .cta-buttons {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
+  .pitch-cta .section-subtitle {
+    margin-bottom: 3rem;
   }
 
   /* Footer */
@@ -840,11 +839,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--primary);
   }
 
-  .footer-links .protocol-link {
-    font-size: 0.85rem;
-    opacity: 0.6;
-  }
-
   .copyright {
     text-align: center;
     color: var(--gray);
@@ -856,9 +850,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     .hero h1 {
       font-size: 2.5rem;
     }
-    
+
     .hero-description {
       font-size: 1.1rem;
+    }
+
+    h2 {
+      font-size: 1.75rem;
     }
 
     .comparison-table {
@@ -866,41 +864,41 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       gap: 2rem;
     }
 
-    .workflow-step {
-      flex-direction: column;
-      text-align: center;
-      gap: 1rem;
-    }
-
     .nav-links {
       display: none;
     }
 
-    .hero-buttons, .cta-buttons {
+    .hero-buttons {
       flex-direction: column;
       align-items: center;
     }
 
     .btn {
       width: 100%;
-      max-width: 300px;
+      max-width: 340px;
+      justify-content: center;
+      text-align: center;
     }
 
-    .floating-card {
-      font-size: 0.8rem;
-      padding: 0.5rem 1rem;
-    }
-
-    .market-stats {
+    .problem-cards,
+    .use-case-grid,
+    .control-grid,
+    .layers-grid {
       grid-template-columns: 1fr;
     }
 
-    .use-case-grid {
-      grid-template-columns: 1fr;
+    .proof-stats {
+      grid-template-columns: 1fr 1fr;
     }
 
-    .differentiator-grid {
-      grid-template-columns: 1fr;
+    .layer-card {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+
+    .learning-headline {
+      font-size: 1.25rem;
     }
   }
 </style>

@@ -1,0 +1,544 @@
+---
+---
+
+<div class="pitch-form-wrapper" id="pitch-form-section">
+  <form id="pitch-form" class="pitch-form">
+    <!-- Audio Recorder -->
+    <div class="form-group">
+      <label class="form-label">
+        <span class="label-icon">&#x1F399;</span>
+        Erzaehl uns von deinem Team
+      </label>
+      <p class="form-hint">Nimm bis zu 3 Minuten auf. Was macht dein Team? Wo waere KI hilfreich?</p>
+      <div class="audio-recorder" id="audio-recorder">
+        <button type="button" class="btn-record" id="btn-record">
+          <span class="record-dot"></span>
+          Aufnahme starten
+        </button>
+        <div class="recording-controls hidden" id="recording-controls">
+          <div class="recording-indicator">
+            <span class="record-dot recording"></span>
+            <span class="timer" id="record-timer">0:00</span>
+            <span class="timer-max">/ 3:00</span>
+          </div>
+          <button type="button" class="btn-stop" id="btn-stop">Stopp</button>
+        </div>
+        <div class="playback-controls hidden" id="playback-controls">
+          <audio id="audio-preview" controls></audio>
+          <button type="button" class="btn-retake" id="btn-retake">Neu aufnehmen</button>
+        </div>
+      </div>
+      <input type="hidden" name="audioBase64" id="audio-data" />
+    </div>
+
+    <!-- Links -->
+    <div class="form-group">
+      <label class="form-label">
+        <span class="label-icon">&#x1F517;</span>
+        Links
+      </label>
+      <p class="form-hint">Website, Produkt, Docs, Social Media — alles was hilft.</p>
+      <div id="links-container">
+        <div class="link-row">
+          <input type="url" name="links[]" placeholder="https://..." class="form-input" />
+        </div>
+      </div>
+      <button type="button" class="btn-add-link" id="btn-add-link">+ Link hinzufuegen</button>
+    </div>
+
+    <!-- Text -->
+    <div class="form-group">
+      <label class="form-label" for="pitch-text">
+        <span class="label-icon">&#x1F4DD;</span>
+        Beschreib kurz was dein Team macht und wo KI helfen soll
+      </label>
+      <textarea id="pitch-text" name="text" rows="4" class="form-input form-textarea" placeholder="z.B. Wir sind ein 8-koepfiges Team und erstellen Nachhaltigkeitsberichte..."></textarea>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label class="form-label" for="pitch-email">
+        <span class="label-icon">&#x1F4E7;</span>
+        Wohin sollen wir dich benachrichtigen?
+      </label>
+      <input type="email" id="pitch-email" name="email" required class="form-input" placeholder="name@firma.de" />
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-primary btn-submit" id="btn-submit">
+      Pitch generieren lassen &rarr;
+    </button>
+
+    <!-- Messages -->
+    <div class="form-message form-error hidden" id="form-error"></div>
+  </form>
+
+  <!-- Success Result -->
+  <div class="pitch-result hidden" id="pitch-result">
+    <div class="result-icon">&#x2705;</div>
+    <h3>Dein Pitch wird generiert!</h3>
+    <p>Deine persoenliche Praesentation findest du hier:</p>
+    <a href="#" id="pitch-link" class="pitch-link" target="_blank"></a>
+    <p class="result-note">Komm in ~30 Minuten zurueck.<br/>Wir schicken dir eine Email, sobald wir koennen.</p>
+  </div>
+</div>
+
+<script>
+  const API_URL = (import.meta as any).env.PUBLIC_API_URL || 'https://api.machinemachine.ai';
+
+  const form = document.getElementById('pitch-form') as HTMLFormElement;
+  const btnRecord = document.getElementById('btn-record') as HTMLButtonElement;
+  const btnStop = document.getElementById('btn-stop') as HTMLButtonElement;
+  const btnRetake = document.getElementById('btn-retake') as HTMLButtonElement;
+  const btnAddLink = document.getElementById('btn-add-link') as HTMLButtonElement;
+  const btnSubmit = document.getElementById('btn-submit') as HTMLButtonElement;
+  const recordingControls = document.getElementById('recording-controls') as HTMLDivElement;
+  const playbackControls = document.getElementById('playback-controls') as HTMLDivElement;
+  const audioPreview = document.getElementById('audio-preview') as HTMLAudioElement;
+  const audioDataInput = document.getElementById('audio-data') as HTMLInputElement;
+  const timerDisplay = document.getElementById('record-timer') as HTMLSpanElement;
+  const linksContainer = document.getElementById('links-container') as HTMLDivElement;
+  const formError = document.getElementById('form-error') as HTMLDivElement;
+  const pitchResult = document.getElementById('pitch-result') as HTMLDivElement;
+  const pitchLink = document.getElementById('pitch-link') as HTMLAnchorElement;
+
+  let mediaRecorder: MediaRecorder | null = null;
+  let audioChunks: Blob[] = [];
+  let timerInterval: number | null = null;
+  let seconds = 0;
+  const MAX_SECONDS = 180;
+
+  // --- Audio Recording ---
+  btnRecord.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      audioChunks = [];
+      seconds = 0;
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        audioPreview.src = URL.createObjectURL(blob);
+
+        // Convert to base64
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          audioDataInput.value = base64;
+        };
+        reader.readAsDataURL(blob);
+
+        recordingControls.classList.add('hidden');
+        playbackControls.classList.remove('hidden');
+        if (timerInterval) clearInterval(timerInterval);
+      };
+
+      mediaRecorder.start();
+      btnRecord.classList.add('hidden');
+      recordingControls.classList.remove('hidden');
+
+      timerInterval = window.setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        timerDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+        if (seconds >= MAX_SECONDS) {
+          mediaRecorder?.stop();
+        }
+      }, 1000);
+    } catch {
+      formError.textContent = 'Mikrofon-Zugriff wurde verweigert. Bitte erlaube den Zugriff und versuch es erneut.';
+      formError.classList.remove('hidden');
+    }
+  });
+
+  btnStop.addEventListener('click', () => {
+    mediaRecorder?.stop();
+  });
+
+  btnRetake.addEventListener('click', () => {
+    audioDataInput.value = '';
+    audioPreview.src = '';
+    playbackControls.classList.add('hidden');
+    btnRecord.classList.remove('hidden');
+  });
+
+  // --- Links ---
+  btnAddLink.addEventListener('click', () => {
+    const row = document.createElement('div');
+    row.className = 'link-row';
+    row.innerHTML = `
+      <input type="url" name="links[]" placeholder="https://..." class="form-input" />
+      <button type="button" class="btn-remove-link" aria-label="Link entfernen">&times;</button>
+    `;
+    row.querySelector('.btn-remove-link')?.addEventListener('click', () => row.remove());
+    linksContainer.appendChild(row);
+  });
+
+  // --- Submit ---
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError.classList.add('hidden');
+
+    const email = (document.getElementById('pitch-email') as HTMLInputElement).value.trim();
+    const text = (document.getElementById('pitch-text') as HTMLTextAreaElement).value.trim();
+    const linkInputs = document.querySelectorAll<HTMLInputElement>('input[name="links[]"]');
+    const links = Array.from(linkInputs).map(i => i.value.trim()).filter(Boolean);
+    const audioBase64 = audioDataInput.value || undefined;
+
+    if (!email) {
+      formError.textContent = 'Bitte gib deine Email-Adresse ein.';
+      formError.classList.remove('hidden');
+      return;
+    }
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Wird gesendet...';
+
+    try {
+      const body: Record<string, unknown> = { email, text, links };
+      if (audioBase64) body.audioBase64 = audioBase64;
+
+      const res = await fetch(`${API_URL}/v1/pitch/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+      const data = await res.json();
+      const uuid = data.uuid || data.id;
+      const pitchUrl = `${window.location.origin}/pitch/${uuid}`;
+
+      pitchLink.href = pitchUrl;
+      pitchLink.textContent = pitchUrl.replace('https://', '').replace('http://', '');
+
+      form.classList.add('hidden');
+      pitchResult.classList.remove('hidden');
+    } catch (err: any) {
+      formError.textContent = 'Etwas ist schiefgelaufen. Bitte versuch es erneut.';
+      formError.classList.remove('hidden');
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Pitch generieren lassen \u2192';
+    }
+  });
+</script>
+
+<style>
+  .pitch-form-wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .pitch-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--light, #e5e7eb);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .label-icon {
+    font-size: 1.2rem;
+  }
+
+  .form-hint {
+    font-size: 0.9rem;
+    color: var(--gray, #6b7280);
+    margin-bottom: 0.25rem;
+  }
+
+  .form-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border, #1f2937);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    color: var(--light, #e5e7eb);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary, #3b82f6);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  /* Audio Recorder */
+  .audio-recorder {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-record {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    color: #f87171;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+  }
+
+  .btn-record:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  .record-dot {
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .record-dot.recording {
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .recording-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #f87171;
+    font-weight: 600;
+  }
+
+  .timer-max {
+    color: var(--gray, #6b7280);
+    font-weight: 400;
+  }
+
+  .btn-stop {
+    padding: 0.5rem 1rem;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 6px;
+    color: #f87171;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-stop:hover {
+    background: rgba(239, 68, 68, 0.3);
+  }
+
+  .playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .playback-controls audio {
+    flex: 1;
+    min-width: 200px;
+    height: 36px;
+  }
+
+  .btn-retake {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border, #1f2937);
+    border-radius: 6px;
+    color: var(--gray, #6b7280);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-retake:hover {
+    border-color: var(--primary, #3b82f6);
+    color: var(--light, #e5e7eb);
+  }
+
+  /* Links */
+  .link-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .link-row .form-input {
+    flex: 1;
+  }
+
+  .btn-remove-link {
+    background: none;
+    border: 1px solid var(--border, #1f2937);
+    border-radius: 6px;
+    color: var(--gray, #6b7280);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .btn-remove-link:hover {
+    border-color: #ef4444;
+    color: #f87171;
+  }
+
+  .btn-add-link {
+    background: none;
+    border: none;
+    color: var(--primary, #3b82f6);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    transition: opacity 0.2s;
+    width: fit-content;
+  }
+
+  .btn-add-link:hover {
+    opacity: 0.8;
+  }
+
+  /* Submit */
+  .btn-submit {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    margin-top: 0.5rem;
+  }
+
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* Messages */
+  .form-message {
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .form-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+  }
+
+  /* Result Panel */
+  .pitch-result {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--surface, rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--border, #1f2937);
+    border-radius: 12px;
+  }
+
+  .result-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .pitch-result h3 {
+    font-size: 1.5rem;
+    color: var(--light, #e5e7eb);
+    margin-bottom: 0.75rem;
+  }
+
+  .pitch-result p {
+    color: var(--gray, #6b7280);
+    margin-bottom: 1rem;
+  }
+
+  .pitch-link {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    color: var(--primary, #3b82f6) !important;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    word-break: break-all;
+  }
+
+  .pitch-link:hover {
+    background: rgba(59, 130, 246, 0.2);
+  }
+
+  .result-note {
+    font-size: 0.9rem;
+    color: var(--gray, #6b7280);
+    line-height: 1.6;
+  }
+
+  /* Utility */
+  .hidden {
+    display: none !important;
+  }
+
+  @media (max-width: 768px) {
+    .pitch-form-wrapper {
+      padding: 0 0.5rem;
+    }
+
+    .playback-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .playback-controls audio {
+      width: 100%;
+    }
+  }
+</style>
