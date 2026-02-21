@@ -712,9 +712,13 @@ app.get('/v1/pitch/:uuid/html', (c) => {
 //                name_chosen → provisioning → live
 // =============================================================================
 
-const ONBOARD_BOT_TOKEN    = process.env.ONBOARD_BOT_TOKEN    || '';
-const ONBOARD_WEBHOOK_SECRET = process.env.ONBOARD_WEBHOOK_SECRET || '';
-const ONBOARD_FILE         = process.env.ONBOARD_FILE         || '/data/onboarding.json';
+const ONBOARD_BOT_TOKEN      = process.env.ONBOARD_BOT_TOKEN      || '';
+const ONBOARD_WEBHOOK_SECRET = process.env.ONBOARD_WEBHOOK_SECRET  || '';
+const ONBOARD_FILE           = process.env.ONBOARD_FILE            || '/data/onboarding.json';
+// Approval notifications go here — set to the Machine.Machine group chat ID
+// Falls back to TG_NOTIFY_CHAT (master's personal chat) if not set
+const ONBOARD_NOTIFY_CHAT    = process.env.ONBOARD_NOTIFY_CHAT     || TG_NOTIFY_CHAT;
+const TWENTY_CRM_URL         = process.env.TWENTY_CRM_URL          || 'https://crm.machinemachine.ai';
 
 // ── Onboarding session store ──────────────────────────────────────────────────
 
@@ -803,13 +807,16 @@ async function updateTwentyCrm(session: OnboardSession, note: string): Promise<v
 
 async function notifyMasterApproval(session: OnboardSession): Promise<void> {
   if (!TG_BOT_TOKEN) return;
-  const text = `🚀 <b>New agent onboarding request!</b>\n\n📧 ${session.email}\n🤖 @${session.botUsername}\n⚡ Agent: <b>${session.agentName}</b>\n\nApprove to spawn?`;
+  const crmLink = session.twentyCrmContactId
+    ? `\n🔗 <a href="${TWENTY_CRM_URL}/object/people/${session.twentyCrmContactId}">View in CRM</a>`
+    : '';
+  const text = `🚀 <b>New agent onboarding request!</b>\n\n📧 ${session.email}\n🤖 @${session.botUsername}\n⚡ Agent: <b>${session.agentName}</b>${crmLink}\n\nApprove to spawn?`;
   try {
     const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: TG_NOTIFY_CHAT,
+        chat_id: ONBOARD_NOTIFY_CHAT,
         text,
         parse_mode: 'HTML',
         reply_markup: {
@@ -835,7 +842,7 @@ async function editApprovalMessage(msgId: number, text: string): Promise<void> {
     await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/editMessageText`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: TG_NOTIFY_CHAT, message_id: msgId, text, parse_mode: 'HTML' }),
+      body: JSON.stringify({ chat_id: ONBOARD_NOTIFY_CHAT, message_id: msgId, text, parse_mode: 'HTML' }),
     });
   } catch { /* best effort */ }
 }
