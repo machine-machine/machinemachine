@@ -437,11 +437,15 @@ Design system (copy EXACTLY):
 - Same component classes: .label, .stat-grid, .card-grid, .comparison, .cta
 - 10-12 slides covering: their specific problem → how Machine.Machine solves it for them → what their AI org would look like → concrete use cases for their domain → next steps (join waitlist)
 
-CRITICAL CSS rules (must include verbatim):
+CRITICAL CSS rules (must include verbatim — do NOT override these):
 .slide { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
-.slide h1, .slide h2, .slide h3 { text-align:center; }
-.slide p { text-align:center; margin-left:auto; margin-right:auto; max-width:720px; }
-.slide .label { text-align:center; display:block; }
+.slide h1,.slide h2,.slide h3,.slide h4 { text-align:center; }
+.slide > p { text-align:center; margin-left:auto; margin-right:auto; max-width:720px; }
+.slide .label, .slide span.label { display:block; text-align:center; width:100%; }
+.org-chart { justify-content:center; width:100%; }
+.org-node { text-align:center; }
+.stat-item { text-align:center; }
+.stat-item h3,.stat-item p { text-align:center; }
 
 Make it feel written specifically for them — use their industry terms, their use cases, their team context.
 Keep the Machine.Machine brand but frame everything around THEIR world.
@@ -611,12 +615,20 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   if (!pitch) return c.json({ error: 'Pitch not found' }, 404);
 
   if (pitch.status === 'ready' && pitch.html) {
-    // Inject CSS fix for slide paragraph alignment (retroactive fix for all pitches)
+    // Inject CSS fix for slide alignment (retroactive fix for all pitches)
     const cssfix = `<style>
-.slide{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.slide h1,.slide h2,.slide h3{text-align:center}
-.slide>p,.slide p:not(.stat-item p):not(.card p){text-align:center;margin-left:auto;margin-right:auto;max-width:720px}
-.slide .label{text-align:center;display:block}
+/* === Pitch alignment fixes === */
+.slide{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important}
+.slide h1,.slide h2,.slide h3,.slide h4{text-align:center!important}
+.slide>p{text-align:center!important;margin-left:auto!important;margin-right:auto!important;max-width:720px!important}
+.slide .label,.slide span.label{display:block!important;text-align:center!important;width:100%!important}
+.org-chart{justify-content:center!important;width:100%!important}
+.org-node{text-align:center!important}
+.stat-grid{justify-items:center!important}
+.stat-item{text-align:center!important}
+.stat-item h3,.stat-item h4,.stat-item p{text-align:center!important}
+.comp-col h3,.comp-col h4{text-align:center!important}
+.cta{display:block!important;text-align:center!important;margin-left:auto!important;margin-right:auto!important;width:fit-content!important}
 </style></head>`;
     const fixedHtml = pitch.html.replace('</head>', cssfix);
     return c.html(fixedHtml);
