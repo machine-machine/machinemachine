@@ -111,20 +111,42 @@ async function trackLead(opts: {
   // 2. Twenty CRM — create person record
   if (TWENTY_API_URL && TWENTY_API_KEY) {
     try {
-      await fetch(`${TWENTY_API_URL}/api/people`, {
+      const firstName = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const res = await fetch(`${TWENTY_API_URL}/graphql`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${TWENTY_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: { firstName: email.split('@')[0], lastName: '' },
-          emails: { primaryEmail: email },
-          city: '',
-          jobTitle: '',
-          // Store pitch context in a note via the API separately if needed
+          query: `mutation {
+            createPerson(data: {
+              name: { firstName: "${firstName}", lastName: "" }
+              emails: { primaryEmail: "${email}" }
+            }) { id }
+          }`,
         }),
       });
+      // If person created, add a note with pitch context
+      const data = await res.json() as any;
+      const personId = data?.data?.createPerson?.id;
+      if (personId && textSnippet) {
+        await fetch(`${TWENTY_API_URL}/graphql`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${TWENTY_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query: `mutation {
+              createNote(data: {
+                body: "Pitch submitted via machinemachine.ai\\nURL: ${pitchUrl}\\nSource: ${sourceUrl}\\nDescription: ${textSnippet.replace(/"/g, "'")}"
+                noteTargets: { createMany: { data: [{ personId: "${personId}" }] } }
+              }) { id }
+            }`,
+          }),
+        });
+      }
     } catch (_) { /* best effort */ }
   }
 }
