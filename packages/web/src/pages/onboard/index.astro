@@ -1,0 +1,620 @@
+---
+// M2O — Telegram Mini App Onboarding Wizard
+// Self-contained: no imports, vanilla JS, Telegram WebApp SDK from CDN
+export const prerender = true;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Machine.Machine — Get Your Agent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0F1729;
+      --surface:  #1a2540;
+      --border:   rgba(124,58,237,0.25);
+      --purple:   #7C3AED;
+      --cyan:     #00D9FF;
+      --text:     #f0f0f8;
+      --muted:    rgba(240,240,248,0.55);
+      --error:    #f87171;
+      --success:  #34d399;
+      --radius:   14px;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 20px 32px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    /* Progress dots */
+    .progress {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s ease;
+    }
+    .dot.active  { background: var(--purple); transform: scale(1.2); }
+    .dot.done    { background: var(--cyan); }
+
+    /* Step card */
+    .step {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+    .step.visible { display: flex; }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-top: -12px;
+    }
+
+    /* Inputs */
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    input {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 14px 16px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--purple); }
+    input.error-field { border-color: var(--error); }
+    input::placeholder { color: var(--muted); }
+
+    /* OTP input */
+    #otp-input {
+      font-size: 1.6rem;
+      letter-spacing: 0.5em;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    /* Name preview */
+    .name-preview {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      min-height: 48px;
+    }
+    .name-preview strong { color: var(--cyan); }
+
+    /* Error */
+    .error-msg {
+      color: var(--error);
+      font-size: 0.82rem;
+      display: none;
+      padding: 10px 14px;
+      background: rgba(248,113,113,0.08);
+      border-radius: 8px;
+      border: 1px solid rgba(248,113,113,0.2);
+    }
+    .error-msg.visible { display: block; }
+
+    /* Primary button */
+    .btn {
+      background: linear-gradient(135deg, var(--purple), #5b21b6);
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 16px;
+      width: 100%;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover:not(:disabled) { opacity: 0.9; }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Spinner inside button */
+    .btn-inner { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .loading .spinner { display: block; }
+    .loading .btn-label { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Back button */
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 6px 0;
+      text-align: left;
+      width: fit-content;
+    }
+    .back-btn:hover { color: var(--text); }
+
+    /* BotFather instructions */
+    .instructions {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .instruction-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .step-num {
+      background: linear-gradient(135deg, var(--purple), #5b21b6);
+      border-radius: 50%;
+      color: #fff;
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      height: 24px; width: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-text { font-size: 0.875rem; line-height: 1.5; color: var(--muted); padding-top: 2px; }
+    .step-text a { color: var(--cyan); text-decoration: none; }
+    .step-text strong { color: var(--text); }
+
+    /* Success state */
+    .success-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--purple), #5b21b6);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto;
+      animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .status-badge {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 auto;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--purple);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .status-dot.live { background: var(--success); animation: none; }
+
+    /* Confetti blobs */
+    .confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+    .confetti-piece {
+      position: absolute; width: 10px; height: 10px; border-radius: 2px;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      from { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      to   { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Token validation success */
+    .validation-ok {
+      background: rgba(52,211,153,0.08);
+      border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 8px;
+      color: var(--success);
+      font-size: 0.875rem;
+      padding: 10px 14px;
+      display: none;
+    }
+    .validation-ok.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="logo">M²</div>
+
+    <div class="progress" id="progress">
+      <div class="dot active" data-step="0"></div>
+      <div class="dot" data-step="1"></div>
+      <div class="dot" data-step="2"></div>
+      <div class="dot" data-step="3"></div>
+      <div class="dot" data-step="4"></div>
+    </div>
+
+    <!-- Step 1: Email -->
+    <div class="step visible" id="step-0">
+      <h2>Get your personal AI agent</h2>
+      <p class="subtitle">Start with your email. We'll send you a 6-digit code.</p>
+      <div class="field">
+        <label>Email address</label>
+        <input id="email-input" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email" />
+      </div>
+      <div class="error-msg" id="email-error"></div>
+      <button class="btn" id="email-btn" onclick="startOnboarding()">
+        <div class="btn-inner">
+          <div class="spinner"></div>
+          <span class="btn-label">Send Code</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div class="step" id="step-1">
+      <button class="back-btn" onclick="goTo(0)">← Back</button>
+      <h2>Enter your code</h2>
+      <p class="subtitle" id="otp-subtitle">We sent a 6-digit code to your email.</p>
+      <div class="field">
+        <label>Verification code</label>
+        <input id="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" />
+      </div>
+      <div class="error-msg" id="otp-error"></div>
+      <button class="btn" id="otp-btn" onclick="verifyOtp()">
+        <div class="btn-inner">
+          <div class="spinner"></div>
+          <span class="btn-label">Verify</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Step 3: BotFather -->
+    <div class="step" id="step-2">
+      <button class="back-btn" onclick="goTo(1)">← Back</button>
+      <h2>Create your personal bot</h2>
+      <p class="subtitle">Follow these steps in Telegram, then paste the token below.</p>
+      <div class="instructions">
+        <div class="instruction-step">
+          <div class="step-num">1</div>
+          <div class="step-text">Open <a href="https://t.me/BotFather" target="_blank">@BotFather</a> in Telegram</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-num">2</div>
+          <div class="step-text">Send <strong>/newbot</strong> and follow the prompts</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-num">3</div>
+          <div class="step-text">Choose a name and username for your bot</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-num">4</div>
+          <div class="step-text">Copy the <strong>token</strong> BotFather sends you</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-num">5</div>
+          <div class="step-text">Paste it below</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Bot token</label>
+        <input id="token-input" type="text" placeholder="123456789:ABC-..." autocomplete="off" />
+      </div>
+      <div class="validation-ok" id="token-ok">✅ <span id="bot-username-display"></span> validated!</div>
+      <div class="error-msg" id="token-error"></div>
+      <button class="btn" id="token-btn" onclick="validateToken()">
+        <div class="btn-inner">
+          <div class="spinner"></div>
+          <span class="btn-label">Validate Token</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Step 4: Name -->
+    <div class="step" id="step-3">
+      <button class="back-btn" onclick="goTo(2)">← Back</button>
+      <h2>Name your agent</h2>
+      <p class="subtitle">Lowercase letters, numbers, hyphens. 3–20 characters.</p>
+      <div class="field">
+        <label>Agent name</label>
+        <input id="name-input" type="text" placeholder="my-agent" autocomplete="off"
+               oninput="updateNamePreview()" />
+      </div>
+      <div class="name-preview" id="name-preview">Your agent will be known as: <strong>—</strong></div>
+      <div class="error-msg" id="name-error"></div>
+      <button class="btn" id="name-btn" onclick="setName()">
+        <div class="btn-inner">
+          <div class="spinner"></div>
+          <span class="btn-label">Claim Name</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Step 5: Done -->
+    <div class="step" id="step-4" style="text-align:center;align-items:center;">
+      <div class="success-icon" id="success-icon">⚡</div>
+      <h2 id="done-heading">Request submitted!</h2>
+      <p class="subtitle" id="done-subtitle" style="text-align:center">
+        Our team is reviewing your request. Your bot will send you a message when it's live.
+      </p>
+      <div class="status-badge" id="status-badge">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Pending review</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    // ── State ────────────────────────────────────────────────────────────────
+    const API_BASE = (() => {
+      if (typeof window === 'undefined') return '';
+      const h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return '/api';
+      return 'https://api.machinemachine.ai';
+    })();
+
+    let sessionId = null;
+    let botUsername = null;
+    let pollInterval = null;
+
+    // ── Telegram WebApp ───────────────────────────────────────────────────────
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+    const tgUserId = tg?.initDataUnsafe?.user?.id?.toString() ?? null;
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    function goTo(step) {
+      document.querySelectorAll('.step').forEach((el, i) => {
+        el.classList.toggle('visible', i === step);
+      });
+      document.querySelectorAll('.dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === step);
+        dot.classList.toggle('done', i < step);
+      });
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      btn.classList.toggle('loading', loading);
+      btn.disabled = loading;
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function clearError(id) {
+      const el = document.getElementById(id);
+      el.textContent = '';
+      el.classList.remove('visible');
+    }
+
+    async function api(path, body) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return res.json();
+    }
+
+    // ── Step 1: Email ─────────────────────────────────────────────────────────
+    async function startOnboarding() {
+      const email = document.getElementById('email-input').value.trim();
+      clearError('email-error');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('email-error', 'Please enter a valid email address.');
+        return;
+      }
+      setLoading('email-btn', true);
+      try {
+        const data = await api('/v1/onboard/start', { email, telegram_user_id: tgUserId });
+        if (data.error) { showError('email-error', data.error); return; }
+        sessionId = data.session_id;
+        document.getElementById('otp-subtitle').textContent = `We sent a 6-digit code to ${email}.`;
+        goTo(1);
+      } catch (e) {
+        showError('email-error', 'Network error. Check your connection.');
+      } finally {
+        setLoading('email-btn', false);
+      }
+    }
+
+    // ── Step 2: OTP ───────────────────────────────────────────────────────────
+    async function verifyOtp() {
+      const otp = document.getElementById('otp-input').value.trim();
+      clearError('otp-error');
+      if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+        showError('otp-error', 'Enter the 6-digit code from your email.');
+        return;
+      }
+      setLoading('otp-btn', true);
+      try {
+        const data = await api('/v1/onboard/verify-email', { session_id: sessionId, otp });
+        if (data.error) { showError('otp-error', data.error); return; }
+        goTo(2);
+      } catch (e) {
+        showError('otp-error', 'Network error. Check your connection.');
+      } finally {
+        setLoading('otp-btn', false);
+      }
+    }
+
+    // ── Step 3: Bot token ─────────────────────────────────────────────────────
+    async function validateToken() {
+      const token = document.getElementById('token-input').value.trim();
+      clearError('token-error');
+      document.getElementById('token-ok').classList.remove('visible');
+      if (!token.match(/^\d+:[A-Za-z0-9_-]+$/)) {
+        showError('token-error', 'Token looks wrong. It should be like: 123456789:ABC...');
+        return;
+      }
+      setLoading('token-btn', true);
+      try {
+        const data = await api('/v1/onboard/validate-token', { session_id: sessionId, bot_token: token });
+        if (data.error) { showError('token-error', data.error); return; }
+        botUsername = data.bot_username;
+        document.getElementById('bot-username-display').textContent = `@${botUsername}`;
+        document.getElementById('token-ok').classList.add('visible');
+        setTimeout(() => goTo(3), 800);
+      } catch (e) {
+        showError('token-error', 'Network error. Check your connection.');
+      } finally {
+        setLoading('token-btn', false);
+      }
+    }
+
+    // ── Step 4: Name ──────────────────────────────────────────────────────────
+    function updateNamePreview() {
+      const name = document.getElementById('name-input').value.trim().toLowerCase();
+      const preview = document.getElementById('name-preview');
+      preview.innerHTML = name
+        ? `Your agent will be known as: <strong>${name}</strong>`
+        : `Your agent will be known as: <strong>—</strong>`;
+    }
+
+    async function setName() {
+      const name = document.getElementById('name-input').value.trim().toLowerCase();
+      clearError('name-error');
+      if (!/^[a-z0-9][a-z0-9-]{1,18}[a-z0-9]$/.test(name)) {
+        showError('name-error', '3–20 chars, lowercase letters/numbers/hyphens only.');
+        return;
+      }
+      setLoading('name-btn', true);
+      try {
+        const data = await api('/v1/onboard/set-name', { session_id: sessionId, agent_name: name });
+        if (data.error) { showError('name-error', data.error); return; }
+        goTo(4);
+        document.getElementById('done-subtitle').textContent =
+          `Our team is reviewing your request. @${botUsername} will message you when it's live.`;
+        startPolling();
+      } catch (e) {
+        showError('name-error', 'Network error. Check your connection.');
+      } finally {
+        setLoading('name-btn', false);
+      }
+    }
+
+    // ── Step 5: Polling ───────────────────────────────────────────────────────
+    function startPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(checkStatus, 10000);
+    }
+
+    async function checkStatus() {
+      if (!sessionId) return;
+      try {
+        const res = await fetch(`${API_BASE}/v1/onboard/status/${sessionId}`);
+        const data = await res.json();
+        if (data.state === 'live') {
+          clearInterval(pollInterval);
+          document.getElementById('success-icon').textContent = '🚀';
+          document.getElementById('done-heading').textContent = 'Your agent is live!';
+          document.getElementById('done-subtitle').textContent =
+            `Say hello to @${data.bot_username || botUsername}. Your AI is ready.`;
+          document.getElementById('status-dot').classList.add('live');
+          document.getElementById('status-text').textContent = '🟢 Live';
+          launchConfetti();
+        } else if (data.state === 'provisioning') {
+          document.getElementById('status-text').textContent = '⚙️ Provisioning...';
+        } else if (data.state === 'rejected') {
+          clearInterval(pollInterval);
+          document.getElementById('status-text').textContent = '❌ Not approved';
+          document.getElementById('done-heading').textContent = 'Request declined';
+          document.getElementById('done-subtitle').textContent =
+            "We couldn't approve your request at this time. Contact us at hello@machinemachine.ai";
+        }
+      } catch { /* silent */ }
+    }
+
+    // ── Confetti ──────────────────────────────────────────────────────────────
+    function launchConfetti() {
+      const container = document.getElementById('confetti');
+      const colors = ['#7C3AED', '#00D9FF', '#3b82f6', '#f0f0f8', '#5b21b6'];
+      for (let i = 0; i < 60; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.cssText = `
+          left: ${Math.random() * 100}%;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          width: ${6 + Math.random() * 8}px;
+          height: ${6 + Math.random() * 8}px;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+          animation-duration: ${1.5 + Math.random() * 2}s;
+          animation-delay: ${Math.random() * 0.8}s;
+        `;
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    // ── Enter key shortcuts ───────────────────────────────────────────────────
+    document.getElementById('email-input').addEventListener('keydown', e => { if (e.key === 'Enter') startOnboarding(); });
+    document.getElementById('otp-input').addEventListener('keydown', e => { if (e.key === 'Enter') verifyOtp(); });
+    document.getElementById('token-input').addEventListener('keydown', e => { if (e.key === 'Enter') validateToken(); });
+    document.getElementById('name-input').addEventListener('keydown', e => { if (e.key === 'Enter') setName(); });
+  </script>
+</body>
+</html>
