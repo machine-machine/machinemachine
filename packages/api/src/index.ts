@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
+import type { OnboardSession } from './db/schema.js';
 import path from 'path';
 
 const app = new Hono();
@@ -702,6 +703,347 @@ app.get('/v1/pitch/:uuid/html', (c) => {
 </html>`;
 
   return c.html(placeholder);
+});
+
+// =============================================================================
+// M2O — Client Onboarding Flow
+// Routes: /v1/onboard/*
+// State machine: email_pending → email_verified → token_validated →
+//                name_chosen → provisioning → live
+// =============================================================================
+
+const ONBOARD_BOT_TOKEN    = process.env.ONBOARD_BOT_TOKEN    || '';
+const ONBOARD_WEBHOOK_SECRET = process.env.ONBOARD_WEBHOOK_SECRET || '';
+const ONBOARD_FILE         = process.env.ONBOARD_FILE         || '/data/onboarding.json';
+
+// ── Onboarding session store ──────────────────────────────────────────────────
+
+function loadSessions(): Map<string, OnboardSession> {
+  try {
+    const raw = fs.readFileSync(ONBOARD_FILE, 'utf8');
+    return new Map(JSON.parse(raw));
+  } catch { return new Map(); }
+}
+
+function saveSessions(): void {
+  try {
+    fs.mkdirSync(path.dirname(ONBOARD_FILE), { recursive: true });
+    fs.writeFileSync(ONBOARD_FILE, JSON.stringify([...onboardSessions.entries()]));
+  } catch (e) { console.error('saveSessions failed:', e); }
+}
+
+const onboardSessions = loadSessions();
+
+// In-memory rate limit: email → { count, window_start }
+const emailRateLimit = new Map<string, { count: number; windowStart: number }>();
+
+function checkRateLimit(email: string): boolean {
+  const now = Date.now();
+  const window = 60 * 60 * 1000; // 1 hour
+  const entry = emailRateLimit.get(email);
+  if (!entry || now - entry.windowStart > window) {
+    emailRateLimit.set(email, { count: 1, windowStart: now });
+    return true;
+  }
+  if (entry.count >= 3) return false;
+  entry.count++;
+  return true;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function generateOtp(): string {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+async function sendOtpEmail(email: string, otp: string): Promise<void> {
+  if (!BREVO_API_KEY) return;
+  await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': BREVO_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+      to: [{ email }],
+      subject: 'Your Machine.Machine verification code',
+      htmlContent: `<div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;padding:40px;background:#0F1729;color:#fff;border-radius:12px">
+        <div style="font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px">M²</div>
+        <h2 style="margin:0 0 16px">Your verification code</h2>
+        <div style="font-size:2.5rem;font-weight:700;letter-spacing:0.3em;color:#00D9FF;margin:24px 0;text-align:center">${otp}</div>
+        <p style="color:rgba(255,255,255,0.6);font-size:0.875rem">This code expires in 10 minutes. If you didn't request this, ignore it.</p>
+      </div>`,
+    }),
+  });
+}
+
+async function updateTwentyCrm(session: OnboardSession, note: string): Promise<void> {
+  if (!TWENTY_API_URL || !TWENTY_API_KEY) return;
+  try {
+    // Get or create contact
+    let contactId = session.twentyCrmContactId;
+    if (!contactId) {
+      const firstName = session.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const res = await fetch(`${TWENTY_API_URL}/graphql`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${TWENTY_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: `mutation { createPerson(data: { name: { firstName: "${firstName}", lastName: "" } emails: { primaryEmail: "${session.email}" } }) { id } }` }),
+      });
+      const data = await res.json() as any;
+      contactId = data?.data?.createPerson?.id;
+      if (contactId) { session.twentyCrmContactId = contactId; saveSessions(); }
+    }
+    if (!contactId) return;
+    // Add state note
+    await fetch(`${TWENTY_API_URL}/graphql`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${TWENTY_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: `mutation { createNote(data: { body: "${note}" noteTargets: { createMany: { data: [{ personId: "${contactId}" }] } } }) { id } }` }),
+    });
+  } catch { /* best effort */ }
+}
+
+async function notifyMasterApproval(session: OnboardSession): Promise<void> {
+  if (!TG_BOT_TOKEN) return;
+  const text = `🚀 <b>New agent onboarding request!</b>\n\n📧 ${session.email}\n🤖 @${session.botUsername}\n⚡ Agent: <b>${session.agentName}</b>\n\nApprove to spawn?`;
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TG_NOTIFY_CHAT,
+        text,
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [[
+            { text: '✅ Approve', callback_data: `approve_${session.id}` },
+            { text: '❌ Reject',  callback_data: `reject_${session.id}` },
+          ]],
+        },
+      }),
+    });
+    const data = await res.json() as any;
+    // store message_id for later editing
+    if (data?.result?.message_id) {
+      (session as any)._approvalMsgId = data.result.message_id;
+      saveSessions();
+    }
+  } catch { /* best effort */ }
+}
+
+async function editApprovalMessage(msgId: number, text: string): Promise<void> {
+  if (!TG_BOT_TOKEN) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/editMessageText`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TG_NOTIFY_CHAT, message_id: msgId, text, parse_mode: 'HTML' }),
+    });
+  } catch { /* best effort */ }
+}
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+
+// POST /v1/onboard/start
+app.post('/v1/onboard/start', async (c) => {
+  const { email, telegram_user_id } = await c.req.json<{ email: string; telegram_user_id?: string }>();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return c.json({ error: 'Valid email required' }, 400);
+  }
+  if (!checkRateLimit(email)) {
+    return c.json({ error: 'Too many attempts. Try again in an hour.' }, 429);
+  }
+  // Reject if active session exists (not rejected/live)
+  const existing = [...onboardSessions.values()].find(
+    s => s.email === email && !['rejected', 'live'].includes(s.state)
+  );
+  if (existing) {
+    return c.json({ session_id: existing.id, message: 'Session already active. Check your email.' });
+  }
+  const otp = generateOtp();
+  const session: OnboardSession = {
+    id: crypto.randomUUID(),
+    email,
+    telegramUserId: telegram_user_id,
+    emailOtp: otp,
+    emailOtpExpiry: Date.now() + 10 * 60 * 1000,
+    emailOtpAttempts: 0,
+    state: 'email_pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  onboardSessions.set(session.id, session);
+  saveSessions();
+  await sendOtpEmail(email, otp).catch(() => {});
+  await updateTwentyCrm(session, `[M2O] Onboarding started — state: email_pending`).catch(() => {});
+  return c.json({ session_id: session.id, message: 'Check your email for a 6-digit verification code.' });
+});
+
+// POST /v1/onboard/verify-email
+app.post('/v1/onboard/verify-email', async (c) => {
+  const { session_id, otp } = await c.req.json<{ session_id: string; otp: string }>();
+  const session = onboardSessions.get(session_id);
+  if (!session || session.state !== 'email_pending') return c.json({ error: 'Invalid session' }, 400);
+  if (session.emailOtpAttempts >= 3) return c.json({ error: 'Too many attempts. Start over.' }, 429);
+  session.emailOtpAttempts++;
+  if (!session.emailOtp || otp !== session.emailOtp || Date.now() > (session.emailOtpExpiry ?? 0)) {
+    saveSessions();
+    return c.json({ error: 'Invalid or expired code.' }, 400);
+  }
+  session.state = 'email_verified';
+  session.emailOtp = undefined;
+  session.updatedAt = new Date().toISOString();
+  saveSessions();
+  await updateTwentyCrm(session, `[M2O] State: email_verified`).catch(() => {});
+  return c.json({ success: true, next_step: 'bot_token' });
+});
+
+// POST /v1/onboard/validate-token
+app.post('/v1/onboard/validate-token', async (c) => {
+  const { session_id, bot_token } = await c.req.json<{ session_id: string; bot_token: string }>();
+  const session = onboardSessions.get(session_id);
+  if (!session || session.state !== 'email_verified') return c.json({ error: 'Invalid session' }, 400);
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${bot_token}/getMe`);
+    const data = await res.json() as any;
+    if (!data.ok) return c.json({ error: 'Invalid bot token. Check you copied it correctly.' }, 400);
+    session.botToken   = bot_token;
+    session.botUsername = data.result.username;
+    session.state      = 'token_validated';
+    session.updatedAt  = new Date().toISOString();
+    saveSessions();
+    await updateTwentyCrm(session, `[M2O] State: token_validated — bot @${session.botUsername}`).catch(() => {});
+    return c.json({ success: true, bot_username: session.botUsername, next_step: 'choose_name' });
+  } catch {
+    return c.json({ error: 'Could not validate token. Try again.' }, 500);
+  }
+});
+
+// POST /v1/onboard/set-name
+app.post('/v1/onboard/set-name', async (c) => {
+  const { session_id, agent_name } = await c.req.json<{ session_id: string; agent_name: string }>();
+  const session = onboardSessions.get(session_id);
+  if (!session || session.state !== 'token_validated') return c.json({ error: 'Invalid session' }, 400);
+  const RESERVED = ['admin', 'root', 'system', 'master', 'm2', 'api', 'bot', 'test'];
+  if (!/^[a-z0-9][a-z0-9-]{1,18}[a-z0-9]$/.test(agent_name) || RESERVED.includes(agent_name)) {
+    return c.json({ error: 'Name must be 3-20 lowercase letters/numbers/hyphens, no reserved words.' }, 400);
+  }
+  session.agentName = agent_name;
+  session.state     = 'name_chosen';
+  session.pendingApprovalSince = Date.now();
+  session.updatedAt = new Date().toISOString();
+  saveSessions();
+  await updateTwentyCrm(session, `[M2O] State: name_chosen — agent: ${agent_name}`).catch(() => {});
+  await notifyMasterApproval(session).catch(() => {});
+  return c.json({ success: true, message: 'Request submitted! Our team will review and your bot will message you when live.' });
+});
+
+// GET /v1/onboard/status/:id
+app.get('/v1/onboard/status/:id', (c) => {
+  const session = onboardSessions.get(c.req.param('id'));
+  if (!session) return c.json({ error: 'Not found' }, 404);
+  return c.json({
+    state:        session.state,
+    bot_username: session.botUsername,
+    agent_name:   session.agentName,
+    updated_at:   session.updatedAt,
+  });
+});
+
+// POST /v1/onboard/webhook  — Telegram webhook for ONBOARD_BOT_TOKEN + master's inline button callbacks
+app.post('/v1/onboard/webhook', async (c) => {
+  // Optional webhook secret verification
+  if (ONBOARD_WEBHOOK_SECRET) {
+    const secret = c.req.header('X-Telegram-Bot-Api-Secret-Token');
+    if (secret !== ONBOARD_WEBHOOK_SECRET) return c.json({ ok: false }, 403);
+  }
+  const update = await c.req.json<any>();
+
+  // Handle approve/reject callback queries (from master's chat)
+  if (update.callback_query) {
+    const { id: cbId, data, message } = update.callback_query;
+    const answerCb = (text: string) =>
+      fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/answerCallbackQuery`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: cbId, text }),
+      }).catch(() => {});
+
+    if (data?.startsWith('approve_') || data?.startsWith('reject_')) {
+      const [action, sessionId] = [data.split('_')[0], data.slice(data.indexOf('_') + 1)];
+      const session = onboardSessions.get(sessionId);
+      if (!session) { await answerCb('Session not found'); return c.json({ ok: true }); }
+
+      if (action === 'approve') {
+        session.state = 'provisioning';
+        session.updatedAt = new Date().toISOString();
+        saveSessions();
+        await answerCb(`✅ Spawning ${session.agentName}...`);
+        if (message?.message_id) await editApprovalMessage(message.message_id, `✅ <b>Approved</b> — spawning <b>${session.agentName}</b>...`);
+        await updateTwentyCrm(session, `[M2O] State: provisioning — approved by master`).catch(() => {});
+        // Trigger spawn (non-blocking)
+        fetch(`http://localhost:${process.env.PORT || 3000}/v1/spawn`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: session.agentName, token: session.botToken, session_id: session.id }),
+        }).catch(() => {});
+      } else {
+        session.state = 'rejected';
+        session.updatedAt = new Date().toISOString();
+        saveSessions();
+        await answerCb('❌ Rejected');
+        if (message?.message_id) await editApprovalMessage(message.message_id, `❌ <b>Rejected</b> — ${session.agentName}`);
+        await updateTwentyCrm(session, `[M2O] State: rejected`).catch(() => {});
+        // Notify user via their bot
+        if (session.botToken && session.telegramUserId) {
+          fetch(`https://api.telegram.org/bot${session.botToken}/sendMessage`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: session.telegramUserId, text: "We couldn't approve your request at this time. Contact us at hello@machinemachine.ai if you think this is a mistake." }),
+          }).catch(() => {});
+        }
+      }
+    }
+    return c.json({ ok: true });
+  }
+
+  return c.json({ ok: true });
+});
+
+// POST /v1/spawn — internal, called after approval
+app.post('/v1/spawn', async (c) => {
+  const { name, token, session_id } = await c.req.json<{ name: string; token: string; session_id?: string }>();
+  if (!name || !token) return c.json({ error: 'name and token required' }, 400);
+  notifyTelegram(`⚙️ <b>Spawning agent: ${name}</b>\nBot token: set\nQueue: will call spawn-machine.sh`);
+  // TODO: exec spawn-machine.sh <name> <token> when API has shell access
+  // For now: logged + master notified
+  if (session_id) {
+    const session = onboardSessions.get(session_id);
+    if (session) {
+      session.state = 'provisioning';
+      session.updatedAt = new Date().toISOString();
+      saveSessions();
+    }
+  }
+  return c.json({ success: true, message: `Spawn queued for ${name}` });
+});
+
+// POST /v1/onboard/notify-live — called when agent is confirmed live
+app.post('/v1/onboard/notify-live', async (c) => {
+  const { session_id } = await c.req.json<{ session_id: string }>();
+  const session = onboardSessions.get(session_id);
+  if (!session) return c.json({ error: 'Not found' }, 404);
+  session.state = 'live';
+  session.updatedAt = new Date().toISOString();
+  saveSessions();
+  await updateTwentyCrm(session, `[M2O] State: live 🚀`).catch(() => {});
+  // Message user via their bot
+  if (session.botToken && session.telegramUserId) {
+    fetch(`https://api.telegram.org/bot${session.botToken}/sendMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: session.telegramUserId,
+        text: `⚡ Your agent <b>${session.agentName}</b> is live!\n\nStart a conversation — I'm ready.`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
+  return c.json({ success: true });
 });
 
 // Start server

@@ -49,3 +49,23 @@ export type Agent = typeof agents.$inferSelect;
 export type NewAgent = typeof agents.$inferInsert;
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
+
+// M2O Onboarding (in-memory + JSON file, not a DB table)
+export type OnboardState = 'email_pending' | 'email_verified' | 'token_validated' | 'name_chosen' | 'provisioning' | 'live' | 'rejected';
+
+export interface OnboardSession {
+  id: string;               // crypto.randomUUID()
+  telegramUserId?: string;  // set when initiated from bot
+  email: string;
+  emailOtp?: string;        // 6-digit code
+  emailOtpExpiry?: number;  // Date.now() + 10min
+  emailOtpAttempts: number; // max 3
+  botToken?: string;
+  botUsername?: string;      // from Telegram getMe
+  agentName?: string;
+  state: OnboardState;
+  twentyCrmContactId?: string;
+  createdAt: string;
+  updatedAt: string;
+  pendingApprovalSince?: number; // when m2 approval was requested
+}
