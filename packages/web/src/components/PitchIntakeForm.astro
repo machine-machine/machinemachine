@@ -40,7 +40,7 @@
       <p class="form-hint">Website, Produkt, Docs, Social Media — alles was hilft.</p>
       <div id="links-container">
         <div class="link-row">
-          <input type="url" name="links[]" placeholder="https://..." class="form-input" />
+          <input type="text" name="links[]" placeholder="https://..." class="form-input" />
         </div>
       </div>
       <button type="button" class="btn-add-link" id="btn-add-link">+ Link hinzufuegen</button>
@@ -173,7 +173,7 @@
     const row = document.createElement('div');
     row.className = 'link-row';
     row.innerHTML = `
-      <input type="url" name="links[]" placeholder="https://..." class="form-input" />
+      <input type="text" name="links[]" placeholder="https://..." class="form-input" />
       <button type="button" class="btn-remove-link" aria-label="Link entfernen">&times;</button>
     `;
     row.querySelector('.btn-remove-link')?.addEventListener('click', () => row.remove());
@@ -188,7 +188,13 @@
     const email = (document.getElementById('pitch-email') as HTMLInputElement).value.trim();
     const text = (document.getElementById('pitch-text') as HTMLTextAreaElement).value.trim();
     const linkInputs = document.querySelectorAll<HTMLInputElement>('input[name="links[]"]');
-    const links = Array.from(linkInputs).map(i => i.value.trim()).filter(Boolean);
+    const links = Array.from(linkInputs)
+      .map(i => {
+        let v = i.value.trim();
+        if (v && !v.startsWith('http://') && !v.startsWith('https://')) v = 'https://' + v;
+        return v;
+      })
+      .filter(Boolean);
     const audioBase64 = audioDataInput.value || undefined;
 
     if (!email) {
