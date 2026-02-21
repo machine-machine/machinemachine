@@ -1081,6 +1081,42 @@ app.post('/v1/onboard/notify-live', async (c) => {
   return c.json({ success: true });
 });
 
+// POST /v1/coolify/webhook — receive Coolify deploy notifications → Telegram alert
+// Setup in Coolify: Team → Notifications → Add → Custom Webhook → https://api.machinemachine.ai/v1/coolify/webhook
+app.post('/v1/coolify/webhook', async (c) => {
+  const secret = c.req.header('x-webhook-secret') || '';
+  const expectedSecret = process.env.COOLIFY_WEBHOOK_SECRET || '';
+  if (expectedSecret && secret !== expectedSecret) return c.json({ error: 'Unauthorized' }, 401);
+
+  const body = await c.req.json<any>().catch(() => ({}));
+
+  // Coolify sends: { type, status, name, uuid, fqdn, ... }
+  const type   = body?.type   || body?.data?.type   || 'deployment';
+  const status = body?.status || body?.data?.status || '';
+  const name   = body?.name   || body?.data?.name   || body?.application_name || 'unknown';
+  const uuid   = body?.uuid   || body?.data?.uuid   || '';
+  const fqdn   = body?.fqdn   || body?.data?.fqdn   || '';
+
+  const statusEmoji: Record<string, string> = {
+    success:  '✅', failed: '🔴', error: '🔴',
+    running:  '🟡', queued: '⏳',
+  };
+  const emoji = statusEmoji[status] || '🔔';
+  const urlLine = fqdn ? `\n🌐 <a href="${fqdn}">${fqdn}</a>` : '';
+
+  const text = `${emoji} <b>Coolify deploy</b>\n\n📦 ${name}\n📊 Status: <b>${status || type}</b>${urlLine}`;
+
+  // Send to MM group via onboarding bot
+  if (ONBOARD_BOT_TOKEN && ONBOARD_NOTIFY_CHAT) {
+    await fetch(`https://api.telegram.org/bot${ONBOARD_BOT_TOKEN}/sendMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: ONBOARD_NOTIFY_CHAT, text, parse_mode: 'HTML' }),
+    }).catch(() => {});
+  }
+
+  return c.json({ ok: true });
+});
+
 // Start server
 const port = parseInt(process.env.PORT || '3000');
 console.log(`🚀 MachineMachine API starting on port ${port}`);
