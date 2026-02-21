@@ -611,7 +611,15 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   if (!pitch) return c.json({ error: 'Pitch not found' }, 404);
 
   if (pitch.status === 'ready' && pitch.html) {
-    return c.html(pitch.html);
+    // Inject CSS fix for slide paragraph alignment (retroactive fix for all pitches)
+    const cssfix = `<style>
+.slide{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.slide h1,.slide h2,.slide h3{text-align:center}
+.slide>p,.slide p:not(.stat-item p):not(.card p){text-align:center;margin-left:auto;margin-right:auto;max-width:720px}
+.slide .label{text-align:center;display:block}
+</style></head>`;
+    const fixedHtml = pitch.html.replace('</head>', cssfix);
+    return c.html(fixedHtml);
   }
 
   // Placeholder page with auto-refresh
