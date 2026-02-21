@@ -190,7 +190,7 @@ Write a short confirmation email (4–6 sentences max). Requirements:
         messages: [{ role: 'user', content: prompt }],
       });
       emailHtml = msg.content
-        .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+        .filter((b: Anthropic.ContentBlock): b is Anthropic.TextBlock => b.type === 'text')
         .map((b: Anthropic.TextBlock) => b.text)
         .join('');
     } else {
