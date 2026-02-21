@@ -152,6 +152,7 @@ export const translations = {
     footer_docs: "Documentation",
     footer_blog: "Blog",
     footer_github: "GitHub",
+    footer_linkedin: "LinkedIn",
     footer_copyright: "© 2026 MachineMachine. AI teams for knowledge organisations.",
   },
 
@@ -308,6 +309,7 @@ export const translations = {
     footer_docs: "Documentation",
     footer_blog: "Blog",
     footer_github: "GitHub",
+    footer_linkedin: "LinkedIn",
     footer_copyright: "© 2026 MachineMachine. KI-Teams für Wissensorganisationen.",
   },
 
@@ -464,6 +466,7 @@ export const translations = {
     footer_docs: "Dokumentacja",
     footer_blog: "Blog",
     footer_github: "GitHub",
+    footer_linkedin: "LinkedIn",
     footer_copyright: "© 2026 MachineMachine. Zespoły AI dla organizacji opartych na wiedzy.",
   },
 } as const;
