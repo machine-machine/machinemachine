@@ -437,6 +437,12 @@ Design system (copy EXACTLY):
 - Same component classes: .label, .stat-grid, .card-grid, .comparison, .cta
 - 10-12 slides covering: their specific problem → how Machine.Machine solves it for them → what their AI org would look like → concrete use cases for their domain → next steps (join waitlist)
 
+CRITICAL CSS rules (must include verbatim):
+.slide { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.slide h1, .slide h2, .slide h3 { text-align:center; }
+.slide p { text-align:center; margin-left:auto; margin-right:auto; max-width:720px; }
+.slide .label { text-align:center; display:block; }
+
 Make it feel written specifically for them — use their industry terms, their use cases, their team context.
 Keep the Machine.Machine brand but frame everything around THEIR world.
 End with: "Bereit? → machinemachine.ai" CTA.
