@@ -631,7 +631,35 @@ app.get('/v1/pitch/:uuid/html', (c) => {
 .comp-col h3,.comp-col h4{text-align:center!important}
 .cta{display:block!important;text-align:center!important;margin-left:auto!important;margin-right:auto!important;width:fit-content!important}
 </style></head>`;
-    const fixedHtml = pitch.html.replace('</head>', cssfix);
+    const ctaBar = `
+<div id="m2-cta-bar" style="
+  position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:linear-gradient(90deg,#0f1729ee,#1a0a3fee);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid #7c3aed55;
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;font-family:inherit;">
+  <span style="color:#94a3b8;font-size:13px;white-space:nowrap;">
+    ⚡ <strong style="color:#e2e8f0;">Machine.Machine</strong> — Your personal AI agent
+  </span>
+  <a href="https://t.me/m2_onboarding_bot" target="_blank" rel="noopener" style="
+    display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:#fff;text-decoration:none;
+    padding:10px 22px;border-radius:50px;
+    font-size:14px;font-weight:600;letter-spacing:0.3px;
+    box-shadow:0 0 20px #7c3aed55;
+    white-space:nowrap;flex-shrink:0;
+    transition:opacity .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    Get Your Agent →
+  </a>
+</div>
+<style>#m2-cta-bar+*,body{padding-bottom:70px}</style>
+</body>`;
+    const fixedHtml = pitch.html
+      .replace('</head>', cssfix)
+      .replace('</body>', ctaBar);
     return c.html(fixedHtml);
   }
 
