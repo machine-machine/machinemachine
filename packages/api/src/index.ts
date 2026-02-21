@@ -834,13 +834,13 @@ async function updateTwentyCrm(session: OnboardSession, note: string): Promise<v
 }
 
 async function notifyMasterApproval(session: OnboardSession): Promise<void> {
-  if (!TG_BOT_TOKEN) return;
+  if (!ONBOARD_BOT_TOKEN) return;
   const crmLink = session.twentyCrmContactId
     ? `\n🔗 <a href="${TWENTY_CRM_URL}/object/people/${session.twentyCrmContactId}">View in CRM</a>`
     : '';
   const text = `🚀 <b>New agent onboarding request!</b>\n\n📧 ${session.email}\n🤖 @${session.botUsername}\n⚡ Agent: <b>${session.agentName}</b>${crmLink}\n\nApprove to spawn?`;
   try {
-    const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${ONBOARD_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -865,9 +865,9 @@ async function notifyMasterApproval(session: OnboardSession): Promise<void> {
 }
 
 async function editApprovalMessage(msgId: number, text: string): Promise<void> {
-  if (!TG_BOT_TOKEN) return;
+  if (!ONBOARD_BOT_TOKEN) return;
   try {
-    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/editMessageText`, {
+    await fetch(`https://api.telegram.org/bot${ONBOARD_BOT_TOKEN}/editMessageText`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: ONBOARD_NOTIFY_CHAT, message_id: msgId, text, parse_mode: 'HTML' }),
@@ -996,7 +996,7 @@ app.post('/v1/onboard/webhook', async (c) => {
   if (update.callback_query) {
     const { id: cbId, data, message } = update.callback_query;
     const answerCb = (text: string) =>
-      fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/answerCallbackQuery`, {
+      fetch(`https://api.telegram.org/bot${ONBOARD_BOT_TOKEN}/answerCallbackQuery`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callback_query_id: cbId, text }),
       }).catch(() => {});
