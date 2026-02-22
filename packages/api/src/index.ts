@@ -1109,6 +1109,35 @@ app.post('/v1/onboard/set-name', async (c) => {
   return c.json({ success: true, provisioning: true, message: 'Your agent is being set up. You\'ll get a message on Telegram when it\'s live.' });
 });
 
+// GET /v1/admin/sessions — list all onboarding sessions (admin only)
+app.get('/v1/admin/sessions', (c) => {
+  const token = c.req.header('x-admin-token') || c.req.query('token') || '';
+  const expected = process.env.ADMIN_SECRET || ONBOARD_WEBHOOK_SECRET;
+  if (expected && token !== expected) return c.json({ error: 'Unauthorized' }, 401);
+
+  const sessions = [...onboardSessions.values()].map(s => ({
+    id:            s.id,
+    email:         s.email,
+    state:         s.state,
+    agent_name:    s.agentName,
+    bot_username:  s.botUsername,
+    preset:        s.preset,
+    qualify_score: s.qualifyScore,
+    qualify_answers: s.qualifyAnswers,
+    referral_code: s.referralCode,
+    created_at:    s.createdAt,
+    updated_at:    s.updatedAt,
+    tg_user_id:    s.telegramUserId,
+  })).sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+
+  const byState = sessions.reduce((acc, s) => {
+    acc[s.state] = (acc[s.state] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return c.json({ total: sessions.length, by_state: byState, sessions });
+});
+
 // GET /v1/onboard/status/:id
 app.get('/v1/onboard/status/:id', (c) => {
   const session = onboardSessions.get(c.req.param('id'));
