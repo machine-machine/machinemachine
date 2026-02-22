@@ -575,6 +575,7 @@ app.post('/v1/pitch/submit', async (c) => {
   // Fire-and-forget background generation + CRM tracking
   generatePitch(uuid);
   trackLead({ email, text, links, pitchUrl: `https://machinemachine.ai/pitch/${uuid}` });
+  track(email, 'pitch_submitted', { uuid, has_links: links.length > 0, text_length: text.length });
 
   const truncatedText = text.length > 100 ? text.slice(0, 100) + '...' : text;
   notifyTelegram(
@@ -1122,6 +1123,9 @@ app.post('/v1/onboard/verify-email', async (c) => {
   session.emailOtpAttempts++;
   if (!session.emailOtp || otp !== session.emailOtp || Date.now() > (session.emailOtpExpiry ?? 0)) {
     saveSessions();
+    track(session.telegramUserId || session.email, 'otp_failed', {
+      session_id, attempts: session.emailOtpAttempts, expired: Date.now() > (session.emailOtpExpiry ?? 0),
+    });
     return c.json({ error: 'Invalid or expired code.' }, 400);
   }
   session.state = 'email_verified';
@@ -1144,7 +1148,10 @@ app.post('/v1/onboard/validate-token', async (c) => {
   try {
     const res = await fetch(`https://api.telegram.org/bot${bot_token}/getMe`);
     const data = await res.json() as any;
-    if (!data.ok) return c.json({ error: 'Invalid bot token. Check you copied it correctly.' }, 400);
+    if (!data.ok) {
+      track(session.telegramUserId || session.email, 'token_invalid', { session_id, error: data.description });
+      return c.json({ error: 'Invalid bot token. Check you copied it correctly.' }, 400);
+    }
     session.botToken   = bot_token;
     session.botUsername = data.result.username;
     session.state      = 'token_validated';
@@ -1169,7 +1176,16 @@ app.post('/v1/onboard/set-name', async (c) => {
   if (!session || session.state !== 'token_validated') return c.json({ error: 'Invalid session' }, 400);
   const RESERVED = ['admin', 'root', 'system', 'master', 'm2', 'api', 'bot', 'test'];
   if (!/^[a-z0-9][a-z0-9-]{1,18}[a-z0-9]$/.test(agent_name) || RESERVED.includes(agent_name)) {
+    track(session.telegramUserId || session.email, 'name_invalid', { session_id, agent_name });
     return c.json({ error: 'Name must be 3-20 lowercase letters/numbers/hyphens, no reserved words.' }, 400);
+  }
+  // Check for name collision
+  const taken = [...onboardSessions.values()].some(
+    s => s.agentName === agent_name && s.id !== session_id && !['destroyed'].includes(s.state as string)
+  );
+  if (taken) {
+    track(session.telegramUserId || session.email, 'name_taken', { session_id, agent_name });
+    return c.json({ error: 'That name is taken. Try another.' }, 409);
   }
   // Store preset if provided from Mini App (overrides bot qualification preset)
   if (preset && ['researcher','builder','creator','generalist'].includes(preset)) {
@@ -1421,11 +1437,13 @@ app.post('/v1/onboard/webhook', async (c) => {
         ).find(s => lev(s.email!.toLowerCase(), email) <= 2);
 
       if (!found) {
+        track(chatId, 'lookup_result', { found: false, email_queried: email });
         await sendBotMessage(chatId, {
           text: `Couldn't find an agent for that email.\n\nCheck for typos and try again, or type /start to set up a new one.`,
         });
         return c.json({ ok: true });
       }
+      track(chatId, 'lookup_result', { found: true, agent_state: found.state, agent_name: found.agentName });
       // Link this Telegram user to the found session if not already linked
       if (!found.telegramUserId) {
         found.telegramUserId = chatId;
@@ -1702,6 +1720,9 @@ app.post('/v1/admin/mark-destroyed', async (c) => {
   session.updatedAt = new Date().toISOString();
   saveSessions();
   await updateTwentyCrm(session, `[M2O] Agent destroyed 🗑️`).catch(() => {});
+  track(session.telegramUserId || session.email, 'agent_destroyed', {
+    session_id: session.id, agent_name: session.agentName, preset: session.preset,
+  });
   return c.json({ success: true, session_id: session.id });
 });
 
