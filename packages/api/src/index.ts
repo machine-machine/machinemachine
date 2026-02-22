@@ -1395,13 +1395,29 @@ app.post('/v1/onboard/webhook', async (c) => {
     if (text && pendingLookups.has(chatId) && text.includes('@') && text.includes('.')) {
       pendingLookups.delete(chatId);
       const email = text.trim().toLowerCase();
-      const found = [...onboardSessions.values()].find(
-        s => s.email?.toLowerCase() === email
-      );
+
+      // Levenshtein distance for fuzzy email match
+      const lev = (a: string, b: string): number => {
+        const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+          Array.from({ length: b.length + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0)
+        );
+        for (let i = 1; i <= a.length; i++)
+          for (let j = 1; j <= b.length; j++)
+            dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1]
+              : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+        return dp[a.length][b.length];
+      };
+
+      // Exact match first, then fuzzy (distance ≤ 2)
+      const all = [...onboardSessions.values()].filter(s => s.email);
+      const found = all.find(s => s.email!.toLowerCase() === email)
+        || all.sort((a, b) =>
+          lev(a.email!.toLowerCase(), email) - lev(b.email!.toLowerCase(), email)
+        ).find(s => lev(s.email!.toLowerCase(), email) <= 2);
+
       if (!found) {
         await sendBotMessage(chatId, {
-          text: `Couldn't find an agent for <b>${email}</b>.\n\nDouble-check the email, or type /start to set up a new one.`,
-          parse_mode: 'HTML',
+          text: `Couldn't find an agent for that email.\n\nCheck for typos and try again, or type /start to set up a new one.`,
         });
         return c.json({ ok: true });
       }
