@@ -1269,7 +1269,8 @@ app.post('/v1/onboard/webhook', async (c) => {
       if (existing && existing.state === 'qualified') {
         const miniAppUrl = `https://machinemachine.ai/onboard?sid=${existing.id}`;
         await sendBotMessage(chatId, {
-          text: `You're already approved ⚡\n\nSet up your agent here:`,
+          text: `You're already approved ⚡\n\nFinish setting up your agent here. Once it's live, <b>your personal bot is the one to talk to</b> — I'm just the setup guide.`,
+          parse_mode: 'HTML',
           reply_markup: { inline_keyboard: [[
             { text: '⚡ Set up my agent →', web_app: { url: miniAppUrl } }
           ]]},
@@ -1294,8 +1295,8 @@ app.post('/v1/onboard/webhook', async (c) => {
       track(chatId, 'bot_start', { ref_code: refCode, tg_username: tgUser.username });
 
       await sendBotMessage(chatId, {
-        text: `Hey ${tgUser.first_name} 👋\n\nQuick question before we set you up.\n\n*What should your agent specialize in?*`,
-        parse_mode: 'Markdown',
+        text: `Hey ${tgUser.first_name} 👋\n\nI'm the Machine.Machine onboarding guide.\n\nI'm here to get you set up — and I can answer any questions about how M2O works along the way. Once your agent is live, <b>your personal bot will be your daily companion</b>. That's the one you'll talk to every day. I'm just here to get you there.\n\nFirst question: <b>what should your agent specialize in?</b>`,
+        parse_mode: 'HTML',
         reply_markup: { inline_keyboard: [
           [
             { text: '🔬 Research & Analysis', callback_data: `qu_${sessionId}_usecase_researcher` },
@@ -1308,6 +1309,37 @@ app.post('/v1/onboard/webhook', async (c) => {
         ]},
       });
       return c.json({ ok: true });
+    }
+
+    // ── General message fallback — bot acts as M2O guide ──────────────────────
+    if (text && !text.startsWith('/')) {
+      const existingSession = [...onboardSessions.values()].find(
+        s => s.telegramUserId === chatId
+      );
+      const isLive = existingSession?.state === 'live';
+
+      if (isLive) {
+        // They have an agent — remind them to use it
+        const botHandle = existingSession?.botUsername ? `@${existingSession.botUsername}` : 'your personal bot';
+        await sendBotMessage(chatId, {
+          text: `Your agent is live — talk to ${botHandle}, not me.\n\nI'm just the onboarding guide. Have a question about M2O? Ask away. Otherwise head to your bot.`,
+        });
+      } else {
+        // Not yet live — answer as a guide, nudge them forward
+        const FAQ: Record<string, string> = {
+          'what': `Machine.Machine gives you a personal AI agent — your own private assistant that lives on Telegram, remembers everything, and works for you continuously.\n\nIt's not a chatbot. It's a dedicated agent running 24/7 just for you.\n\nType /start to get yours.`,
+          'how':  `Setup takes about 5 minutes:\n\n1. You answer 2 questions (I just need to know what kind of agent fits you)\n2. You create a Telegram bot via @BotFather\n3. Give me the token\n4. We spin it up\n\nYour agent is live ~3 minutes after that.\n\nType /start to begin.`,
+          'cost': `Machine.Machine is currently in early access. Reach out at machinemachine.ai for pricing.\n\nType /start to apply.`,
+          'diff': `Your personal bot (the one you'll create via @BotFather) is your agent — private, persistent, remembers you across sessions.\n\nThis bot (@m2_onboarding_bot) is just the setup guide. Once you're live, you won't need me.`,
+        };
+        const lower = text.toLowerCase();
+        const matched = Object.entries(FAQ).find(([kw]) => lower.includes(kw));
+        const reply = matched
+          ? matched[1]
+          : `Good question. I'm the Machine.Machine onboarding guide — I can tell you how M2O works, what your agent will do, or get you set up.\n\nType /start to begin, or ask me anything.`;
+
+        await sendBotMessage(chatId, { text: reply });
+      }
     }
   }
 
@@ -1380,7 +1412,8 @@ app.post('/v1/onboard/webhook', async (c) => {
 
         const miniAppUrl = `https://machinemachine.ai/onboard?sid=${session.id}`;
         await sendBotMessage(chatId, {
-          text: `You're in ⚡\n\nSet up your agent — takes about 5 minutes.`,
+          text: `You're in ⚡\n\nHere's what happens next:\n\n1. You'll create a Telegram bot via @BotFather — that bot becomes <b>your personal agent</b>. It remembers you, works for you, and is yours alone.\n2. Give it a name and a token.\n3. We spin it up. Takes about 3 minutes.\n\nAfter that, talk to your bot — not this one. <b>This bot is just for setup and questions about M2O.</b>\n\nReady?`,
+          parse_mode: 'HTML',
           reply_markup: { inline_keyboard: [[
             { text: '⚡ Set up my agent →', web_app: { url: miniAppUrl } }
           ]]},
