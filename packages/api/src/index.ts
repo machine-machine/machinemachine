@@ -1685,6 +1685,21 @@ app.post('/v1/onboard/notify-live', async (c) => {
   return c.json({ success: true });
 });
 
+// POST /v1/admin/mark-destroyed — called by spawn-machine.sh destroy; marks session state
+app.post('/v1/admin/mark-destroyed', async (c) => {
+  const adminToken = c.req.header('x-admin-token') || '';
+  if (adminToken !== (process.env.APP_PASSWORD || '')) return c.json({ error: 'Unauthorized' }, 401);
+  const { agent_name } = await c.req.json<{ agent_name: string }>();
+  // Find session by agentName
+  const session = [...onboardSessions.values()].find(s => s.agentName === agent_name);
+  if (!session) return c.json({ error: 'Session not found' }, 404);
+  (session as any).state = 'destroyed';
+  session.updatedAt = new Date().toISOString();
+  saveSessions();
+  await updateTwentyCrm(session, `[M2O] Agent destroyed 🗑️`).catch(() => {});
+  return c.json({ success: true, session_id: session.id });
+});
+
 // POST /v1/admin/set-guac-creds — called by spawn-machine.sh after Guacamole user created
 app.post('/v1/admin/set-guac-creds', async (c) => {
   const adminToken = c.req.header('x-admin-token') || '';
