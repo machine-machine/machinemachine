@@ -1203,6 +1203,80 @@ app.post('/v1/onboard/set-name', async (c) => {
   return c.json({ success: true, provisioning: true, message: 'Your agent is being set up. You\'ll get a message on Telegram when it\'s live.' });
 });
 
+// POST /v1/admin/link-agent — manually create/restore a live session for an already-spawned agent
+// Use when session was lost (pre-S3-backup redeploys) but agent container is running
+app.post('/v1/admin/link-agent', async (c) => {
+  const token = c.req.header('x-admin-token') || '';
+  const expected = process.env.ADMIN_SECRET || ONBOARD_WEBHOOK_SECRET;
+  if (expected && token !== expected) return c.json({ error: 'Unauthorized' }, 401);
+
+  const body = await c.req.json<{
+    email: string;
+    agent_name: string;
+    bot_token: string;
+    bot_username: string;
+    tg_user_id: string;
+    preset?: string;
+    coolify_uuid?: string;
+  }>();
+
+  const { email, agent_name, bot_token, bot_username, tg_user_id, preset, coolify_uuid } = body;
+  if (!email || !agent_name || !bot_token || !tg_user_id) {
+    return c.json({ error: 'Required: email, agent_name, bot_token, tg_user_id' }, 400);
+  }
+
+  // Check if a session already exists for this agent
+  const existing = [...onboardSessions.values()].find(
+    s => s.agentName === agent_name || s.email?.toLowerCase() === email.toLowerCase()
+  );
+  if (existing) {
+    // Update the existing session with TG user ID and mark live
+    existing.telegramUserId = tg_user_id;
+    existing.botToken       = bot_token;
+    existing.botUsername    = bot_username;
+    existing.agentName      = agent_name;
+    existing.state          = 'live';
+    if (preset) existing.preset = preset as any;
+    existing.updatedAt = new Date().toISOString();
+    saveSessions();
+  } else {
+    // Create a fresh live session
+    const sessionId = crypto.randomUUID();
+    const session: OnboardSession = {
+      id: sessionId, email, telegramUserId: tg_user_id,
+      botToken: bot_token, botUsername: bot_username, agentName: agent_name,
+      emailOtpAttempts: 0, state: 'live', preset: (preset as any) || 'generalist',
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    };
+    onboardSessions.set(sessionId, session);
+    saveSessions();
+  }
+
+  // Send live notification via their personal bot
+  const firstMessages: Record<string, string> = {
+    researcher: `Hey 👋 I'm <b>${agent_name}</b> — your research intelligence.\n\nI can search the web, synthesize anything, and remember what matters.\n\nWhat are you trying to understand?`,
+    builder:    `Hey 👋 I'm <b>${agent_name}</b>.\n\nI build with you: code, debug, review, deploy. I remember context across sessions.\n\nWhat are you working on?`,
+    creator:    `Hey 👋 I'm <b>${agent_name}</b> — your creative partner.\n\nI write, edit, position, and pitch. Tell me what you're making.`,
+    generalist: `Hey 👋 I'm <b>${agent_name}</b>.\n\nI adapt to whatever you need. Web access, memory, no patience for filler.\n\nWhat's first?`,
+  };
+  const firstMsg = firstMessages[preset || 'generalist'] || firstMessages.generalist;
+  await fetch(`https://api.telegram.org/bot${bot_token}/sendMessage`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: tg_user_id, text: firstMsg, parse_mode: 'HTML' }),
+  }).catch(() => {});
+
+  // Also notify via onboarding bot so they know to switch
+  await sendBotMessage(tg_user_id, {
+    text: `✅ Your agent <b>${agent_name}</b> is live!\n\nTalk to it via @${bot_username} — that's your daily companion. This bot is just here for setup and M2O questions.`,
+    parse_mode: 'HTML',
+    reply_markup: { inline_keyboard: [[
+      { text: `Open @${bot_username} →`, url: `https://t.me/${bot_username}` },
+    ]]},
+  });
+
+  return c.json({ success: true, linked: { email, agent_name, bot_username, tg_user_id } });
+});
+
 // GET /v1/admin/sessions — list all onboarding sessions (admin only)
 app.get('/v1/admin/sessions', (c) => {
   const token = c.req.header('x-admin-token') || c.req.query('token') || '';
