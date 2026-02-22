@@ -274,6 +274,46 @@ export const prerender = true;
       display: none;
     }
     .validation-ok.visible { display: block; }
+
+    /* Preset grid */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      margin: 8px 0 4px;
+    }
+    .preset-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 14px 14px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      text-align: left;
+    }
+    .preset-card:hover {
+      border-color: rgba(0,217,255,0.4);
+      background: rgba(0,217,255,0.06);
+    }
+    .preset-card.selected {
+      border-color: var(--cyan);
+      background: rgba(0,217,255,0.1);
+      transform: scale(1.02);
+    }
+    .preset-icon  { font-size: 1.5rem; line-height: 1; }
+    .preset-name  { font-size: 0.8rem; font-weight: 600; color: var(--text); margin-top: 4px; }
+    .preset-desc  { font-size: 0.7rem; color: var(--muted); line-height: 1.3; }
+
+    /* Spinning status dot */
+    .status-dot.spinning {
+      animation: pulse 1.2s ease-in-out infinite;
+      background: var(--cyan);
+    }
   </style>
 </head>
 <body>
@@ -286,6 +326,7 @@ export const prerender = true;
       <div class="dot" data-step="2"></div>
       <div class="dot" data-step="3"></div>
       <div class="dot" data-step="4"></div>
+      <div class="dot" data-step="5"></div>
     </div>
 
     <!-- Step 1: Email -->
@@ -323,9 +364,39 @@ export const prerender = true;
       </button>
     </div>
 
-    <!-- Step 3: BotFather -->
+    <!-- Step 3: Preset selection (new) -->
     <div class="step" id="step-2">
       <button class="back-btn" onclick="goTo(1)">← Back</button>
+      <h2>What should your agent specialize in?</h2>
+      <p class="subtitle">This shapes its personality and default skills.</p>
+      <div class="preset-grid" id="preset-grid">
+        <button class="preset-card" data-preset="researcher" onclick="selectPreset('researcher')">
+          <span class="preset-icon">🔬</span>
+          <span class="preset-name">Research &amp; Analysis</span>
+          <span class="preset-desc">Deep dives, synthesis, citations</span>
+        </button>
+        <button class="preset-card" data-preset="builder" onclick="selectPreset('builder')">
+          <span class="preset-icon">🛠</span>
+          <span class="preset-name">Building &amp; Code</span>
+          <span class="preset-desc">Dev work, debugging, review</span>
+        </button>
+        <button class="preset-card" data-preset="creator" onclick="selectPreset('creator')">
+          <span class="preset-icon">✍️</span>
+          <span class="preset-name">Writing &amp; Content</span>
+          <span class="preset-desc">Write, edit, position, pitch</span>
+        </button>
+        <button class="preset-card" data-preset="generalist" onclick="selectPreset('generalist')">
+          <span class="preset-icon">🧠</span>
+          <span class="preset-name">General Intelligence</span>
+          <span class="preset-desc">Adapts to whatever you need</span>
+        </button>
+      </div>
+      <div class="error-msg" id="preset-error"></div>
+    </div>
+
+    <!-- Step 4: BotFather -->
+    <div class="step" id="step-3">
+      <button class="back-btn" onclick="goTo(2)">← Back</button>
       <h2>Create your personal bot</h2>
       <p class="subtitle">Follow these steps in Telegram, then paste the token below.</p>
       <div class="instructions">
@@ -364,9 +435,9 @@ export const prerender = true;
       </button>
     </div>
 
-    <!-- Step 4: Name -->
-    <div class="step" id="step-3">
-      <button class="back-btn" onclick="goTo(2)">← Back</button>
+    <!-- Step 5: Name -->
+    <div class="step" id="step-4">
+      <button class="back-btn" onclick="goTo(3)">← Back</button>
       <h2>Name your agent</h2>
       <p class="subtitle">Lowercase letters, numbers, hyphens. 3–20 characters.</p>
       <div class="field">
@@ -384,16 +455,16 @@ export const prerender = true;
       </button>
     </div>
 
-    <!-- Step 5: Done -->
-    <div class="step" id="step-4" style="text-align:center;align-items:center;">
+    <!-- Step 6: Provisioning -->
+    <div class="step" id="step-5" style="text-align:center;align-items:center;">
       <div class="success-icon" id="success-icon">⚡</div>
-      <h2 id="done-heading">Request submitted!</h2>
+      <h2 id="done-heading">Setting up your agent…</h2>
       <p class="subtitle" id="done-subtitle" style="text-align:center">
-        Our team is reviewing your request. Your bot will send you a message when it's live.
+        This takes a few minutes. Your bot will message you the moment it's live.
       </p>
       <div class="status-badge" id="status-badge">
-        <div class="status-dot" id="status-dot"></div>
-        <span id="status-text">Pending review</span>
+        <div class="status-dot spinning" id="status-dot"></div>
+        <span id="status-text">Provisioning</span>
       </div>
     </div>
   </div>
@@ -412,6 +483,7 @@ export const prerender = true;
     let sessionId = null;
     let botUsername = null;
     let pollInterval = null;
+    let selectedPreset = 'generalist'; // default
 
     // ── Telegram WebApp ───────────────────────────────────────────────────────
     const tg = window.Telegram?.WebApp;
@@ -420,6 +492,24 @@ export const prerender = true;
       tg.expand();
     }
     const tgUserId = tg?.initDataUnsafe?.user?.id?.toString() ?? null;
+
+    // ── ?sid param — load existing session from bot qualification ─────────────
+    const urlSid = new URLSearchParams(window.location.search).get('sid');
+    if (urlSid) {
+      sessionId = urlSid;
+      // Restore preset if session has one
+      fetch(`${API_BASE}/v1/onboard/status/${urlSid}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.preset) {
+            selectedPreset = d.preset;
+            // Pre-select the card visually
+            document.querySelectorAll('.preset-card').forEach(c => {
+              c.classList.toggle('selected', c.dataset.preset === d.preset);
+            });
+          }
+        }).catch(() => {});
+    }
 
     // ── Navigation ────────────────────────────────────────────────────────────
     function goTo(step) {
@@ -470,7 +560,10 @@ export const prerender = true;
       }
       setLoading('email-btn', true);
       try {
-        const data = await api('/v1/onboard/start', { email, telegram_user_id: tgUserId });
+        // Pass existing session_id if user came from bot qualification (?sid)
+        const payload = { email, telegram_user_id: tgUserId };
+        if (sessionId) payload.existing_session_id = sessionId;
+        const data = await api('/v1/onboard/start', payload);
         if (data.error) { showError('email-error', data.error); return; }
         sessionId = data.session_id;
         document.getElementById('otp-subtitle').textContent = `We sent a 6-digit code to ${email}.`;
@@ -494,7 +587,7 @@ export const prerender = true;
       try {
         const data = await api('/v1/onboard/verify-email', { session_id: sessionId, otp });
         if (data.error) { showError('otp-error', data.error); return; }
-        goTo(2);
+        goTo(2); // → preset selection
       } catch (e) {
         showError('otp-error', 'Network error. Check your connection.');
       } finally {
@@ -502,7 +595,18 @@ export const prerender = true;
       }
     }
 
-    // ── Step 3: Bot token ─────────────────────────────────────────────────────
+    // ── Step 3: Preset selection ──────────────────────────────────────────────
+    function selectPreset(preset) {
+      selectedPreset = preset;
+      document.querySelectorAll('.preset-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.preset === preset);
+      });
+      clearError('preset-error');
+      // Auto-advance after short delay so the selection is visible
+      setTimeout(() => goTo(3), 350);
+    }
+
+    // ── Step 4: Bot token ─────────────────────────────────────────────────────
     async function validateToken() {
       const token = document.getElementById('token-input').value.trim();
       clearError('token-error');
@@ -518,7 +622,7 @@ export const prerender = true;
         botUsername = data.bot_username;
         document.getElementById('bot-username-display').textContent = `@${botUsername}`;
         document.getElementById('token-ok').classList.add('visible');
-        setTimeout(() => goTo(3), 800);
+        setTimeout(() => goTo(4), 800); // → name step
       } catch (e) {
         showError('token-error', 'Network error. Check your connection.');
       } finally {
@@ -526,7 +630,7 @@ export const prerender = true;
       }
     }
 
-    // ── Step 4: Name ──────────────────────────────────────────────────────────
+    // ── Step 5: Name ──────────────────────────────────────────────────────────
     function updateNamePreview() {
       const name = document.getElementById('name-input').value.trim().toLowerCase();
       const preview = document.getElementById('name-preview');
@@ -544,11 +648,16 @@ export const prerender = true;
       }
       setLoading('name-btn', true);
       try {
-        const data = await api('/v1/onboard/set-name', { session_id: sessionId, agent_name: name });
+        const data = await api('/v1/onboard/set-name', {
+          session_id: sessionId,
+          agent_name: name,
+          preset: selectedPreset,
+        });
         if (data.error) { showError('name-error', data.error); return; }
-        goTo(4);
+        goTo(5);
+        document.getElementById('done-heading').textContent = `Setting up ${name}…`;
         document.getElementById('done-subtitle').textContent =
-          `Our team is reviewing your request. @${botUsername} will message you when it's live.`;
+          `Your agent is provisioning. @${botUsername || name} will message you when it's live — usually within 10 minutes.`;
         startPolling();
       } catch (e) {
         showError('name-error', 'Network error. Check your connection.');

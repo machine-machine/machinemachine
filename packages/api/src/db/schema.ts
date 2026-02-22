@@ -51,7 +51,16 @@ export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 
 // M2O Onboarding (in-memory + JSON file, not a DB table)
-export type OnboardState = 'email_pending' | 'email_verified' | 'token_validated' | 'name_chosen' | 'provisioning' | 'live' | 'rejected';
+export type OnboardState =
+  | 'email_pending' | 'email_verified'
+  | 'qualifying'     // bot is running 2-question qualification conversation
+  | 'qualified'      // passed qualification — auto-spawn path, no manual approval
+  | 'contact_track'  // below score threshold — nurture path, master can push anytime
+  | 'waitlisted'     // capacity cap reached (future use)
+  | 'token_validated' | 'name_chosen' | 'provisioning' | 'live'
+  | 'rejected';      // hard block only (abuse, invalid token, etc.)
+
+export type AgentPreset = 'researcher' | 'builder' | 'creator' | 'generalist';
 
 export interface OnboardSession {
   id: string;               // crypto.randomUUID()
@@ -67,5 +76,10 @@ export interface OnboardSession {
   twentyCrmContactId?: string;
   createdAt: string;
   updatedAt: string;
-  pendingApprovalSince?: number; // when m2 approval was requested
+  pendingApprovalSince?: number; // legacy — kept for existing sessions
+  // Qualification fields (set during bot conversation)
+  qualifyScore?: number;
+  qualifyAnswers?: { useCase: string; teamSize: string };
+  preset?: AgentPreset;
+  referralCode?: string;
 }

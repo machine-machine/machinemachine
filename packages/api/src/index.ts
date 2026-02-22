@@ -766,6 +766,69 @@ function saveSessions(): void {
 
 const onboardSessions = loadSessions();
 
+// ── Qualification scoring ─────────────────────────────────────────────────────
+
+const FREE_EMAIL_PROVIDERS = new Set([
+  'gmail.com','yahoo.com','hotmail.com','outlook.com','live.com',
+  'protonmail.com','icloud.com','me.com','aol.com','mail.com',
+]);
+const QUALIFY_THRESHOLD = 70;
+
+function scoreSession(session: OnboardSession): { score: number; reasons: string[] } {
+  let score = 50;
+  const reasons: string[] = [];
+
+  // Company email domain
+  const domain = (session.email || '').split('@')[1]?.toLowerCase() || '';
+  if (domain && !FREE_EMAIL_PROVIDERS.has(domain)) {
+    score += 30; reasons.push(`company email (${domain}) +30`);
+  }
+
+  // Specific use case
+  const useCase = session.qualifyAnswers?.useCase || 'generalist';
+  if (useCase !== 'generalist') {
+    score += 20; reasons.push(`specific use case (${useCase}) +20`);
+  }
+
+  // Team size
+  const teamSize = session.qualifyAnswers?.teamSize || 'solo';
+  if (teamSize === 'company')   { score += 40; reasons.push('company size +40'); }
+  else if (teamSize === 'team') { score += 20; reasons.push('team size +20'); }
+
+  // Referral
+  if (session.referralCode) { score += 25; reasons.push(`referral +25`); }
+
+  return { score, reasons };
+}
+
+// ── Spawn queue (heartbeat picks this up and runs spawn-machine.sh) ───────────
+
+const SPAWN_QUEUE_FILE = process.env.SPAWN_QUEUE_FILE || '/data/spawn-queue.json';
+
+function writeSpawnQueue(entry: {
+  name: string; token: string; session_id: string; notify_url: string;
+}): void {
+  try {
+    fs.mkdirSync(path.dirname(SPAWN_QUEUE_FILE), { recursive: true });
+    let queue: any = { pending: [] };
+    try { queue = JSON.parse(fs.readFileSync(SPAWN_QUEUE_FILE, 'utf8')); } catch {}
+    queue.pending = queue.pending || [];
+    queue.pending.push({ ...entry, attempts: 0, requestedAt: Date.now() });
+    fs.writeFileSync(SPAWN_QUEUE_FILE, JSON.stringify(queue, null, 2));
+    console.log(`[spawn-queue] queued: ${entry.name}`);
+  } catch (e) { console.error('[spawn-queue] write failed:', e); }
+}
+
+// ── Bot helpers ───────────────────────────────────────────────────────────────
+
+async function sendBotMessage(chatId: string, payload: Record<string, unknown>): Promise<void> {
+  if (!ONBOARD_BOT_TOKEN) return;
+  await fetch(`https://api.telegram.org/bot${ONBOARD_BOT_TOKEN}/sendMessage`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, ...payload }),
+  }).catch(() => {});
+}
+
 // In-memory rate limit: email → { count, window_start }
 const emailRateLimit = new Map<string, { count: number; windowStart: number }>();
 
@@ -879,13 +942,35 @@ async function editApprovalMessage(msgId: number, text: string): Promise<void> {
 
 // POST /v1/onboard/start
 app.post('/v1/onboard/start', async (c) => {
-  const { email, telegram_user_id } = await c.req.json<{ email: string; telegram_user_id?: string }>();
+  const { email, telegram_user_id, existing_session_id } = await c.req.json<{
+    email: string; telegram_user_id?: string; existing_session_id?: string;
+  }>();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return c.json({ error: 'Valid email required' }, 400);
   }
   if (!checkRateLimit(email)) {
     return c.json({ error: 'Too many attempts. Try again in an hour.' }, 429);
   }
+
+  // If user came from bot qualification — attach email to their existing session
+  if (existing_session_id) {
+    const qualified = onboardSessions.get(existing_session_id);
+    if (qualified && ['qualifying','qualified','contact_track'].includes(qualified.state)) {
+      qualified.email = email;
+      qualified.emailOtp = generateOtp();
+      qualified.emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+      qualified.emailOtpAttempts = 0;
+      qualified.telegramUserId = telegram_user_id || qualified.telegramUserId;
+      // Move qualifying → email_pending (needs OTP before proceeding)
+      if (qualified.state === 'qualifying') qualified.state = 'email_pending';
+      qualified.updatedAt = new Date().toISOString();
+      saveSessions();
+      await sendOtpEmail(email, qualified.emailOtp).catch(() => {});
+      await updateTwentyCrm(qualified, `[M2O] Email attached: ${email}`).catch(() => {});
+      return c.json({ session_id: qualified.id });
+    }
+  }
+
   // Reject if active session exists (not rejected/live)
   const existing = [...onboardSessions.values()].find(
     s => s.email === email && !['rejected', 'live'].includes(s.state)
@@ -952,23 +1037,43 @@ app.post('/v1/onboard/validate-token', async (c) => {
   }
 });
 
-// POST /v1/onboard/set-name
+// POST /v1/onboard/set-name — auto-provisions without manual approval
 app.post('/v1/onboard/set-name', async (c) => {
-  const { session_id, agent_name } = await c.req.json<{ session_id: string; agent_name: string }>();
+  const { session_id, agent_name, preset } = await c.req.json<{
+    session_id: string; agent_name: string; preset?: string;
+  }>();
   const session = onboardSessions.get(session_id);
   if (!session || session.state !== 'token_validated') return c.json({ error: 'Invalid session' }, 400);
   const RESERVED = ['admin', 'root', 'system', 'master', 'm2', 'api', 'bot', 'test'];
   if (!/^[a-z0-9][a-z0-9-]{1,18}[a-z0-9]$/.test(agent_name) || RESERVED.includes(agent_name)) {
     return c.json({ error: 'Name must be 3-20 lowercase letters/numbers/hyphens, no reserved words.' }, 400);
   }
-  session.agentName = agent_name;
-  session.state     = 'name_chosen';
-  session.pendingApprovalSince = Date.now();
-  session.updatedAt = new Date().toISOString();
+  // Store preset if provided from Mini App (overrides bot qualification preset)
+  if (preset && ['researcher','builder','creator','generalist'].includes(preset)) {
+    session.preset = preset as any;
+  }
+  // Re-score now that we have email
+  const { score, reasons } = scoreSession(session);
+  session.qualifyScore = score;
+  session.agentName    = agent_name;
+  session.state        = 'provisioning';
+  session.updatedAt    = new Date().toISOString();
   saveSessions();
-  await updateTwentyCrm(session, `[M2O] State: name_chosen — agent: ${agent_name}`).catch(() => {});
-  await notifyMasterApproval(session).catch(() => {});
-  return c.json({ success: true, message: 'Request submitted! Our team will review and your bot will message you when live.' });
+
+  await updateTwentyCrm(session,
+    `[M2O] Provisioning: ${agent_name} | preset: ${session.preset || 'generalist'} | score: ${score} (${reasons.join(', ')})`
+  ).catch(() => {});
+
+  // Write to spawn queue — m2 heartbeat picks this up and runs spawn-machine.sh
+  const notifyUrl = `https://api.machinemachine.ai/v1/onboard/notify-live`;
+  writeSpawnQueue({ name: agent_name, token: session.botToken!, session_id, notify_url: notifyUrl });
+
+  // Non-blocking observability log to MM group
+  notifyTelegram(
+    `⚙️ <b>Spawn queued: ${agent_name}</b>\nEmail: ${session.email}\nPreset: ${session.preset || 'generalist'}\nScore: ${score}\nBot: @${session.botUsername}`
+  );
+
+  return c.json({ success: true, provisioning: true, message: 'Your agent is being set up. You\'ll get a message on Telegram when it\'s live.' });
 });
 
 // GET /v1/onboard/status/:id
@@ -976,31 +1081,164 @@ app.get('/v1/onboard/status/:id', (c) => {
   const session = onboardSessions.get(c.req.param('id'));
   if (!session) return c.json({ error: 'Not found' }, 404);
   return c.json({
-    state:        session.state,
-    bot_username: session.botUsername,
-    agent_name:   session.agentName,
-    updated_at:   session.updatedAt,
+    state:         session.state,
+    bot_username:  session.botUsername,
+    agent_name:    session.agentName,
+    preset:        session.preset,
+    qualify_score: session.qualifyScore,
+    updated_at:    session.updatedAt,
   });
 });
 
-// POST /v1/onboard/webhook  — Telegram webhook for ONBOARD_BOT_TOKEN + master's inline button callbacks
+// POST /v1/onboard/webhook  — Telegram bot webhook (qualification + legacy approve/reject)
 app.post('/v1/onboard/webhook', async (c) => {
-  // Optional webhook secret verification
   if (ONBOARD_WEBHOOK_SECRET) {
     const secret = c.req.header('X-Telegram-Bot-Api-Secret-Token');
     if (secret !== ONBOARD_WEBHOOK_SECRET) return c.json({ ok: false }, 403);
   }
   const update = await c.req.json<any>();
 
-  // Handle approve/reject callback queries (from master's chat)
+  // ── /start message — begin qualification conversation ──────────────────────
+  if (update.message) {
+    const msg  = update.message;
+    const text = (msg.text || '').trim();
+    const chatId = msg.chat.id.toString();
+
+    if (text.startsWith('/start')) {
+      const tgUser   = msg.from;
+      const refCode  = text.split(' ')[1] || undefined;
+
+      // One active session per Telegram user — reuse if already qualifying/qualified
+      const existing = [...onboardSessions.values()].find(
+        s => s.telegramUserId === chatId && !['live','rejected'].includes(s.state)
+      );
+      if (existing && existing.state === 'qualified') {
+        const miniAppUrl = `https://machinemachine.ai/onboard?sid=${existing.id}`;
+        await sendBotMessage(chatId, {
+          text: `You're already approved ⚡\n\nSet up your agent here:`,
+          reply_markup: { inline_keyboard: [[
+            { text: '⚡ Set up my agent →', web_app: { url: miniAppUrl } }
+          ]]},
+        });
+        return c.json({ ok: true });
+      }
+      if (existing && existing.state === 'contact_track') {
+        await sendBotMessage(chatId, { text: `You're on the early access list — we'll reach out when your spot opens.` });
+        return c.json({ ok: true });
+      }
+
+      // Create new qualifying session
+      const sessionId = crypto.randomUUID();
+      const session: OnboardSession = {
+        id: sessionId, telegramUserId: chatId, email: '',
+        emailOtpAttempts: 0, state: 'qualifying',
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+        referralCode: refCode,
+      };
+      onboardSessions.set(sessionId, session);
+      saveSessions();
+
+      await sendBotMessage(chatId, {
+        text: `Hey ${tgUser.first_name} 👋\n\nQuick question before we set you up.\n\n*What should your agent specialize in?*`,
+        parse_mode: 'Markdown',
+        reply_markup: { inline_keyboard: [
+          [
+            { text: '🔬 Research & Analysis', callback_data: `qu_${sessionId}_usecase_researcher` },
+            { text: '🛠 Building & Code',     callback_data: `qu_${sessionId}_usecase_builder`    },
+          ],
+          [
+            { text: '✍️ Writing & Content',   callback_data: `qu_${sessionId}_usecase_creator`    },
+            { text: '🧠 General Intelligence', callback_data: `qu_${sessionId}_usecase_generalist` },
+          ],
+        ]},
+      });
+      return c.json({ ok: true });
+    }
+  }
+
+  // ── callback_query — qualification + legacy approve/reject ─────────────────
   if (update.callback_query) {
-    const { id: cbId, data, message } = update.callback_query;
+    const { id: cbId, data, message, from } = update.callback_query;
+    const chatId = (message?.chat?.id || from?.id)?.toString() || '';
+
     const answerCb = (text: string) =>
       fetch(`https://api.telegram.org/bot${ONBOARD_BOT_TOKEN}/answerCallbackQuery`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callback_query_id: cbId, text }),
       }).catch(() => {});
 
+    // ── Step 1: use case answer → ask team size ──────────────────────────────
+    if (data?.startsWith('qu_') && data.includes('_usecase_')) {
+      // format: qu_{sessionId}_usecase_{value}
+      const parts   = data.split('_usecase_');
+      const sessionId = parts[0].replace('qu_', '');
+      const useCase   = parts[1]; // researcher | builder | creator | generalist
+      const session   = onboardSessions.get(sessionId);
+      if (!session) { await answerCb('Session expired — send /start to begin again'); return c.json({ ok: true }); }
+
+      session.qualifyAnswers = { useCase, teamSize: '' };
+      session.preset = useCase as any;
+      session.updatedAt = new Date().toISOString();
+      saveSessions();
+      await answerCb('Got it!');
+
+      await sendBotMessage(chatId, {
+        text: `Perfect. Who's this for?`,
+        reply_markup: { inline_keyboard: [[
+          { text: 'Just me',    callback_data: `qu_${sessionId}_team_solo`    },
+          { text: 'My team',   callback_data: `qu_${sessionId}_team_team`    },
+          { text: 'My company',callback_data: `qu_${sessionId}_team_company` },
+        ]]},
+      });
+      return c.json({ ok: true });
+    }
+
+    // ── Step 2: team size answer → score + branch ────────────────────────────
+    if (data?.startsWith('qu_') && data.includes('_team_')) {
+      // format: qu_{sessionId}_team_{value}
+      const parts    = data.split('_team_');
+      const sessionId = parts[0].replace('qu_', '');
+      const teamSize  = parts[1]; // solo | team | company
+      const session   = onboardSessions.get(sessionId);
+      if (!session) { await answerCb('Session expired — send /start to begin again'); return c.json({ ok: true }); }
+
+      session.qualifyAnswers = { ...(session.qualifyAnswers || { useCase: 'generalist' }), teamSize };
+      session.updatedAt = new Date().toISOString();
+
+      // Score (email domain can't be checked yet — scored again in set-name)
+      const { score, reasons } = scoreSession(session);
+      session.qualifyScore = score;
+      await answerCb('✅');
+
+      if (score >= QUALIFY_THRESHOLD) {
+        session.state = 'qualified';
+        saveSessions();
+        await updateTwentyCrm(session,
+          `[M2O] Qualified (score: ${score}) — ${reasons.join(', ')}`
+        ).catch(() => {});
+
+        const miniAppUrl = `https://machinemachine.ai/onboard?sid=${session.id}`;
+        await sendBotMessage(chatId, {
+          text: `You're in ⚡\n\nSet up your agent — takes about 5 minutes.`,
+          reply_markup: { inline_keyboard: [[
+            { text: '⚡ Set up my agent →', web_app: { url: miniAppUrl } }
+          ]]},
+        });
+      } else {
+        session.state = 'contact_track';
+        saveSessions();
+        await updateTwentyCrm(session,
+          `[M2O] Contact track (score: ${score}) — ${reasons.join(', ')}`
+        ).catch(() => {});
+
+        await sendBotMessage(chatId, {
+          text: `You're on the early access list for Machine.Machine.\n\nWe're rolling out deliberately — each agent is set up with care, not mass-deployed.\n\nWe'll reach out directly when your spot opens.\n\n→ machinemachine.ai`,
+        });
+      }
+      return c.json({ ok: true });
+    }
+
+    // ── Legacy: manual approve/reject (kept for backward compat, now rarely used) ──
     if (data?.startsWith('approve_') || data?.startsWith('reject_')) {
       const [action, sessionId] = [data.split('_')[0], data.slice(data.indexOf('_') + 1)];
       const session = onboardSessions.get(sessionId);
@@ -1013,11 +1251,7 @@ app.post('/v1/onboard/webhook', async (c) => {
         await answerCb(`✅ Spawning ${session.agentName}...`);
         if (message?.message_id) await editApprovalMessage(message.message_id, `✅ <b>Approved</b> — spawning <b>${session.agentName}</b>...`);
         await updateTwentyCrm(session, `[M2O] State: provisioning — approved by master`).catch(() => {});
-        // Trigger spawn (non-blocking)
-        fetch(`http://localhost:${process.env.PORT || 3000}/v1/spawn`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: session.agentName, token: session.botToken, session_id: session.id }),
-        }).catch(() => {});
+        writeSpawnQueue({ name: session.agentName!, token: session.botToken!, session_id: session.id, notify_url: 'https://api.machinemachine.ai/v1/onboard/notify-live' });
       } else {
         session.state = 'rejected';
         session.updatedAt = new Date().toISOString();
@@ -1025,7 +1259,6 @@ app.post('/v1/onboard/webhook', async (c) => {
         await answerCb('❌ Rejected');
         if (message?.message_id) await editApprovalMessage(message.message_id, `❌ <b>Rejected</b> — ${session.agentName}`);
         await updateTwentyCrm(session, `[M2O] State: rejected`).catch(() => {});
-        // Notify user via their bot
         if (session.botToken && session.telegramUserId) {
           fetch(`https://api.telegram.org/bot${session.botToken}/sendMessage`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
