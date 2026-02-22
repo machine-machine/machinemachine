@@ -589,7 +589,6 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
         const data = await api('/v1/onboard/start', payload);
         if (data.error) { showError('email-error', data.error); return; }
         sessionId = data.session_id;
-        ph('email_submitted', { session_id: sessionId, had_bot_qualification: !!urlSid });
         document.getElementById('otp-subtitle').textContent = `We sent a 6-digit code to ${email}.`;
         goTo(1);
       } catch (e) {
@@ -645,7 +644,6 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
         const data = await api('/v1/onboard/validate-token', { session_id: sessionId, bot_token: token });
         if (data.error) { showError('token-error', data.error); return; }
         botUsername = data.bot_username;
-        ph('token_validated', { session_id: sessionId, bot_username: botUsername });
         document.getElementById('bot-username-display').textContent = `@${botUsername}`;
         document.getElementById('token-ok').classList.add('visible');
         setTimeout(() => goTo(4), 800); // → name step
@@ -680,7 +678,6 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
           preset: selectedPreset,
         });
         if (data.error) { showError('name-error', data.error); return; }
-        ph('name_chosen', { session_id: sessionId, agent_name: name, preset: selectedPreset });
         goTo(5);
         document.getElementById('done-heading').textContent = `Application received ⚡`;
         document.getElementById('done-subtitle').innerHTML =
