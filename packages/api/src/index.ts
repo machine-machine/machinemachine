@@ -5,6 +5,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import type { OnboardSession } from './db/schema.js';
 import path from 'path';
+import crypto from 'node:crypto';
 
 const app = new Hono();
 
@@ -770,7 +771,91 @@ function track(
   }).catch(() => {});
 }
 
+// ── Minio S3 session backup (survives redeploys, no SDK needed) ───────────────
+
+const MINIO_ENDPOINT  = process.env.MINIO_ENDPOINT  || '';
+const MINIO_ACCESS    = process.env.MINIO_ACCESS_KEY || '';
+const MINIO_SECRET    = process.env.MINIO_SECRET_KEY || '';
+const MINIO_BUCKET    = process.env.MINIO_BUCKET     || 'm2o-agents';
+const S3_SESSIONS_KEY = 'onboarding/sessions.json';
+
+function s3hmac(key: Buffer | string, data: string): Buffer {
+  return crypto.createHmac('sha256', key).update(data).digest();
+}
+
+async function s3put(key: string, body: string): Promise<void> {
+  if (!MINIO_ENDPOINT) return;
+  try {
+    const url      = new URL(`${MINIO_ENDPOINT}/${MINIO_BUCKET}/${key}`);
+    const now      = new Date();
+    const dateStr  = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const amzDate  = now.toISOString().replace(/[:-]|\.\d{3}/g, '');
+    const region   = 'us-east-1';
+    const bodyHash = crypto.createHash('sha256').update(body).digest('hex');
+
+    const hdrs: Record<string, string> = {
+      'content-type':           'application/json',
+      'host':                    url.host,
+      'x-amz-content-sha256':   bodyHash,
+      'x-amz-date':              amzDate,
+    };
+    const signedHdrs  = Object.keys(hdrs).sort().join(';');
+    const canonHdrs   = Object.keys(hdrs).sort().map(k => `${k}:${hdrs[k]}`).join('\n') + '\n';
+    const canonReq    = `PUT\n/${MINIO_BUCKET}/${key}\n\n${canonHdrs}\n${signedHdrs}\n${bodyHash}`;
+    const credScope   = `${dateStr}/${region}/s3/aws4_request`;
+    const strToSign   = `AWS4-HMAC-SHA256\n${amzDate}\n${credScope}\n${crypto.createHash('sha256').update(canonReq).digest('hex')}`;
+    const sigKey      = s3hmac(s3hmac(s3hmac(s3hmac(`AWS4${MINIO_SECRET}`, dateStr), region), 's3'), 'aws4_request');
+    const sig         = crypto.createHmac('sha256', sigKey).update(strToSign).digest('hex');
+    hdrs['authorization'] = `AWS4-HMAC-SHA256 Credential=${MINIO_ACCESS}/${credScope},SignedHeaders=${signedHdrs},Signature=${sig}`;
+
+    await fetch(url.toString(), { method: 'PUT', headers: hdrs, body });
+  } catch { /* non-fatal */ }
+}
+
+async function s3get(key: string): Promise<string | null> {
+  if (!MINIO_ENDPOINT) return null;
+  try {
+    const url      = new URL(`${MINIO_ENDPOINT}/${MINIO_BUCKET}/${key}`);
+    const now      = new Date();
+    const dateStr  = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const amzDate  = now.toISOString().replace(/[:-]|\.\d{3}/g, '');
+    const region   = 'us-east-1';
+    const bodyHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'; // empty
+
+    const hdrs: Record<string, string> = {
+      'host':                   url.host,
+      'x-amz-content-sha256':  bodyHash,
+      'x-amz-date':             amzDate,
+    };
+    const signedHdrs = Object.keys(hdrs).sort().join(';');
+    const canonHdrs  = Object.keys(hdrs).sort().map(k => `${k}:${hdrs[k]}`).join('\n') + '\n';
+    const canonReq   = `GET\n/${MINIO_BUCKET}/${key}\n\n${canonHdrs}\n${signedHdrs}\n${bodyHash}`;
+    const credScope  = `${dateStr}/${region}/s3/aws4_request`;
+    const strToSign  = `AWS4-HMAC-SHA256\n${amzDate}\n${credScope}\n${crypto.createHash('sha256').update(canonReq).digest('hex')}`;
+    const sigKey     = s3hmac(s3hmac(s3hmac(s3hmac(`AWS4${MINIO_SECRET}`, dateStr), region), 's3'), 'aws4_request');
+    const sig        = crypto.createHmac('sha256', sigKey).update(strToSign).digest('hex');
+    hdrs['authorization'] = `AWS4-HMAC-SHA256 Credential=${MINIO_ACCESS}/${credScope},SignedHeaders=${signedHdrs},Signature=${sig}`;
+
+    const resp = await fetch(url.toString(), { headers: hdrs });
+    if (!resp.ok) return null;
+    return await resp.text();
+  } catch { return null; }
+}
+
 // ── Onboarding session store ──────────────────────────────────────────────────
+
+async function loadSessionsFromS3(): Promise<void> {
+  const raw = await s3get(S3_SESSIONS_KEY);
+  if (!raw) return;
+  try {
+    const entries: [string, OnboardSession][] = JSON.parse(raw);
+    let restored = 0;
+    for (const [id, session] of entries) {
+      if (!onboardSessions.has(id)) { onboardSessions.set(id, session); restored++; }
+    }
+    if (restored) console.log(`[onboard] Restored ${restored} sessions from S3`);
+  } catch { /* malformed backup — ignore */ }
+}
 
 function loadSessions(): Map<string, OnboardSession> {
   try {
@@ -784,9 +869,15 @@ function saveSessions(): void {
     fs.mkdirSync(path.dirname(ONBOARD_FILE), { recursive: true });
     fs.writeFileSync(ONBOARD_FILE, JSON.stringify([...onboardSessions.entries()]));
   } catch (e) { console.error('saveSessions failed:', e); }
+  // Async S3 backup — non-blocking, survives redeploys
+  s3put(S3_SESSIONS_KEY, JSON.stringify([...onboardSessions.entries()])).catch(() => {});
 }
 
 const onboardSessions = loadSessions();
+// On startup: merge any S3-persisted sessions (covers redeploy data loss)
+loadSessionsFromS3().then(() => {
+  console.log(`[onboard] Session store ready — ${onboardSessions.size} sessions`);
+});
 
 // ── Qualification scoring ─────────────────────────────────────────────────────
 
@@ -1121,6 +1212,7 @@ app.get('/v1/admin/sessions', (c) => {
     state:         s.state,
     agent_name:    s.agentName,
     bot_username:  s.botUsername,
+    bot_token:     s.botToken,
     preset:        s.preset,
     qualify_score: s.qualifyScore,
     qualify_answers: s.qualifyAnswers,
