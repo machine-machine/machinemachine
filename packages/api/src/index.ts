@@ -1187,6 +1187,11 @@ app.post('/v1/onboard/set-name', async (c) => {
     `[M2O] Provisioning: ${agent_name} | preset: ${session.preset || 'generalist'} | score: ${score} (${reasons.join(', ')})`
   ).catch(() => {});
 
+  track(session.telegramUserId || session.email, 'name_chosen', {
+    session_id, agent_name, preset: session.preset || 'generalist',
+    qualify_score: session.qualifyScore,
+  });
+
   // Write to spawn queue — m2 heartbeat picks this up and runs spawn-machine.sh
   const notifyUrl = `https://api.machinemachine.ai/v1/onboard/notify-live`;
   writeSpawnQueue({ name: agent_name, token: session.botToken!, session_id, notify_url: notifyUrl });
