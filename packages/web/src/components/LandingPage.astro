@@ -22,8 +22,8 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
       <a href={homeHref} class="logo">M&sup2;</a>
       <div class="lang-switcher">
         <a href="/" class="lang-flag" data-lang="en" title="English">🇬🇧</a>
-        <a href="/de" class="lang-flag" data-lang="de" title="Deutsch">🇩🇪</a>
-        <a href="/pl" class="lang-flag" data-lang="pl" title="Polski">🇵🇱</a>
+        <a href="/de/" class="lang-flag" data-lang="de" title="Deutsch">🇩🇪</a>
+        <a href="/pl/" class="lang-flag" data-lang="pl" title="Polski">🇵🇱</a>
       </div>
       <ul class="nav-links">
         <li><a href="#problem">{t(locale, 'nav_problem')}</a></li>
@@ -287,9 +287,9 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     localStorage.setItem('mm_lang', browserLang);
     if (browserLang === 'de' && !path.startsWith('/de')) {
-      window.location.href = '/de' + (path === '/' ? '' : path);
+      window.location.href = '/de/';
     } else if (browserLang === 'pl' && !path.startsWith('/pl')) {
-      window.location.href = '/pl' + (path === '/' ? '' : path);
+      window.location.href = '/pl/';
     }
   }
 </script>
