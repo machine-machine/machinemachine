@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     // Meta
-    meta_title: "MachineMachine | AI Teams for Knowledge Organisations.",
+    meta_title: "MachineMachine — Your experts shouldn't be doing clerk work.",
     meta_description: "Machine.Machine builds AI teams that handle the work your experts shouldn't need to do — so they can do the work only they can.",
 
     // Nav
@@ -158,7 +158,7 @@ export const translations = {
 
   de: {
     // Meta
-    meta_title: "MachineMachine | KI-Teams für Wissensorganisationen.",
+    meta_title: "MachineMachine — Deine Experten sollten keine Sachbearbeiter sein.",
     meta_description: "Machine.Machine baut KI-Teams die den übertragbaren Teil übernehmen — damit deine Experten sich auf das konzentrieren, was wirklich sie braucht.",
 
     // Nav
@@ -315,7 +315,7 @@ export const translations = {
 
   pl: {
     // Meta
-    meta_title: "MachineMachine | Zespoły AI dla organizacji opartych na wiedzy.",
+    meta_title: "MachineMachine — Twoi eksperci nie powinni być urzędnikami.",
     meta_description: "Machine.Machine buduje zespoły AI, które przejmują powtarzalną część pracy — żeby twoi eksperci skupili się na tym, co naprawdę wymaga ich.",
 
     // Nav
