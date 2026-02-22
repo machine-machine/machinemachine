@@ -472,11 +472,19 @@ export const prerender = true;
       <div class="success-icon" id="success-icon">⚡</div>
       <h2 id="done-heading">Setting up your agent…</h2>
       <p class="subtitle" id="done-subtitle" style="text-align:center">
-        This takes a few minutes. Your bot will message you the moment it's live.
+        This takes a few minutes.
       </p>
       <div class="status-badge" id="status-badge">
         <div class="status-dot spinning" id="status-dot"></div>
         <span id="status-text">Provisioning</span>
+      </div>
+      <div id="onboard-bot-nudge" style="margin-top:1.5rem;padding:1rem 1.2rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;text-align:left;max-width:320px;">
+        <p style="margin:0 0 0.5rem;font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">To receive your live notification</p>
+        <p style="margin:0 0 0.8rem;font-size:0.95rem;color:var(--text-primary);line-height:1.4;">Open <strong>@m2_onboarding_bot</strong> on Telegram and press <strong>Start</strong>. You'll get a message the moment your agent is ready.</p>
+        <a href="https://t.me/m2_onboarding_bot" target="_blank"
+           style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--accent);color:#fff;border-radius:8px;font-size:0.9rem;font-weight:600;text-decoration:none;">
+          Open @m2_onboarding_bot →
+        </a>
       </div>
     </div>
   </div>
@@ -672,7 +680,7 @@ export const prerender = true;
         goTo(5);
         document.getElementById('done-heading').textContent = `Setting up ${name}…`;
         document.getElementById('done-subtitle').textContent =
-          `Your agent is provisioning. @${botUsername || name} will message you when it's live — usually within 10 minutes.`;
+          `Your agent is provisioning. Open @m2_onboarding_bot on Telegram and press Start — you'll get a message there the moment it's live.`;
         startPolling();
       } catch (e) {
         showError('name-error', 'Network error. Check your connection.');
@@ -696,11 +704,26 @@ export const prerender = true;
           clearInterval(pollInterval);
           document.getElementById('success-icon').textContent = '🚀';
           document.getElementById('done-heading').textContent = 'Your agent is live!';
+          const handle = data.bot_username || botUsername;
           document.getElementById('done-subtitle').textContent =
-            `Say hello to @${data.bot_username || botUsername}. Your AI is ready.`;
+            `Your personal AI is ready. Open the bot below and say hello — that's your daily companion, not this chat.`;
           document.getElementById('status-dot').classList.add('live');
           document.getElementById('status-text').textContent = '🟢 Live';
-          ph('agent_live_client', { session_id: sessionId, preset: data.preset, bot_username: data.bot_username });
+          // Replace the setup nudge with a "go to your bot" button
+          const nudge = document.getElementById('onboard-bot-nudge');
+          if (nudge && handle) {
+            nudge.innerHTML = `
+              <p style="margin:0 0 0.8rem;font-size:0.95rem;color:var(--text-primary);line-height:1.4;">
+                Talk to <strong>@${handle}</strong> — that's your agent. This onboarding bot is just for setup and M2O questions.
+              </p>
+              <a href="https://t.me/${handle}" target="_blank"
+                 style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--success, #22c55e);color:#fff;border-radius:8px;font-size:0.9rem;font-weight:600;text-decoration:none;">
+                Open @${handle} →
+              </a>`;
+          } else if (nudge) {
+            nudge.style.display = 'none';
+          }
+          ph('agent_live_client', { session_id: sessionId, preset: data.preset, bot_username: handle });
           if (window.posthog && posthog.identify) posthog.identify(sessionId);
           launchConfetti();
         } else if (data.state === 'provisioning') {

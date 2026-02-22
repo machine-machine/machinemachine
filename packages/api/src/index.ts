@@ -874,6 +874,9 @@ function saveSessions(): void {
 }
 
 const onboardSessions = loadSessions();
+// Tracks users who tapped "I already have an agent" and are waiting to provide their email
+const pendingLookups = new Map<string, true>(); // chatId → true
+
 // On startup: merge any S3-persisted sessions (covers redeploy data loss)
 loadSessionsFromS3().then(() => {
   console.log(`[onboard] Session store ready — ${onboardSessions.size} sessions`);
@@ -1295,7 +1298,7 @@ app.post('/v1/onboard/webhook', async (c) => {
       track(chatId, 'bot_start', { ref_code: refCode, tg_username: tgUser.username });
 
       await sendBotMessage(chatId, {
-        text: `Hey ${tgUser.first_name} 👋\n\nI'm the Machine.Machine onboarding guide.\n\nI'm here to get you set up — and I can answer any questions about how M2O works along the way. Once your agent is live, <b>your personal bot will be your daily companion</b>. That's the one you'll talk to every day. I'm just here to get you there.\n\nFirst question: <b>what should your agent specialize in?</b>`,
+        text: `Hey ${tgUser.first_name} 👋\n\nI'm the Machine.Machine onboarding guide.\n\nI'm here to get you set up — and I can answer any questions about how M2O works along the way. Once your agent is live, <b>your personal bot will be your daily companion</b>. That's the one you'll talk to every day. I'm just here to get you there.\n\nFirst question: <b>what should your agent specialize in?</b>\n\n<i>Already set up an agent? Tap below to find it.</i>`,
         parse_mode: 'HTML',
         reply_markup: { inline_keyboard: [
           [
@@ -1306,8 +1309,56 @@ app.post('/v1/onboard/webhook', async (c) => {
             { text: '✍️ Writing & Content',   callback_data: `qu_${sessionId}_usecase_creator`    },
             { text: '🧠 General Intelligence', callback_data: `qu_${sessionId}_usecase_generalist` },
           ],
+          [
+            { text: '🔍 I already have an agent', callback_data: `lookup_${sessionId}` },
+          ],
         ]},
       });
+      return c.json({ ok: true });
+    }
+
+    // ── Email lookup — user tapped "I already have an agent" and sent their email ──
+    if (text && pendingLookups.has(chatId) && text.includes('@') && text.includes('.')) {
+      pendingLookups.delete(chatId);
+      const email = text.trim().toLowerCase();
+      const found = [...onboardSessions.values()].find(
+        s => s.email?.toLowerCase() === email
+      );
+      if (!found) {
+        await sendBotMessage(chatId, {
+          text: `Couldn't find an agent for <b>${email}</b>.\n\nDouble-check the email, or type /start to set up a new one.`,
+          parse_mode: 'HTML',
+        });
+        return c.json({ ok: true });
+      }
+      // Link this Telegram user to the found session if not already linked
+      if (!found.telegramUserId) {
+        found.telegramUserId = chatId;
+        found.updatedAt = new Date().toISOString();
+        saveSessions();
+      }
+      if (found.state === 'live') {
+        const handle = found.botUsername;
+        await sendBotMessage(chatId, {
+          text: `Found it ✅\n\nYour agent <b>${found.agentName || handle}</b> is already live.\n\nTalk to it here:`,
+          parse_mode: 'HTML',
+          reply_markup: handle ? { inline_keyboard: [[
+            { text: `Open @${handle} →`, url: `https://t.me/${handle}` },
+          ]]} : undefined,
+        });
+      } else if (['provisioning', 'name_chosen'].includes(found.state)) {
+        await sendBotMessage(chatId, {
+          text: `Found your agent — it's still provisioning ⚙️\n\nUsually takes 3–5 minutes. I'll message you here the moment it's live.`,
+        });
+      } else {
+        const miniAppUrl = `https://machinemachine.ai/onboard?sid=${found.id}`;
+        await sendBotMessage(chatId, {
+          text: `Found your session — setup isn't finished yet.\n\nContinue here:`,
+          reply_markup: { inline_keyboard: [[
+            { text: '⚡ Continue setup →', web_app: { url: miniAppUrl } },
+          ]]},
+        });
+      }
       return c.json({ ok: true });
     }
 
@@ -1429,6 +1480,16 @@ app.post('/v1/onboard/webhook', async (c) => {
           text: `You're on the early access list for Machine.Machine.\n\nWe're rolling out deliberately — each agent is set up with care, not mass-deployed.\n\nWe'll reach out directly when your spot opens.\n\n→ machinemachine.ai`,
         });
       }
+      return c.json({ ok: true });
+    }
+
+    // ── "I already have an agent" lookup flow ────────────────────────────────
+    if (data?.startsWith('lookup_')) {
+      await answerCb('');
+      pendingLookups.set(chatId, true);
+      await sendBotMessage(chatId, {
+        text: `What email did you use to sign up? I'll look up your agent.`,
+      });
       return c.json({ ok: true });
     }
 
