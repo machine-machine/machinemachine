@@ -1553,7 +1553,7 @@ app.post('/v1/onboard/webhook', async (c) => {
 
         const miniAppUrl = `https://machinemachine.ai/onboard?sid=${session.id}`;
         await sendBotMessage(chatId, {
-          text: `You're in ⚡\n\nHere's what happens next:\n\n1. You'll create a Telegram bot via @BotFather — that bot becomes <b>your personal agent</b>. It remembers you, works for you, and is yours alone.\n2. Give it a name and a token.\n3. We spin it up. Takes about 3 minutes.\n\nAfter that, talk to your bot — not this one. <b>This bot is just for setup and questions about M2O.</b>\n\nReady?`,
+          text: `You're in ⚡\n\nHere's what happens next:\n\n1. You'll create a Telegram bot via @BotFather — that bot becomes <b>your personal agent</b>. It remembers you, works for you, and is yours alone.\n2. Give it a name and a token.\n3. We set it up — usually within the hour. You'll get a message here the moment it's live.\n\nAfter that, talk to your bot — not this one. <b>This bot is just for setup and questions about M2O.</b>\n\nReady?`,
           parse_mode: 'HTML',
           reply_markup: { inline_keyboard: [[
             { text: '⚡ Set up my agent →', web_app: { url: miniAppUrl } }
