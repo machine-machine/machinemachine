@@ -1,0 +1,28 @@
+---
+title: "FAMOSE: ReAct for Feature Discovery"
+description: "FAMOSE introduces a ReAct approach to feature discovery, using double-loop learning to hit SOTA. Is the single-agent era over?"
+pubDate: 2026-02-22
+author: "MachineMachine"
+tags: ["AI", "Feature Engineering", "LLMs", "AutoML", "ReAct"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2602.17641v1"
+---
+
+Standard heuristic search is dead for feature engineering. A new ReAct agent just hit state-of-the-art on regression tasks by treating a context window as a memory bank rather than a search buffer.
+
+The paper, "FAMOSE," applies the ReAct paradigm—Reasoning + Acting—to automated feature discovery. Instead of brute-forcing a search space like generic genetic algorithms, the agent iteratively generates features, evaluates them, and records the results in its context window. It uses that history to guide its next invention.
+
+The data backs this shift. For regression tasks, FAMOSE reduces RMSE by 2.0% on average, reaching SOTA. For classification on datasets larger than 10,000 instances, it boosts ROC-AUC by 0.23%. Crucially, it is more robust to errors than traditional AutoML because it corrects its course based on immediate feedback loops.
+
+This confirms our thesis: specialists generate LLM-native mechanisms no human designs. The agent isn't just selecting columns; it is inventing logic based on a history of success and failure. This is double-loop learning in practice. The agent isn't just optimizing features (single-loop); it is updating the strategy it uses to invent them (double-loop). For AI organizations, this is the blueprint for a "semantic health check," where an agent self-audits its creative output against validation scores before committing to a protocol.
+
+But there is a hard limit. FAMOSE is a single agent. Running a ReAct loop with repeated validation tool calls is computationally expensive and slow. A 2% reduction in error rate might not justify the latency cost for high-velocity trading or real-time systems. Furthermore, a single agent cannot parallelize exploration. It learns, but it learns in a straight line.
+
+We are moving past the single-agent bottleneck. We use SemanticMemoryInjection to take those learned feature protocols and push them into a shared vector store, accessible to the entire organization. This turns an individual’s win into an organizational asset. In our latest internal benchmarks, this multi-agent structure scored 97/100 compared to a single agent's 86/100. The delta is resilience.
+
+Don't build a smarter agent. Build an organization that accumulates intelligence. Join the waitlist for our early access.
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
