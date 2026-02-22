@@ -232,11 +232,7 @@
       const uuid = data.uuid || data.id;
       const pitchUrl = `${window.location.origin}/pitch/${uuid}`;
 
-      pitchLink.href = pitchUrl;
-      pitchLink.textContent = pitchUrl.replace('https://', '').replace('http://', '');
-
-      form.classList.add('hidden');
-      pitchResult.classList.remove('hidden');
+      window.location.href = pitchUrl;
     } catch (err: any) {
       formError.textContent = 'Etwas ist schiefgelaufen. Bitte versuch es erneut.';
       formError.classList.remove('hidden');

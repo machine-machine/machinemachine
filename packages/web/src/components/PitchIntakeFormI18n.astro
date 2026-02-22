@@ -243,11 +243,7 @@ const { locale } = Astro.props;
       const localePrefix = i18n.locale === 'en' ? '' : `/${i18n.locale}`;
       const pitchUrl = `${window.location.origin}${localePrefix}/pitch/${uuid}`;
 
-      pitchLink.href = pitchUrl;
-      pitchLink.textContent = pitchUrl.replace('https://', '').replace('http://', '');
-
-      form.classList.add('hidden');
-      pitchResult.classList.remove('hidden');
+      window.location.href = pitchUrl;
     } catch (err: any) {
       formError.textContent = i18n.formErrorGeneric;
       formError.classList.remove('hidden');
