@@ -58,7 +58,8 @@ export type OnboardState =
   | 'contact_track'  // below score threshold — nurture path, master can push anytime
   | 'waitlisted'     // capacity cap reached (future use)
   | 'token_validated' | 'name_chosen' | 'provisioning' | 'live'
-  | 'rejected';      // hard block only (abuse, invalid token, etc.)
+  | 'rejected'       // hard block only (abuse, invalid token, etc.)
+  | 'destroyed';     // agent decommissioned via spawn-machine.sh destroy
 
 export type AgentPreset = 'researcher' | 'builder' | 'creator' | 'generalist';
 
