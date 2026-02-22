@@ -211,6 +211,10 @@
 
     btnSubmit.disabled = true;
     btnSubmit.textContent = 'Wird gesendet...';
+    (window as any).ph?.('pitch_form_submitted', {
+      has_audio: !!audioBase64, has_links: links.length > 0, has_text: !!text,
+      page: window.location.pathname,
+    });
 
     try {
       const body: Record<string, unknown> = { email, text, links };
