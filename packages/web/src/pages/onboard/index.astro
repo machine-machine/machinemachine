@@ -12,6 +12,18 @@ export const prerender = true;
   <title>Machine.Machine — Get Your Agent</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- PostHog analytics -->
+  <script is:inline>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a=__POSTHOG_ARRAY__,u.push(["init",i,s,a]),n=0;n<u.length;n++){var l=u[n];0<l.length&&g(u,l)}},e.__SV=1)}(document,window.posthog||[]);
+    const PH_API_KEY = 'POSTHOG_PLACEHOLDER_KEY';
+    const PH_HOST    = 'https://posthog.machinemachine.ai';
+    if (PH_API_KEY && PH_API_KEY !== 'POSTHOG_PLACEHOLDER_KEY') {
+      posthog.init(PH_API_KEY, { api_host: PH_HOST, autocapture: false, capture_pageview: false });
+    }
+    function ph(event, props) {
+      try { if (window.posthog && posthog.capture) posthog.capture(event, props || {}); } catch(e) {}
+    }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -512,6 +524,7 @@ export const prerender = true;
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
+    const STEP_NAMES = ['email', 'otp', 'preset', 'botfather', 'name', 'provisioning'];
     function goTo(step) {
       document.querySelectorAll('.step').forEach((el, i) => {
         el.classList.toggle('visible', i === step);
@@ -520,6 +533,7 @@ export const prerender = true;
         dot.classList.toggle('active', i === step);
         dot.classList.toggle('done', i < step);
       });
+      ph('step_viewed', { step, step_name: STEP_NAMES[step], session_id: sessionId, had_bot_qualification: !!urlSid });
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -602,6 +616,7 @@ export const prerender = true;
         c.classList.toggle('selected', c.dataset.preset === preset);
       });
       clearError('preset-error');
+      ph('preset_selected', { preset, session_id: sessionId });
       // Auto-advance after short delay so the selection is visible
       setTimeout(() => goTo(3), 350);
     }
@@ -685,6 +700,8 @@ export const prerender = true;
             `Say hello to @${data.bot_username || botUsername}. Your AI is ready.`;
           document.getElementById('status-dot').classList.add('live');
           document.getElementById('status-text').textContent = '🟢 Live';
+          ph('agent_live_client', { session_id: sessionId, preset: data.preset, bot_username: data.bot_username });
+          if (window.posthog && posthog.identify) posthog.identify(sessionId);
           launchConfetti();
         } else if (data.state === 'provisioning') {
           document.getElementById('status-text').textContent = '⚙️ Provisioning...';

@@ -747,6 +747,28 @@ const ONBOARD_FILE           = process.env.ONBOARD_FILE            || '/data/onb
 // Falls back to TG_NOTIFY_CHAT (master's personal chat) if not set
 const ONBOARD_NOTIFY_CHAT    = process.env.ONBOARD_NOTIFY_CHAT     || TG_NOTIFY_CHAT;
 const TWENTY_CRM_URL         = process.env.TWENTY_CRM_URL          || 'https://crm.machinemachine.ai';
+const POSTHOG_API_KEY        = process.env.POSTHOG_API_KEY         || '';
+const POSTHOG_HOST           = process.env.POSTHOG_HOST            || 'https://posthog.machinemachine.ai';
+
+// ── PostHog — fire-and-forget server-side capture (no SDK, just REST) ─────────
+function track(
+  distinctId: string,
+  event: string,
+  properties: Record<string, unknown> = {},
+): void {
+  if (!POSTHOG_API_KEY) return;
+  fetch(`${POSTHOG_HOST}/capture/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      api_key: POSTHOG_API_KEY,
+      distinct_id: distinctId || 'anonymous',
+      event,
+      properties: { ...properties, $lib: 'machinemachine-api' },
+      timestamp: new Date().toISOString(),
+    }),
+  }).catch(() => {});
+}
 
 // ── Onboarding session store ──────────────────────────────────────────────────
 
@@ -1013,6 +1035,10 @@ app.post('/v1/onboard/verify-email', async (c) => {
   session.updatedAt = new Date().toISOString();
   saveSessions();
   await updateTwentyCrm(session, `[M2O] State: email_verified`).catch(() => {});
+  track(session.telegramUserId || session.email, 'email_verified', {
+    session_id, had_bot_qualification: !!session.qualifyScore,
+    qualify_score: session.qualifyScore,
+  });
   return c.json({ success: true, next_step: 'bot_token' });
 });
 
@@ -1031,6 +1057,9 @@ app.post('/v1/onboard/validate-token', async (c) => {
     session.updatedAt  = new Date().toISOString();
     saveSessions();
     await updateTwentyCrm(session, `[M2O] State: token_validated — bot @${session.botUsername}`).catch(() => {});
+    track(session.telegramUserId || session.email, 'token_validated', {
+      session_id, bot_username: session.botUsername, preset: session.preset,
+    });
     return c.json({ success: true, bot_username: session.botUsername, next_step: 'choose_name' });
   } catch {
     return c.json({ error: 'Could not validate token. Try again.' }, 500);
@@ -1067,6 +1096,10 @@ app.post('/v1/onboard/set-name', async (c) => {
   // Write to spawn queue — m2 heartbeat picks this up and runs spawn-machine.sh
   const notifyUrl = `https://api.machinemachine.ai/v1/onboard/notify-live`;
   writeSpawnQueue({ name: agent_name, token: session.botToken!, session_id, notify_url: notifyUrl });
+  track(session.telegramUserId || session.email, 'spawn_queued', {
+    session_id, agent_name, preset: session.preset || 'generalist',
+    qualify_score: session.qualifyScore, email_domain: session.email.split('@')[1],
+  });
 
   // Non-blocking observability log to MM group
   notifyTelegram(
@@ -1137,6 +1170,7 @@ app.post('/v1/onboard/webhook', async (c) => {
       };
       onboardSessions.set(sessionId, session);
       saveSessions();
+      track(chatId, 'bot_start', { ref_code: refCode, tg_username: tgUser.username });
 
       await sendBotMessage(chatId, {
         text: `Hey ${tgUser.first_name} 👋\n\nQuick question before we set you up.\n\n*What should your agent specialize in?*`,
@@ -1181,6 +1215,7 @@ app.post('/v1/onboard/webhook', async (c) => {
       session.updatedAt = new Date().toISOString();
       saveSessions();
       await answerCb('Got it!');
+      track(session.telegramUserId || sessionId, 'qualify_usecase_selected', { use_case: useCase, session_id: sessionId });
 
       await sendBotMessage(chatId, {
         text: `Perfect. Who's this for?`,
@@ -1209,6 +1244,11 @@ app.post('/v1/onboard/webhook', async (c) => {
       const { score, reasons } = scoreSession(session);
       session.qualifyScore = score;
       await answerCb('✅');
+      track(session.telegramUserId || sessionId, 'qualify_result', {
+        score, qualified: score >= QUALIFY_THRESHOLD,
+        use_case: session.qualifyAnswers?.useCase, team_size: teamSize,
+        session_id: sessionId,
+      });
 
       if (score >= QUALIFY_THRESHOLD) {
         session.state = 'qualified';
@@ -1296,19 +1336,29 @@ app.post('/v1/onboard/notify-live', async (c) => {
   const { session_id } = await c.req.json<{ session_id: string }>();
   const session = onboardSessions.get(session_id);
   if (!session) return c.json({ error: 'Not found' }, 404);
+  const provisioningStartMs = new Date(session.updatedAt).getTime();
   session.state = 'live';
   session.updatedAt = new Date().toISOString();
   saveSessions();
   await updateTwentyCrm(session, `[M2O] State: live 🚀`).catch(() => {});
-  // Message user via their bot
+  track(session.telegramUserId || session.email, 'agent_live', {
+    session_id, agent_name: session.agentName,
+    preset: session.preset || 'generalist',
+    qualify_score: session.qualifyScore,
+    time_to_live_ms: Date.now() - new Date(session.createdAt).getTime(),
+  });
+  // Personalized first message per preset
+  const firstMessages: Record<string, string> = {
+    researcher: `Hey 👋 I'm <b>${session.agentName}</b> — your research intelligence.\n\nI can search the web, synthesize anything, and remember what matters.\n\nWhat are you trying to understand?`,
+    builder:    `Hey 👋 I'm <b>${session.agentName}</b>.\n\nI build with you: code, debug, review, deploy. I remember context across sessions.\n\nWhat are you working on?`,
+    creator:    `Hey 👋 I'm <b>${session.agentName}</b> — your creative partner.\n\nI write, edit, position, and pitch. Tell me what you're making.`,
+    generalist: `Hey 👋 I'm <b>${session.agentName}</b>.\n\nI adapt to whatever you need. Web access, memory, no patience for filler.\n\nWhat's first?`,
+  };
+  const firstMsg = firstMessages[session.preset || 'generalist'] || firstMessages.generalist;
   if (session.botToken && session.telegramUserId) {
     fetch(`https://api.telegram.org/bot${session.botToken}/sendMessage`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: session.telegramUserId,
-        text: `⚡ Your agent <b>${session.agentName}</b> is live!\n\nStart a conversation — I'm ready.`,
-        parse_mode: 'HTML',
-      }),
+      body: JSON.stringify({ chat_id: session.telegramUserId, text: firstMsg, parse_mode: 'HTML' }),
     }).catch(() => {});
   }
   return c.json({ success: true });
