@@ -1661,11 +1661,43 @@ app.post('/v1/onboard/notify-live', async (c) => {
   };
   const firstMsg = firstMessages[session.preset || 'generalist'] || firstMessages.generalist;
   if (session.botToken && session.telegramUserId) {
-    fetch(`https://api.telegram.org/bot${session.botToken}/sendMessage`, {
+    const tgApi = `https://api.telegram.org/bot${session.botToken}/sendMessage`;
+    // First message — personalized intro
+    await fetch(tgApi, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: session.telegramUserId, text: firstMsg, parse_mode: 'HTML' }),
     }).catch(() => {});
+    // Second message — desktop access (if Guacamole creds available)
+    if (session.guacamoleUser && session.guacamolePass) {
+      const desktopMsg =
+        `🖥️ <b>Your desktop is ready</b>\n\n` +
+        `<b>URL:</b> <a href="https://m2o.machinemachine.ai">m2o.machinemachine.ai</a>\n` +
+        `<b>Username:</b> <code>${session.guacamoleUser}</code>\n` +
+        `<b>Password:</b> <code>${session.guacamolePass}</code>\n\n` +
+        `Log in to see your agent's desktop environment. You can watch it work, ` +
+        `open a terminal, or paste files directly.`;
+      await fetch(tgApi, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: session.telegramUserId, text: desktopMsg, parse_mode: 'HTML' }),
+      }).catch(() => {});
+    }
   }
+  return c.json({ success: true });
+});
+
+// POST /v1/admin/set-guac-creds — called by spawn-machine.sh after Guacamole user created
+app.post('/v1/admin/set-guac-creds', async (c) => {
+  const adminToken = c.req.header('x-admin-token') || '';
+  if (adminToken !== (process.env.APP_PASSWORD || '')) return c.json({ error: 'Unauthorized' }, 401);
+  const { session_id, guacamole_user, guacamole_pass } = await c.req.json<{
+    session_id: string; guacamole_user: string; guacamole_pass: string;
+  }>();
+  const session = onboardSessions.get(session_id);
+  if (!session) return c.json({ error: 'Session not found' }, 404);
+  session.guacamoleUser = guacamole_user;
+  session.guacamolePass = guacamole_pass;
+  session.updatedAt = new Date().toISOString();
+  saveSessions();
   return c.json({ success: true });
 });
 
