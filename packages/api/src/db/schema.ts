@@ -82,4 +82,7 @@ export interface OnboardSession {
   qualifyAnswers?: { useCase: string; teamSize: string };
   preset?: AgentPreset;
   referralCode?: string;
+  // Desktop access (set by spawn-machine.sh after Guacamole step)
+  guacamoleUser?: string;
+  guacamolePass?: string;
 }
