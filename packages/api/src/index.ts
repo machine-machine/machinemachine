@@ -1090,7 +1090,7 @@ app.post('/v1/onboard/start', async (c) => {
 
   // Reject if active session exists (not rejected/live)
   const existing = [...onboardSessions.values()].find(
-    s => s.email === email && !['rejected', 'live'].includes(s.state)
+    s => (s.email || '').toLowerCase() === email.toLowerCase() && !['rejected', 'live'].includes(s.state)
   );
   if (existing) {
     // If session came from bot qualification (qualified/qualifying/contact_track) but email
@@ -1100,6 +1100,16 @@ app.post('/v1/onboard/start', async (c) => {
       existing.emailOtpExpiry = Date.now() + 10 * 60 * 1000;
       existing.emailOtpAttempts = 0;
       existing.state = 'email_pending';
+      existing.updatedAt = new Date().toISOString();
+      saveSessions();
+      await sendOtpEmail(email, existing.emailOtp).catch(() => {});
+      return c.json({ session_id: existing.id, message: 'Check your email for a 6-digit verification code.' });
+    }
+    // If OTP has expired for email_pending session, regenerate and resend
+    if (existing.state === 'email_pending' && Date.now() > (existing.emailOtpExpiry ?? 0)) {
+      existing.emailOtp = generateOtp();
+      existing.emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+      existing.emailOtpAttempts = 0;
       existing.updatedAt = new Date().toISOString();
       saveSessions();
       await sendOtpEmail(email, existing.emailOtp).catch(() => {});
