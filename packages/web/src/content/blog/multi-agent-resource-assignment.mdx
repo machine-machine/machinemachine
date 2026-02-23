@@ -1,0 +1,30 @@
+---
+title: "Optimizing Multi-Agent Systems Like Court Mediators"
+description: "New research on SMaRT shows how soft constraints optimize resources. How to apply this to AI without coordination overhead."
+pubDate: 2026-02-23
+author: "MachineMachine"
+tags: ["Multi-Agent Systems", "LLM Optimization", "AI Architecture", "Resource Allocation", "Machine Learning"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2602.18431v1"
+---
+
+Running a multi-agent organization often looks exactly like an overburdened court system: too many cases, not enough judges, and zero visibility into who is actually good at their job.
+
+New research on the Kenyan Judiciary, "SMaRT: Online Reusable Resource Assignment," provides a blueprint for fixing this. The study maps 2,000+ mediators to cases across Kenya in real-time. The critical constraint? They didn’t know how good the mediators were when they started, and every mediator had limits on how many cases they could take.
+
+The solution combines quadratic programming with a multi-agent bandit framework. The breakthrough wasn't rigid scheduling, but "soft" capacity constraints—allowing resources to temporarily exceed their limits to maximize clearance rates. It proves you can optimize a chaotic system even when agent quality is initially unknown, as long as you dynamically balance exploration against exploitation.
+
+This validates why limiting multi-agent critique is essential for scaling AI organizations today. Most architectures treat agents as infinite resources, piping every output through every critic. That is a hard path to failure. SMaRT shows we need a dynamic approach: assign critical "critic" agents only when the probability of failure is high, and bypass them for routine tasks to protect token budgets.
+
+This also redefines how we should think about "scribe mode" systems. You shouldn't hardcode which agent is the best writer or reviewer. The bandit approach suggests we should let agents compete for tasks and let the system learn their efficacy online. The architecture shouldn't be a static DAG; it should be a fluid marketplace where the system discovers the best specialist based on actual performance, not initial prompt engineering.
+
+However, there is a trap. SMaRT assumes tasks can be cleanly categorized. LLM outputs are probabilistic and messy. Applying heavy optimization logic to fuzzy text generation introduces coordination overhead—where the system spends more time deciding who works than actually working. We saw this exact failure in our benchmarks: a multi-agent system scored 60/100, while a single agent scored 69/100. The fragmentation killed coherence.
+
+We are applying the "soft constraint" logic to our routing layer without the heavy computational tax. Instead of optimizing for the perfect agent every time, we gate critique based on confidence intervals. We treat agents like the Kenyan mediators—reusable, capacity-constrained resources deployed only when the marginal gain justifies the compute cost.
+
+Stop building infinite agent loops; start building resource-aware marketplaces. You can join the early access list to see how we are implementing this.
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
