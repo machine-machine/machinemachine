@@ -509,6 +509,13 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
     let pollInterval = null;
     let selectedPreset = 'generalist'; // default
 
+    // ── sessionId persistence ─────────────────────────────────────────────────
+    function setSessionId(id) {
+      sessionId = id;
+      if (id) sessionStorage.setItem('m2o_sid', id);
+      else sessionStorage.removeItem('m2o_sid');
+    }
+
     // ── Telegram WebApp ───────────────────────────────────────────────────────
     const tg = window.Telegram?.WebApp;
     if (tg) {
@@ -517,24 +524,39 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
     }
     const tgUserId = tg?.initDataUnsafe?.user?.id?.toString() ?? null;
 
-    // ── ?sid param — load existing session from bot qualification ─────────────
+    // ── Restore session from sessionStorage or ?sid URL param ─────────────────
     const urlSid = new URLSearchParams(window.location.search).get('sid');
-    if (urlSid) {
-      sessionId = urlSid;
-      // Restore preset if session has one
-      fetch(`${API_BASE}/v1/onboard/status/${urlSid}`)
+    const storedSid = sessionStorage.getItem('m2o_sid');
+    const initSid = storedSid || urlSid;
+
+    const STATE_STEP = {
+      'email_pending': 1, 'email_verified': 2, 'token_validated': 4,
+      'provisioning': 5, 'live': 5, 'qualified': 0, 'qualifying': 0,
+    };
+
+    if (initSid) {
+      setSessionId(initSid);
+      // Restore UI state from session status
+      fetch(`${API_BASE}/v1/onboard/status/${initSid}`)
         .then(r => r.json())
         .then(d => {
+          if (d.error) {
+            // Session gone (e.g. API redeploy) — clear stored sid and start fresh
+            setSessionId(null);
+            return;
+          }
+          // Navigate to the correct step
+          const step = STATE_STEP[d.state] ?? 0;
+          if (step > 0) goTo(step);
           if (d.preset) {
             selectedPreset = d.preset;
-            // Pre-select the card visually
             document.querySelectorAll('.preset-card').forEach(c => {
               c.classList.toggle('selected', c.dataset.preset === d.preset);
             });
-            // Show continue button since a preset is already chosen
             const continueBtn = document.getElementById('preset-continue-btn');
             if (continueBtn) continueBtn.style.display = 'flex';
           }
+          if (d.bot_username) botUsername = d.bot_username;
         }).catch(() => {});
     }
 
@@ -594,7 +616,7 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
         if (sessionId) payload.existing_session_id = sessionId;
         const data = await api('/v1/onboard/start', payload);
         if (data.error) { showError('email-error', data.error); return; }
-        sessionId = data.session_id;
+        setSessionId(data.session_id);
         document.getElementById('otp-subtitle').textContent = `We sent a 6-digit code to ${email}.`;
         goTo(1);
       } catch (e) {
