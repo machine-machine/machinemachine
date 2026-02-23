@@ -1093,6 +1093,18 @@ app.post('/v1/onboard/start', async (c) => {
     s => s.email === email && !['rejected', 'live'].includes(s.state)
   );
   if (existing) {
+    // If session came from bot qualification (qualified/qualifying/contact_track) but email
+    // hasn't been verified yet, reset to email_pending and send a fresh OTP
+    if (['qualifying', 'qualified', 'contact_track'].includes(existing.state)) {
+      existing.emailOtp = generateOtp();
+      existing.emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+      existing.emailOtpAttempts = 0;
+      existing.state = 'email_pending';
+      existing.updatedAt = new Date().toISOString();
+      saveSessions();
+      await sendOtpEmail(email, existing.emailOtp).catch(() => {});
+      return c.json({ session_id: existing.id, message: 'Check your email for a 6-digit verification code.' });
+    }
     return c.json({ session_id: existing.id, message: 'Session already active. Check your email.' });
   }
   const otp = generateOtp();
