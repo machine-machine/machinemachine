@@ -617,6 +617,23 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
         const data = await api('/v1/onboard/start', payload);
         if (data.error) { showError('email-error', data.error); return; }
         setSessionId(data.session_id);
+        // If session is already past OTP (e.g. reload after verification), skip to correct step
+        try {
+          const statusData = await fetch(`${API_BASE}/v1/onboard/status/${data.session_id}`).then(r => r.json());
+          const step = STATE_STEP[statusData.state] ?? 1;
+          if (step > 1) {
+            if (statusData.preset) {
+              selectedPreset = statusData.preset;
+              document.querySelectorAll('.preset-card').forEach(c => {
+                c.classList.toggle('selected', c.dataset.preset === statusData.preset);
+              });
+              const continueBtn = document.getElementById('preset-continue-btn');
+              if (continueBtn) continueBtn.style.display = 'flex';
+            }
+            goTo(step);
+            return;
+          }
+        } catch(e) {}
         document.getElementById('otp-subtitle').textContent = `We sent a 6-digit code to ${email}.`;
         goTo(1);
       } catch (e) {
