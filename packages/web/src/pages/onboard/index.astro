@@ -404,6 +404,9 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
         </button>
       </div>
       <div class="error-msg" id="preset-error"></div>
+      <button class="btn" id="preset-continue-btn" style="display:none;margin-top:8px;" onclick="goTo(3)">
+        <div class="btn-inner"><span class="btn-label">Continue →</span></div>
+      </button>
     </div>
 
     <!-- Step 4: BotFather -->
@@ -528,6 +531,9 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
             document.querySelectorAll('.preset-card').forEach(c => {
               c.classList.toggle('selected', c.dataset.preset === d.preset);
             });
+            // Show continue button since a preset is already chosen
+            const continueBtn = document.getElementById('preset-continue-btn');
+            if (continueBtn) continueBtn.style.display = 'flex';
           }
         }).catch(() => {});
     }
@@ -626,7 +632,10 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
       });
       clearError('preset-error');
       ph('preset_selected', { preset, session_id: sessionId });
-      // Auto-advance after short delay so the selection is visible
+      // Show explicit Continue button (fallback for Telegram Mini App auto-advance issues)
+      const continueBtn = document.getElementById('preset-continue-btn');
+      if (continueBtn) continueBtn.style.display = 'flex';
+      // Also auto-advance after short delay
       setTimeout(() => goTo(3), 350);
     }
 
