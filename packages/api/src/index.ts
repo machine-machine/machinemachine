@@ -1696,9 +1696,7 @@ app.post('/v1/onboard/webhook', async (c) => {
 app.post('/v1/spawn', async (c) => {
   const { name, token, session_id } = await c.req.json<{ name: string; token: string; session_id?: string }>();
   if (!name || !token) return c.json({ error: 'name and token required' }, 400);
-  notifyTelegram(`⚙️ <b>Spawning agent: ${name}</b>\nBot token: set\nQueue: will call spawn-machine.sh`);
-  // TODO: exec spawn-machine.sh <name> <token> when API has shell access
-  // For now: logged + master notified
+  notifyTelegram(`⚙️ <b>Spawning agent: ${name}</b>\nBot token: set\nQueue: m2 heartbeat will pick up`);
   if (session_id) {
     const session = onboardSessions.get(session_id);
     if (session) {
@@ -1708,6 +1706,35 @@ app.post('/v1/spawn', async (c) => {
     }
   }
   return c.json({ success: true, message: `Spawn queued for ${name}` });
+});
+
+// GET /v1/admin/spawn-queue — returns pending spawn requests (for m2 heartbeat)
+app.get('/v1/admin/spawn-queue', async (c) => {
+  const adminToken = c.req.header('x-admin-token') || '';
+  if (adminToken !== (process.env.APP_PASSWORD || '')) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const raw = fs.readFileSync(SPAWN_QUEUE_FILE, 'utf8');
+    return c.json(JSON.parse(raw));
+  } catch {
+    return c.json({ pending: [] });
+  }
+});
+
+// POST /v1/admin/spawn-queue/ack — remove a processed entry by name
+app.post('/v1/admin/spawn-queue/ack', async (c) => {
+  const adminToken = c.req.header('x-admin-token') || '';
+  if (adminToken !== (process.env.APP_PASSWORD || '')) return c.json({ error: 'Unauthorized' }, 401);
+  const { name } = await c.req.json<{ name: string }>();
+  if (!name) return c.json({ error: 'name required' }, 400);
+  try {
+    let queue: any = { pending: [] };
+    try { queue = JSON.parse(fs.readFileSync(SPAWN_QUEUE_FILE, 'utf8')); } catch {}
+    const before = queue.pending.length;
+    queue.pending = queue.pending.filter((e: any) => e.name !== name);
+    fs.writeFileSync(SPAWN_QUEUE_FILE, JSON.stringify(queue, null, 2));
+    console.log(`[spawn-queue] acked: ${name} (removed ${before - queue.pending.length} entry)`);
+  } catch (e) { console.error('[spawn-queue] ack failed:', e); }
+  return c.json({ ok: true });
 });
 
 // POST /v1/onboard/notify-live — called when agent is confirmed live
