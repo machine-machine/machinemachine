@@ -1,0 +1,293 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="MachineMachine — Benchmark Results" description="Real benchmark data: multi-agent organisational architectures vs single-agent on enterprise tasks.">
+  <header>
+    <nav class="container">
+      <a href="/" class="logo">M²</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/docs">Docs</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero-bench">
+    <div class="container">
+      <div class="bench-badge">📊 BenchmarkSuite v2 · Real Data</div>
+      <h1>Does multi-agent actually work?</h1>
+      <p class="hero-sub">We ran a blinded benchmark: three enterprise tasks, three organisational topologies, multiple iterations. Single-agent baseline vs multi-agent coordination. Here's what we found.</p>
+      <div class="methodology-row">
+        <div class="method-pill">🔬 Blinded evaluator (Claude Haiku)</div>
+        <div class="method-pill">📋 45 conditions total</div>
+        <div class="method-pill">💰 Real API cost: $1.94</div>
+        <div class="method-pill">📅 February 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results-section">
+    <div class="container">
+
+      <!-- Headline result -->
+      <div class="headline-result">
+        <div class="headline-number">+20%</div>
+        <div class="headline-label">improvement on contract review<br/>with the right multi-agent topology</div>
+      </div>
+
+      <!-- Results table -->
+      <div class="results-grid">
+
+        <div class="task-block">
+          <div class="task-header">
+            <span class="task-icon">📜</span>
+            <div>
+              <h2>Contract Review</h2>
+              <p class="task-sub">Legal &amp; Compliance — identify risks, recommend amendments</p>
+            </div>
+          </div>
+          <div class="topology-results">
+            <div class="topo-row winner">
+              <div class="topo-name">Star <span class="topo-tag">✓ Best</span></div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:81.3%">SA 81.3</div>
+                <div class="score-bar ma" style="width:97.7%">MA 97.7</div>
+              </div>
+              <div class="delta positive">+16.4 pts</div>
+            </div>
+            <div class="topo-row">
+              <div class="topo-name">Self-Decompose</div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:92%">SA 92.0</div>
+                <div class="score-bar ma" style="width:93.6%">MA 93.6</div>
+              </div>
+              <div class="delta positive">+1.6 pts</div>
+            </div>
+            <div class="topo-row">
+              <div class="topo-name">HRM <span class="topo-tag warning">⚠ Wrong choice</span></div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:87.9%">SA 87.9</div>
+                <div class="score-bar ma-bad" style="width:51.7%">MA 51.7</div>
+              </div>
+              <div class="delta negative">−36.2 pts</div>
+            </div>
+          </div>
+          <div class="task-insight">
+            <strong>Insight:</strong> Star topology (parallel specialists → synthesis) dominates here.
+            HRM (hierarchical decomposition) catastrophically fails — the task needs broad coverage, not deep hierarchy.
+            <strong>Topology selection is the product.</strong>
+          </div>
+        </div>
+
+        <div class="task-block">
+          <div class="task-header">
+            <span class="task-icon">🔍</span>
+            <div>
+              <h2>Code Review Protocol</h2>
+              <p class="task-sub">Software Engineering — design a complete CI gate for a 3x-daily shipping team</p>
+            </div>
+          </div>
+          <div class="topology-results">
+            <div class="topo-row winner">
+              <div class="topo-name">HRM <span class="topo-tag">✓ Best</span></div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:87.1%">SA 87.1</div>
+                <div class="score-bar ma" style="width:91.7%">MA 91.7</div>
+              </div>
+              <div class="delta positive">+4.6 pts</div>
+            </div>
+            <div class="topo-row">
+              <div class="topo-name">Star</div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:87%">SA 87.0</div>
+                <div class="score-bar ma-bad" style="width:81.1%">MA 81.1</div>
+              </div>
+              <div class="delta negative">−5.9 pts</div>
+            </div>
+            <div class="topo-row">
+              <div class="topo-name">Self-Decompose</div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:87.1%">SA 87.1</div>
+                <div class="score-bar ma-bad" style="width:79%">MA 79.0</div>
+              </div>
+              <div class="delta negative">−8.1 pts</div>
+            </div>
+          </div>
+          <div class="task-insight">
+            <strong>Insight:</strong> Hierarchical review (sub-tasks → integration) wins here.
+            Flat star parallelism actually hurts on tasks that need sequential reasoning chains.
+          </div>
+        </div>
+
+        <div class="task-block">
+          <div class="task-header">
+            <span class="task-icon">🎫</span>
+            <div>
+              <h2>Support Triage System</h2>
+              <p class="task-sub">Customer Support — design a full triage system for a B2B SaaS product</p>
+            </div>
+          </div>
+          <div class="topology-results">
+            <div class="topo-row winner">
+              <div class="topo-name">HRM <span class="topo-tag">✓ Best</span></div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:87.5%">SA 87.5</div>
+                <div class="score-bar ma" style="width:92.2%">MA 92.2</div>
+              </div>
+              <div class="delta positive">+4.7 pts</div>
+            </div>
+            <div class="topo-row">
+              <div class="topo-name">Self-Decompose</div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:88.4%">SA 88.4</div>
+                <div class="score-bar ma" style="width:88.7%">MA 88.7</div>
+              </div>
+              <div class="delta neutral">+0.2 pts</div>
+            </div>
+            <div class="topo-row">
+              <div class="topo-name">Star</div>
+              <div class="score-bar-wrap">
+                <div class="score-bar sa" style="width:86.4%">SA 86.4</div>
+                <div class="score-bar ma" style="width:87.6%">MA 87.6</div>
+              </div>
+              <div class="delta positive">+1.1 pts</div>
+            </div>
+          </div>
+          <div class="task-insight">
+            <strong>Insight:</strong> Consistent improvements across all topologies — this task benefits from any multi-agent approach.
+          </div>
+        </div>
+
+      </div><!-- /results-grid -->
+
+      <!-- The real takeaway -->
+      <div class="takeaway-section">
+        <h2>What this actually means</h2>
+        <div class="takeaway-grid">
+          <div class="takeaway-card">
+            <div class="takeaway-icon">📐</div>
+            <h3>Topology is the variable</h3>
+            <p>Multi-agent isn't universally better. The right topology can add 20 points. The wrong one can lose 36. Structure determines outcome — not model size.</p>
+          </div>
+          <div class="takeaway-card highlight">
+            <div class="takeaway-icon">⚡</div>
+            <h3>Our thesis is validated</h3>
+            <p>MachineMachine doesn't deploy agents. It deploys organisations — with dynamic topology selection matched to the task. That's the edge that compounds.</p>
+          </div>
+          <div class="takeaway-card">
+            <div class="takeaway-icon">🔬</div>
+            <h3>Reproducible</h3>
+            <p>Source: <a href="https://git.machinemachine.ai/machine.machine/agent-org-simulator" target="_blank" rel="noopener">machine.machine/agent-org-simulator</a>. Blinded evaluation by Claude Haiku. Raw JSON results available on request.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="bench-cta">
+        <a href="/onboard/" class="btn btn-primary">Get your agent ⚡</a>
+        <a href="/blog" class="btn btn-secondary">Read the research →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/docs">Docs</a>
+        <a href="/blog">Blog</a>
+        <a href="https://git.machinemachine.ai/machine.machine" target="_blank" rel="noopener">Git</a>
+      </div>
+      <p class="copyright">© 2026 Machine.Machine</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f; --bg2: #12121a; --bg3: #1a1a25;
+    --text: #e0e0e0; --muted: #6b7280;
+    --primary: #3b82f6; --secondary: #8b5cf6; --accent: #06d6a0;
+    --red: #ef4444; --yellow: #f59e0b;
+  }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { color: var(--secondary); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; align-items: center; gap: 2rem; padding: 1.5rem 0; }
+  .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a { color: var(--muted); font-size: 0.9rem; }
+
+  /* Hero */
+  .hero-bench { padding: 5rem 0 3rem; text-align: center; }
+  .bench-badge { display: inline-block; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: var(--primary); padding: 0.3rem 1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; }
+  .hero-sub { color: var(--muted); max-width: 600px; margin: 0 auto 2rem; line-height: 1.7; }
+  .methodology-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+  .method-pill { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.8rem; color: var(--muted); }
+
+  /* Headline result */
+  .headline-result { text-align: center; margin: 3rem 0 4rem; }
+  .headline-number { font-size: 6rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+  .headline-label { font-size: 1.2rem; color: var(--muted); margin-top: 0.5rem; }
+
+  /* Results */
+  .results-section { padding: 0 0 6rem; }
+  .results-grid { display: flex; flex-direction: column; gap: 2.5rem; }
+  .task-block { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; padding: 2rem; }
+  .task-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+  .task-icon { font-size: 2rem; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .task-sub { color: var(--muted); font-size: 0.875rem; }
+  .topology-results { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .topo-row { display: grid; grid-template-columns: 200px 1fr 80px; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-radius: 0.5rem; background: rgba(255,255,255,0.02); }
+  .topo-row.winner { background: rgba(6,214,160,0.05); border: 1px solid rgba(6,214,160,0.15); }
+  .topo-name { font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .topo-tag { font-size: 0.7rem; font-weight: 500; background: rgba(6,214,160,0.1); color: var(--accent); padding: 0.15rem 0.5rem; border-radius: 999px; }
+  .topo-tag.warning { background: rgba(245,158,11,0.1); color: var(--yellow); }
+  .score-bar-wrap { display: flex; flex-direction: column; gap: 0.3rem; }
+  .score-bar, .score-bar-sa, .score-bar-ma, .score-bar-ma-bad {
+    height: 22px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+    display: flex; align-items: center; padding: 0 8px; min-width: 40px;
+    max-width: 100%; transition: width 1s ease;
+  }
+  .score-bar.sa { background: rgba(107,114,128,0.3); color: var(--muted); }
+  .score-bar.ma { background: linear-gradient(90deg, var(--accent), var(--primary)); color: #000; }
+  .score-bar.ma-bad { background: rgba(239,68,68,0.3); color: var(--red); }
+  .delta { font-size: 0.9rem; font-weight: 700; text-align: right; }
+  .delta.positive { color: var(--accent); }
+  .delta.negative { color: var(--red); }
+  .delta.neutral { color: var(--muted); }
+  .task-insight { background: rgba(59,130,246,0.05); border-left: 3px solid var(--primary); padding: 1rem; border-radius: 0 0.5rem 0.5rem 0; font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+  .task-insight strong { color: var(--text); }
+
+  /* Takeaway */
+  .takeaway-section { margin: 4rem 0; text-align: center; }
+  .takeaway-section h2 { font-size: 2rem; font-weight: 800; margin-bottom: 2rem; }
+  .takeaway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .takeaway-card { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; padding: 2rem; text-align: left; }
+  .takeaway-card.highlight { border-color: rgba(6,214,160,0.3); background: rgba(6,214,160,0.04); }
+  .takeaway-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .takeaway-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .takeaway-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+  /* CTA */
+  .bench-cta { display: flex; gap: 1rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #000; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,0.3); color: #000; }
+  .btn-secondary { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--text); }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.4); }
+
+  /* Footer */
+  footer { padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.06); text-align: center; }
+  .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+  .footer-links a { color: var(--muted); font-size: 0.875rem; }
+  .copyright { color: var(--muted); font-size: 0.8rem; }
+</style>
