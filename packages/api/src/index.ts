@@ -437,6 +437,7 @@ Design system (copy EXACTLY):
 - scroll-snap full-height slides (.deck > .slide)
 - Left 4px gradient bar on non-title slides
 - Same component classes: .label, .stat-grid, .card-grid, .comparison, .cta
+- MUST be mobile responsive: font sizes use clamp(), grids collapse to 1 column on mobile, no horizontal overflow
 - 10-12 slides covering: their specific problem → how Machine.Machine solves it for them → what their AI org would look like → concrete use cases for their domain → next steps (join waitlist)
 
 CRITICAL CSS rules (must include verbatim — do NOT override these):
@@ -618,7 +619,7 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   if (!pitch) return c.json({ error: 'Pitch not found' }, 404);
 
   if (pitch.status === 'ready' && pitch.html) {
-    // Inject CSS fix for slide alignment (retroactive fix for all pitches)
+    // Inject CSS fix for slide alignment + mobile responsiveness (retroactive fix for all pitches)
     const cssfix = `<style>
 /* === Pitch alignment fixes === */
 .slide{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important}
@@ -632,6 +633,25 @@ app.get('/v1/pitch/:uuid/html', (c) => {
 .stat-item h3,.stat-item h4,.stat-item p{text-align:center!important}
 .comp-col h3,.comp-col h4{text-align:center!important}
 .cta{display:block!important;text-align:center!important;margin-left:auto!important;margin-right:auto!important;width:fit-content!important}
+/* === Mobile responsiveness === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important}
+  .deck,.slide{width:100%!important;min-width:0!important;overflow-x:hidden!important}
+  .slide{padding:1.5rem 1.25rem 5rem!important;min-height:100svh!important;box-sizing:border-box!important}
+  .slide h1{font-size:clamp(1.6rem,6vw,3rem)!important;line-height:1.2!important}
+  .slide h2{font-size:clamp(1.3rem,5vw,2.2rem)!important;line-height:1.3!important}
+  .slide h3,.slide h4{font-size:clamp(1rem,4vw,1.5rem)!important}
+  .slide p,.slide li{font-size:clamp(0.875rem,3.5vw,1.1rem)!important;line-height:1.6!important}
+  .stat-grid,.card-grid,.comparison,.org-chart{display:flex!important;flex-direction:column!important;align-items:center!important;gap:1rem!important;width:100%!important}
+  .stat-item,.card,.comp-col,.org-node{width:100%!important;max-width:360px!important;box-sizing:border-box!important}
+  .cta{width:auto!important;max-width:90vw!important;padding:0.875rem 1.5rem!important;font-size:1rem!important;white-space:normal!important;word-break:break-word!important}
+  table{display:block!important;overflow-x:auto!important;width:100%!important}
+  img{max-width:100%!important;height:auto!important}
+  pre,code{white-space:pre-wrap!important;word-break:break-word!important;max-width:100%!important}
+  #m2-cta-bar{padding:10px 16px!important;gap:10px!important}
+  #m2-cta-bar span{font-size:11px!important}
+  #m2-cta-bar a{padding:8px 16px!important;font-size:13px!important}
+}
 </style></head>`;
     const ctaBar = `
 <div id="m2-cta-bar" style="
