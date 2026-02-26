@@ -13,11 +13,11 @@ export const translations = {
     nav_docs: "Docs",
 
     // Hero
-    hero_badge: "AI teams. Not AI tools.",
-    hero_h1: "Your experts shouldn't be<br/>doing clerk work.",
-    hero_sub: "Machine.Machine builds AI teams that handle the work your experts shouldn't need to do&thinsp;—<br/>so they can do the work only they can.",
-    hero_cta_primary: "Build your AI team",
-    hero_cta_secondary: "See how it works",
+    hero_badge: "The Operating System for AI Labor",
+    hero_h1: "Deploy an AI workforce.<br/>Scale without hiring.",
+    hero_sub: "Machine.Machine gives your organisation autonomous agents with memory, coordination, and voice&thinsp;—<br/>deployed in 45 seconds, running 24/7, learning as they work.",
+    hero_cta_primary: "Get your agent ⚡",
+    hero_cta_secondary: "See the fleet →",
 
     // Problem
     problem_h2: "Your organisation runs on expertise.<br/>Most of that expertise is currently buried under emails.",

@@ -45,8 +45,8 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
       <h1 set:html={t(locale, 'hero_h1')} />
       <p class="hero-description" set:html={t(locale, 'hero_sub')} />
       <div class="hero-buttons">
-        <a href="#pitch-form" class="btn btn-primary">{t(locale, 'hero_cta_primary')} &darr;</a>
-        <a href="#problem" class="btn btn-secondary">{t(locale, 'hero_cta_secondary')} &rarr;</a>
+        <a href="/onboard/" class="btn btn-primary">{t(locale, 'hero_cta_primary')}</a>
+        <a href="#live-fleet" class="btn btn-secondary">{t(locale, 'hero_cta_secondary')}</a>
       </div>
     </div>
   </section>
