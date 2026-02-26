@@ -130,7 +130,7 @@ export const translations = {
     // Form result
     form_result_title: "Your pitch is being generated!",
     form_result_text: "Your personal presentation can be found here:",
-    form_result_note: "Come back in ~30 minutes.<br/>We'll send you an email as soon as we can.",
+    form_result_note: "Usually ready in ~45 seconds.<br/>We'll also send you an email when it's done.",
 
     // Pitch page
     pitch_page_title: "Your Pitch | MachineMachine",
@@ -444,7 +444,7 @@ export const translations = {
     // Form result
     form_result_title: "Twój pitch jest generowany!",
     form_result_text: "Twoją osobistą prezentację znajdziesz tutaj:",
-    form_result_note: "Wróć za ~30 minut.<br/>Wyślemy ci maila, jak tylko będziemy mogli.",
+    form_result_note: "Zwykle gotowe w ~45 sekund.<br/>Wyślemy ci też maila, gdy będzie gotowe.",
 
     // Pitch page
     pitch_page_title: "Twój Pitch | MachineMachine",
