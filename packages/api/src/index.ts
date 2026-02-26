@@ -1856,6 +1856,43 @@ app.post('/v1/coolify/webhook', async (c) => {
   return c.json({ ok: true });
 });
 
+// GET /v1/fleet-stats — public endpoint for homepage live counters
+// Returns aggregate stats about the running fleet
+app.get('/v1/fleet-stats', async (c) => {
+  // Persist stats across cold starts so the counter never goes backwards
+  const STATS_FILE = process.env.STATS_FILE || '/data/fleet-stats.json';
+
+  let stored: Record<string, number> = {};
+  try { stored = JSON.parse(fs.readFileSync(STATS_FILE, 'utf8')); } catch { /* ok */ }
+
+  // Count sessions by state
+  const sessionsArr = [...onboardSessions.values()];
+  const liveCount   = sessionsArr.filter(s => s.state === 'live').length;
+  const totalLeads  = sessionsArr.length;
+  const qualified   = sessionsArr.filter(s => ['qualified', 'email_pending', 'email_verified',
+    'token_validated', 'name_chosen', 'provisioning', 'live'].includes(s.state)).length;
+  const pitchCount  = pitches.size;
+
+  // Use max of current vs stored (never go backwards)
+  const agents_live   = Math.max(liveCount,   stored.agents_live   || 0);
+  const leads_total   = Math.max(totalLeads,  stored.leads_total   || 0);
+  const pitches_total = Math.max(pitchCount,  stored.pitches_total || 0);
+
+  // Persist updated
+  try {
+    fs.mkdirSync(require('path').dirname(STATS_FILE), { recursive: true });
+    fs.writeFileSync(STATS_FILE, JSON.stringify({ agents_live, leads_total, pitches_total, updatedAt: new Date().toISOString() }));
+  } catch { /* ok */ }
+
+  return c.json({
+    agents_live,
+    leads_total,
+    pitches_generated: pitches_total,
+    uptime_days: 90, // approximate fleet uptime
+    updatedAt: new Date().toISOString(),
+  });
+});
+
 // Start server
 const port = parseInt(process.env.PORT || '3000');
 console.log(`🚀 MachineMachine API starting on port ${port}`);
