@@ -1,0 +1,215 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const reposData = JSON.parse(readFileSync(join(process.cwd(), 'src/content/repos.json'), 'utf-8'));
+
+const tagColors: Record<string, string> = {
+  infra: '#7c3aed',
+  docker: '#60a5fa',
+  web: '#38bdf8',
+  astro: '#f472b6',
+  governance: '#a78bfa',
+  memory: '#a78bfa',
+  qdrant: '#818cf8',
+  bge: '#818cf8',
+  skill: '#4ade80',
+  comms: '#60a5fa',
+  redis: '#f87171',
+  monitoring: '#fbbf24',
+  vnc: '#94a3b8',
+  spawn: '#34d399',
+  automation: '#fbbf24',
+  compiler: '#fbbf24',
+  research: '#60a5fa',
+  aieos: '#a78bfa',
+  reasoning: '#c084fc',
+  tts: '#f472b6',
+  voice: '#f472b6',
+  stt: '#fb923c',
+  media: '#fb7185',
+  video: '#fb7185',
+  image: '#fda4af',
+  planka: '#4ade80',
+  crm: '#34d399',
+  desktop: '#94a3b8',
+  growth: '#38bdf8',
+  analytics: '#22d3ee',
+  browser: '#60a5fa',
+  api: '#a78bfa',
+  client: '#fb923c',
+  finance: '#4ade80',
+  product: '#38bdf8',
+};
+---
+
+<BaseLayout title="Repo Map | Machine.Machine" description="Full repository map for all Machine.Machine subsystems.">
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #0a0a12; }
+    .page { background: #0a0a12; min-height: 100vh; color: #e2e8f0; font-family: 'Space Grotesk', system-ui, sans-serif; }
+    
+    .top-nav { background: #10101e; border-bottom: 1px solid #1e1e38; padding: 12px 48px; display: flex; align-items: center; gap: 16px; font-size: 0.82rem; }
+    .top-nav a { color: #64748b; text-decoration: none; }
+    .top-nav a:hover { color: #a78bfa; }
+    .top-nav .sep { color: #1e1e38; }
+    .top-nav .curr { color: #e2e8f0; }
+    
+    .hero { padding: 48px 48px 32px; border-bottom: 1px solid #1e1e38; }
+    .hero .tag { display: inline-block; padding: 4px 12px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); border-radius: 999px; font-size: 0.72rem; font-weight: 600; color: #a78bfa; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+    .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
+    .hero p { color: #64748b; font-size: 0.9rem; max-width: 640px; }
+    .stats { display: flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+    .stat { }
+    .stat .val { font-size: 1.6rem; font-weight: 800; }
+    .stat .lbl { font-size: 0.75rem; color: #64748b; }
+    
+    .container { max-width: 1280px; margin: 0 auto; padding: 40px 48px; }
+    
+    /* Category section */
+    .cat-section { margin-bottom: 48px; }
+    .cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1e1e38; }
+    .cat-icon { font-size: 1.3rem; }
+    .cat-name { font-size: 1rem; font-weight: 700; }
+    .cat-count { font-size: 0.75rem; color: #64748b; font-weight: 500; }
+    
+    /* Repo grid */
+    .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+    .repo-card { background: #10101e; border: 1px solid #1e1e38; border-radius: 10px; padding: 16px 18px; transition: border-color 0.2s, transform 0.15s; position: relative; }
+    .repo-card:hover { border-color: #7c3aed50; transform: translateY(-1px); }
+    .repo-card .rc-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .repo-card .rc-name { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; }
+    .repo-card .rc-desc { font-size: 0.78rem; color: #64748b; line-height: 1.5; margin-bottom: 10px; flex: 1; }
+    .repo-card .rc-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tag-pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .rc-coolify { margin-left: auto; font-size: 0.65rem; color: #64748b; display: flex; align-items: center; gap: 4px; }
+    .rc-coolify .dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
+    .rc-git-link { color: #64748b; font-size: 0.72rem; text-decoration: none; font-family: 'JetBrains Mono', monospace; }
+    .rc-git-link:hover { color: #a78bfa; }
+    
+    /* Activity feed */
+    .activity-section { margin-bottom: 48px; }
+    .activity-list { background: #10101e; border: 1px solid #1e1e38; border-radius: 12px; overflow: hidden; }
+    .activity-item { display: flex; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(30,30,56,0.7); align-items: flex-start; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item .ai-date { font-size: 0.72rem; color: #475569; min-width: 80px; font-family: 'JetBrains Mono', monospace; padding-top: 2px; }
+    .activity-item .ai-repo { font-size: 0.72rem; font-weight: 600; color: #7c3aed; min-width: 160px; }
+    .activity-item .ai-sha { font-size: 0.7rem; color: #334155; font-family: 'JetBrains Mono', monospace; min-width: 52px; }
+    .activity-item .ai-msg { font-size: 0.82rem; color: #94a3b8; flex: 1; }
+    
+    @media (max-width: 768px) {
+      .top-nav, .hero, .container { padding-left: 20px; padding-right: 20px; }
+      .repo-grid { grid-template-columns: 1fr; }
+    }
+    
+    footer { border-top: 1px solid #1e1e38; padding: 20px 48px; color: #475569; font-size: 0.78rem; display: flex; justify-content: space-between; }
+  </style>
+
+  <div class="page">
+    <nav class="top-nav">
+      <a href="/report">Reports</a>
+      <span class="sep">/</span>
+      <span class="curr">Repository Map</span>
+    </nav>
+
+    <div class="hero">
+      <div class="tag">🗂️ Internal · System Map</div>
+      <h1>Repository Overview</h1>
+      <p>All <strong>50 repositories</strong> in the machine.machine org on Forgejo (git.machinemachine.ai), organised by subsystem.</p>
+      <div class="stats">
+        {reposData.categories.map((cat: any) => (
+          <div class="stat">
+            <div class="val" style={`color: ${cat.color}`}>{cat.repos.length}</div>
+            <div class="lbl">{cat.name}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- RECENT ACTIVITY -->
+      <div class="activity-section">
+        <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px; border-bottom:1px solid #1e1e38; padding-bottom:12px;">
+          <h2 style="font-size:1rem; font-weight:700;">⚡ Recent Git Activity (Last 7 Days)</h2>
+          <span style="font-size:0.8rem; color:#64748b;">Auto-updated weekly</span>
+        </div>
+        <div class="activity-list">
+          {[
+            { date: '2026-02-27', repo: 'machinemachine', sha: '13a0ec3', msg: 'feat: weekly report archive — /report index + /report/[date] detail pages' },
+            { date: '2026-02-27', repo: 'machinemachine', sha: '1c603c6', msg: 'feat: add weekly system report at /report' },
+            { date: '2026-02-27', repo: 'machinemachine', sha: 'ad43783', msg: 'content: MediX-R1: Open Ended Medical RL (auto-generated from arXiv)' },
+            { date: '2026-02-27', repo: 'fleet-dashboard', sha: '42c9813', msg: 'feat: add /api/load endpoint for container CPU/RAM stats' },
+            { date: '2026-02-26', repo: 'machinemachine', sha: '322eeb9', msg: 'feat: /benchmark page — real SA vs MA results from BenchmarkSuite v2' },
+            { date: '2026-02-26', repo: 'machinemachine', sha: '3346c6a', msg: 'feat: enterprise positioning upgrade — hero rewrite + CTA to onboarding' },
+            { date: '2026-02-26', repo: 'm2o-fleet', sha: 'fb434ef', msg: 'feat: add nasr to fleet registry' },
+            { date: '2026-02-25', repo: 'fleet-dashboard', sha: '5c50ff4', msg: 'fix: claim_task handles fleet-bus.sh JSON format' },
+            { date: '2026-02-25', repo: 'dark-factory-engine', sha: '99d3e77', msg: 'feat: add research.md and build.md workflow templates' },
+            { date: '2026-02-25', repo: 'm2-desktop', sha: 'b1e63c7', msg: 'fix: add unix_http_server socket to supervisord.conf' },
+            { date: '2026-02-25', repo: 'm2-desktop', sha: '4cda72c', msg: 'feat: bake qdrant-session-memory hook into agent image' },
+            { date: '2026-02-24', repo: 'm2-desktop', sha: 'cd1ffdb', msg: 'feat: AgentX private key setup + fleet-ssh helper in entrypoint' },
+            { date: '2026-02-22', repo: 'fleet-playbook', sha: '141643f', msg: 'feat: §8 OpenClaw Release + Update Rhythm' },
+            { date: '2026-02-22', repo: 'fleet-playbook', sha: '6f0aafc', msg: 'feat(§11): RLM in fleet-review + retro observation parking pattern' },
+            { date: '2026-02-22', repo: 'dark-factory-engine', sha: '8929390', msg: 'feat: Coolify integration — bin/deploy + bin/monitor' },
+            { date: '2026-02-22', repo: 'm2o-fleet', sha: 'c457855', msg: 'feat: Incoming Machines tab — live onboarding pipeline view' },
+            { date: '2026-02-21', repo: 'agent.memory.system', sha: '97fb467', msg: 'fix: replace curl healthcheck with python3 urllib in memory-api' },
+            { date: '2026-02-21', repo: 'fleet-playbook', sha: 'c522291', msg: 'docs: §3.11 m2o-autoheal — self-healing gateway monitor' },
+          ].map(item => (
+            <div class="activity-item">
+              <span class="ai-date">{item.date}</span>
+              <span class="ai-repo">{item.repo}</span>
+              <span class="ai-sha">{item.sha}</span>
+              <span class="ai-msg">{item.msg}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- REPO CATEGORIES -->
+      {reposData.categories.map((cat: any) => (
+        <div class="cat-section">
+          <div class="cat-header">
+            <span class="cat-icon">{cat.icon}</span>
+            <span class="cat-name" style={`color: ${cat.color}`}>{cat.name}</span>
+            <span class="cat-count">{cat.repos.length} repos</span>
+          </div>
+          <div class="repo-grid">
+            {cat.repos.map((repo: any) => (
+              <div class="repo-card" style={`border-left: 3px solid ${cat.color}40`}>
+                <div class="rc-top">
+                  <div style="flex:1">
+                    <div class="rc-name">
+                      <a href={repo.url} target="_blank" rel="noopener" style={`color: ${cat.color}; text-decoration: none;`}>
+                        {repo.name}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="rc-desc">{repo.desc}</div>
+                <div class="rc-footer">
+                  {repo.tags.map((tag: string) => (
+                    <span class="tag-pill" style={`background: ${tagColors[tag] || '#475569'}15; color: ${tagColors[tag] || '#94a3b8'}; border: 1px solid ${tagColors[tag] || '#475569'}30`}>
+                      {tag}
+                    </span>
+                  ))}
+                  {repo.coolify && (
+                    <span class="rc-coolify">
+                      <span class="dot"></span>deployed
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+    </div>
+
+    <footer>
+      <span>⚡ Machine.Machine — 50 repos in machine.machine org · git.machinemachine.ai</span>
+      <a href="/report" style="color:#7c3aed; text-decoration:none;">← Reports</a>
+    </footer>
+  </div>
+</BaseLayout>

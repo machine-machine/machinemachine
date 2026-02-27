@@ -1,0 +1,114 @@
+{
+  "categories": [
+    {
+      "name": "Core Platform",
+      "icon": "⚡",
+      "color": "#7c3aed",
+      "repos": [
+        { "name": "m2-desktop", "desc": "Base Docker image for all m2o agents — XFCE, OpenClaw, supervisor stack", "url": "http://git.machinemachine.ai/machine.machine/m2-desktop", "coolify": "oksko440840go08wow8cwo4w", "tags": ["infra", "docker"] },
+        { "name": "machinemachine", "desc": "Main website — Astro + landing, report, pitch, onboarding pages", "url": "http://git.machinemachine.ai/machine.machine/machinemachine", "coolify": "w84s84gkcogcskgw8scwk8k4", "tags": ["web", "astro"] },
+        { "name": "fleet-playbook", "desc": "Operating model for the entire fleet — v0.2 with roles, comms, autonomy loops", "url": "http://git.machinemachine.ai/machine.machine/fleet-playbook", "tags": ["governance"] },
+        { "name": "fleet-governance", "desc": "Policy schemas, invariants, amendment log for fleet-wide governance", "url": "http://git.machinemachine.ai/machine.machine/fleet-governance", "tags": ["governance"] }
+      ]
+    },
+    {
+      "name": "Memory & Intelligence",
+      "icon": "🧠",
+      "color": "#a78bfa",
+      "repos": [
+        { "name": "agent.memory.system", "desc": "Qdrant + BGE-M3 semantic memory — REST API, session watcher, RLM", "url": "http://git.machinemachine.ai/machine.machine/agent.memory.system", "coolify": "vc00o4oggcckgwkc48408c4w", "tags": ["memory", "qdrant", "bge"] },
+        { "name": "openclaw-m2-memory-skill", "desc": "OpenClaw skill: semantic vector memory store/search/consolidate", "url": "http://git.machinemachine.ai/machine.machine/openclaw-m2-memory-skill", "tags": ["skill", "memory"] },
+        { "name": "bge-openai-proxy", "desc": "BGE-M3 OpenAI-compatible proxy + fleet escalation API", "url": "http://git.machinemachine.ai/machine.machine/bge-openai-proxy", "coolify": "iw4socwc4okkgkowsss488g4", "tags": ["memory", "comms"] }
+      ]
+    },
+    {
+      "name": "Fleet Management",
+      "icon": "🤖",
+      "color": "#60a5fa",
+      "repos": [
+        { "name": "fleet-dashboard", "desc": "Real-time fleet viz — force graph, agent heartbeats, benchmark runner, /api/load", "url": "http://git.machinemachine.ai/machine.machine/fleet-dashboard", "coolify": "iw4socwc4okkgkowsss488g4", "tags": ["infra", "monitoring"] },
+        { "name": "fleet-bus", "desc": "Redis-backed inter-agent message bus + escalation consumer", "url": "http://git.machinemachine.ai/machine.machine/fleet-bus", "tags": ["comms", "redis"] },
+        { "name": "m2o-fleet", "desc": "Fleet registry, agent profiles, spawn queue, onboarding API backend", "url": "http://git.machinemachine.ai/machine.machine/m2o-fleet", "tags": ["infra", "api"] },
+        { "name": "m2o-guacamole", "desc": "Guacamole docker-compose for agent desktop VNC access", "url": "http://git.machinemachine.ai/machine.machine/m2o-guacamole", "tags": ["infra", "vnc"] },
+        { "name": "openclaw-spawn-machine-skill", "desc": "Agent factory workflow — 7-step spawn from identity to first contact", "url": "http://git.machinemachine.ai/machine.machine/openclaw-spawn-machine-skill", "tags": ["skill", "spawn"] }
+      ]
+    },
+    {
+      "name": "Dark Factory Engine",
+      "icon": "🏭",
+      "color": "#fbbf24",
+      "repos": [
+        { "name": "dark-factory-engine", "desc": "Workflow → OpenClaw skill compiler + Coolify deploy pipeline", "url": "http://git.machinemachine.ai/machine.machine/dark-factory-engine", "tags": ["automation", "compiler"] },
+        { "name": "agent-org-simulator", "desc": "AIEOS org topology benchmark + evolving org simulator", "url": "http://git.machinemachine.ai/machine.machine/agent-org-simulator", "tags": ["research", "aieos"] },
+        { "name": "openclaw-self-improve-skill", "desc": "Self-improvement loop: capture → review → amendment → PR", "url": "http://git.machinemachine.ai/machine.machine/openclaw-self-improve-skill", "tags": ["skill", "governance"] },
+        { "name": "openclaw-bmad-elicit-skill", "desc": "Advanced elicitation — 50+ reasoning techniques for deep analysis", "url": "http://git.machinemachine.ai/machine.machine/openclaw-bmad-elicit-skill", "tags": ["skill", "reasoning"] }
+      ]
+    },
+    {
+      "name": "Voice & Media",
+      "icon": "🎙️",
+      "color": "#f472b6",
+      "repos": [
+        { "name": "openclaw-tts-skill", "desc": "Qwen3-TTS voice synthesis skill — vivian voice, reference audio cloning", "url": "http://git.machinemachine.ai/machine.machine/openclaw-tts-skill", "tags": ["skill", "tts", "voice"] },
+        { "name": "m2o-skill-tts-manager", "desc": "TTS provider manager — routing, fallback, Opus encoding", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-tts-manager", "tags": ["skill", "tts"] },
+        { "name": "m2o-skill-stt", "desc": "Speech-to-text skill wrapping Speaches (faster-whisper-large-v3)", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-stt", "tags": ["skill", "stt"] },
+        { "name": "ltx2-server", "desc": "LTX-2 video generation server — AI video synthesis", "url": "http://git.machinemachine.ai/machine.machine/ltx2-server", "coolify": "hcsw4c08woo0sk88o84k4oos", "tags": ["media", "video"] },
+        { "name": "comfyui-server", "desc": "ComfyUI image generation server with custom workflows", "url": "http://git.machinemachine.ai/machine.machine/comfyui-server", "tags": ["media", "image"] }
+      ]
+    },
+    {
+      "name": "Skills Library",
+      "icon": "🔧",
+      "color": "#34d399",
+      "repos": [
+        { "name": "openclaw-planka-skill", "desc": "Planka kanban full CRUD via OpenClaw skill", "url": "http://git.machinemachine.ai/machine.machine/openclaw-planka-skill", "tags": ["skill", "planka"] },
+        { "name": "m2o-skill-planka-pm", "desc": "PM assistant — status, context, done, move cards", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-planka-pm", "tags": ["skill", "planka"] },
+        { "name": "m2o-skill-coolify", "desc": "Coolify deploy/manage skill for fleet agents", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-coolify", "tags": ["skill", "infra"] },
+        { "name": "m2o-skill-playbook", "desc": "Section-by-section fleet playbook access skill", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-playbook", "tags": ["skill", "governance"] },
+        { "name": "m2o-skill-twenty", "desc": "Twenty CRM skill — contacts, companies, pipeline", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-twenty", "tags": ["skill", "crm"] },
+        { "name": "m2o-skill-xfce-desktop", "desc": "XFCE desktop automation via xdotool", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-xfce-desktop", "tags": ["skill", "desktop"] },
+        { "name": "m2o-skill-x-scraper", "desc": "X/Twitter content scraper skill", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-x-scraper", "tags": ["skill", "growth"] },
+        { "name": "x-monitor", "desc": "X/Twitter signal monitor cron — pump.fun / solana news", "url": "http://git.machinemachine.ai/machine.machine/x-monitor", "tags": ["growth", "monitoring"] },
+        { "name": "m2o-skill-browser-persistence", "desc": "Browser profile persistence for agents", "url": "http://git.machinemachine.ai/machine.machine/m2o-skill-browser-persistence", "tags": ["skill", "browser"] },
+        { "name": "openclaw-backup", "desc": "Automated workspace backup skill", "url": "http://git.machinemachine.ai/machine.machine/openclaw-backup", "tags": ["skill", "infra"] }
+      ]
+    },
+    {
+      "name": "Client Projects",
+      "icon": "🎨",
+      "color": "#fb923c",
+      "repos": [
+        { "name": "meditation-dk", "desc": "meditation.machinemachine.ai — Gunnar Mühlmann philosophy site, Next.js 15", "url": "http://git.machinemachine.ai/machine.machine/meditation-dk", "coolify": "g8c88488ssskkooc0koksoco", "tags": ["client", "web"] },
+        { "name": "peter-ai-assistant", "desc": "Peter Mühlmann AI assistant configuration + workspace", "url": "http://git.machinemachine.ai/machine.machine/peter-ai-assistant", "tags": ["client", "agent"] },
+        { "name": "mp1-muhlman-ai", "desc": "Fund cashflow app — SQLite + Excel + Streamlit for Peter", "url": "http://git.machinemachine.ai/machine.machine/mp1-muhlman-ai", "tags": ["client", "finance"] },
+        { "name": "knoedelpuff", "desc": "Knoedelpuff client project", "url": "http://git.machinemachine.ai/machine.machine/knoedelpuff", "coolify": "knoedelpuff", "tags": ["client"] },
+        { "name": "dexy", "desc": "Dexy project", "url": "http://git.machinemachine.ai/machine.machine/dexy", "tags": ["client"] },
+        { "name": "polimo", "desc": "Polimo app", "url": "http://git.machinemachine.ai/machine.machine/polimo", "tags": ["client"] }
+      ]
+    },
+    {
+      "name": "Growth & Marketing",
+      "icon": "📣",
+      "color": "#38bdf8",
+      "repos": [
+        { "name": "pitch-deck", "desc": "pitch.machinemachine.ai — investor pitch deck site", "url": "http://git.machinemachine.ai/machine.machine/pitch-deck", "coolify": "pitch", "tags": ["growth", "web"] },
+        { "name": "how-machinemachine", "desc": "how.machinemachine.ai — product explainer site", "url": "http://git.machinemachine.ai/machine.machine/how-machinemachine", "tags": ["growth", "web"] },
+        { "name": "gst-machinemachine", "desc": "gst.machinemachine.ai — GST/global sales tools", "url": "http://git.machinemachine.ai/machine.machine/gst-machinemachine", "tags": ["growth"] },
+        { "name": "m2o-posthog", "desc": "PostHog analytics integration for fleet", "url": "http://git.machinemachine.ai/machine.machine/m2o-posthog", "tags": ["growth", "analytics"] },
+        { "name": "cargstore", "desc": "cargs.machinemachine.ai — app store for the desktop environment", "url": "http://git.machinemachine.ai/machine.machine/cargstore", "tags": ["product"] }
+      ]
+    },
+    {
+      "name": "Research & Finance",
+      "icon": "📊",
+      "color": "#4ade80",
+      "repos": [
+        { "name": "trading-2dexy", "desc": "Trading research + Dexy financial tools", "url": "http://git.machinemachine.ai/machine.machine/trading-2dexy", "tags": ["finance", "research"] },
+        { "name": "muhl-fund-api-skill", "desc": "Mühlmann fund API skill — investment data", "url": "http://git.machinemachine.ai/machine.machine/muhl-fund-api-skill", "tags": ["skill", "finance"] },
+        { "name": "muhl-agents", "desc": "Mühlmann multi-agent research workflow", "url": "http://git.machinemachine.ai/machine.machine/muhl-agents", "tags": ["finance", "agents"] },
+        { "name": "Peter-annual-report", "desc": "Annual report automation for Peter", "url": "http://git.machinemachine.ai/machine.machine/Peter-annual-report", "tags": ["finance", "client"] },
+        { "name": "openclaw-skill-excell", "desc": "Excel automation skill for financial reports", "url": "http://git.machinemachine.ai/machine.machine/openclaw-skill-excell", "tags": ["skill", "finance"] }
+      ]
+    }
+  ]
+}
