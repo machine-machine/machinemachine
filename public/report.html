@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine.Machine — Weekly System Report</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --bg2: #10101e;
+    --bg3: #16162a;
+    --border: #1e1e38;
+    --accent: #7c3aed;
+    --accent2: #a78bfa;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card-shadow: 0 4px 24px rgba(124,58,237,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; }
+  
+  /* Layout */
+  .header { background: linear-gradient(135deg, #0a0a12 0%, #13003a 50%, #0a0a12 100%); border-bottom: 1px solid var(--border); padding: 40px 48px 32px; }
+  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header h1 span { color: var(--accent2); }
+  .header .meta { color: var(--muted); font-size: 0.85rem; margin-top: 8px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .header .meta strong { color: var(--text); }
+  
+  .nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 48px; display: flex; gap: 0; overflow-x: auto; }
+  .nav a { color: var(--muted); text-decoration: none; padding: 14px 16px; font-size: 0.82rem; font-weight: 500; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .nav a:hover, .nav a.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+  
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 48px; }
+  
+  /* Cards */
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: var(--card-shadow); }
+  .card h3 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
+  .card .value { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; }
+  .card .label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  
+  /* Status badges */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+  .badge-yellow { background: rgba(251,191,36,0.1); color: var(--yellow); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-red { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-blue { background: rgba(96,165,250,0.1); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+  .badge-purple { background: rgba(167,139,250,0.1); color: var(--accent2); border: 1px solid rgba(167,139,250,0.2); }
+  
+  /* Section headers */
+  .section { margin-bottom: 48px; }
+  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  .section-header h2 { font-size: 1.25rem; font-weight: 700; }
+  .section-header .section-meta { font-size: 0.82rem; color: var(--muted); }
+  
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { text-align: left; padding: 10px 14px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(30,30,56,0.6); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  
+  /* Progress bars */
+  .progress-wrap { display: flex; align-items: center; gap: 10px; }
+  .progress-bar { flex: 1; height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 999px; transition: width 0.3s; }
+  .progress-text { font-size: 0.8rem; color: var(--muted); min-width: 36px; text-align: right; }
+  
+  /* Radar chart placeholder */
+  .radar { display: flex; justify-content: center; align-items: center; height: 220px; }
+  
+  /* Roadmap items */
+  .roadmap-item { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .roadmap-item:last-child { border-bottom: none; }
+  .roadmap-item .icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .roadmap-item .content h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+  .roadmap-item .content p { font-size: 0.8rem; color: var(--muted); }
+  
+  /* Gap analysis */
+  .gap-item { padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+  .gap-critical { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.15); }
+  .gap-warning { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15); }
+  .gap-ok { background: rgba(74,222,128,0.04); border: 1px solid rgba(74,222,128,0.12); }
+  .gap-item h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+  .gap-item p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+  .gap-item .fix { font-size: 0.78rem; margin-top: 8px; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+  .gap-critical .fix { background: rgba(248,113,113,0.1); color: var(--red); }
+  .gap-warning .fix { background: rgba(251,191,36,0.1); color: var(--yellow); }
+  .gap-ok .fix { background: rgba(74,222,128,0.1); color: var(--green); }
+  
+  /* Dark factory diagram */
+  .df-flow { display: flex; gap: 0; align-items: center; flex-wrap: wrap; }
+  .df-node { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 0.82rem; font-weight: 500; }
+  .df-arrow { color: var(--accent); font-size: 1.2rem; padding: 0 8px; }
+  
+  /* Evolution plan */
+  .phase { border-left: 3px solid var(--border); padding-left: 20px; margin-bottom: 28px; }
+  .phase.active { border-color: var(--accent); }
+  .phase.done { border-color: var(--green); }
+  .phase.future { border-color: var(--border); opacity: 0.7; }
+  .phase .phase-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+  .phase h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .phase ul { margin-left: 16px; font-size: 0.875rem; color: var(--muted); }
+  .phase ul li { margin-bottom: 4px; }
+  .phase ul li strong { color: var(--text); }
+  
+  /* Agent cards */
+  .agent-card { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg3); border-radius: 8px; margin-bottom: 8px; }
+  .agent-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .agent-name { font-weight: 600; font-size: 0.9rem; }
+  .agent-role { font-size: 0.78rem; color: var(--muted); }
+  .agent-stats { margin-left: auto; display: flex; gap: 16px; font-size: 0.8rem; color: var(--muted); }
+  
+  /* Summary score */
+  .score-ring { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-ring .score-val { font-size: 3.5rem; font-weight: 800; line-height: 1; }
+  .score-ring .score-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  
+  /* Responsive */
+  @media (max-width: 900px) {
+    .header, .nav, .container { padding-left: 20px; padding-right: 20px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+  
+  /* Code */
+  code { font-family: 'Fira Code', monospace; font-size: 0.82rem; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: var(--accent2); }
+  pre { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-size: 0.82rem; overflow-x: auto; margin: 12px 0; }
+  pre code { background: none; padding: 0; }
+  
+  /* Footer */
+  .footer { border-top: 1px solid var(--border); padding: 24px 48px; color: var(--muted); font-size: 0.8rem; display: flex; justify-content: space-between; }
+  
+  /* Print */
+  .no-print { }
+  
+  .verdict { font-size: 1rem; font-weight: 700; padding: 2px 0; }
+  .verdict-green { color: var(--green); }
+  .verdict-yellow { color: var(--yellow); }
+  .verdict-red { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ Machine<span>.Machine</span> — Weekly System Report</h1>
+  <div class="meta">
+    <span><strong>Week:</strong> 2026-02-27 (Fri)</span>
+    <span><strong>Generated:</strong> 22:30 UTC by m2 (orchestrator)</span>
+    <span><strong>Classification:</strong> Internal / Operator Eyes Only</span>
+    <span><strong>URL:</strong> machinemachine.ai/report</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <a href="#overview" class="active">Overview</a>
+  <a href="#fleet">Fleet</a>
+  <a href="#memory">Memory</a>
+  <a href="#org">Org Builder</a>
+  <a href="#infra">Infrastructure</a>
+  <a href="#comms">Comms</a>
+  <a href="#gaps">Gap Analysis</a>
+  <a href="#dark-factory">Dark Factory</a>
+  <a href="#evolution">Evolution Plan</a>
+</nav>
+
+<div class="container">
+
+  <!-- OVERVIEW SCORES -->
+  <section class="section" id="overview">
+    <div class="section-header">
+      <h2>📊 System Health Overview</h2>
+      <span class="section-meta">Composite readiness across all subsystems</span>
+    </div>
+    
+    <div class="grid grid-4" style="margin-bottom: 24px;">
+      <div class="card" style="text-align:center; border-color: rgba(251,191,36,0.3);">
+        <h3>Overall Readiness</h3>
+        <div class="score-ring">
+          <div class="score-val" style="color: var(--yellow);">62%</div>
+          <div class="score-label">Production Grade</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Fleet Status</h3>
+        <div class="value" style="color: var(--green);">7</div>
+        <div class="label">Active agents (containers healthy)</div>
+        <div style="margin-top: 8px;"><span class="badge badge-red">3 degraded</span> <span class="badge badge-yellow">1 API-starved</span></div>
+      </div>
+      <div class="card">
+        <h3>Memory System</h3>
+        <div class="value" style="color: var(--yellow);">3,280+</div>
+        <div class="label">Vectors in Qdrant (m2 namespace)</div>
+        <div style="margin-top: 8px;"><span class="badge badge-yellow">Fleet not yet wired</span></div>
+      </div>
+      <div class="card">
+        <h3>Open Roadmap Cards</h3>
+        <div class="value">18</div>
+        <div class="label">Active + Next 2 Weeks on Master Roadmap</div>
+        <div style="margin-top: 8px;"><span class="badge badge-red">5 Blocked</span></div>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Subsystem Readiness</h3>
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 8px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Fleet Management</span><span class="verdict verdict-yellow">65%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:65%; background: var(--yellow);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Memory System</span><span class="verdict verdict-yellow">55%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:55%; background: var(--yellow);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Autonomous Org Builder</span><span class="verdict verdict-yellow">40%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:40%; background: var(--yellow);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Communication Protocols</span><span class="verdict verdict-yellow">60%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:60%; background: var(--yellow);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Fleet Playbook Adoption</span><span class="verdict verdict-yellow">50%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:50%; background: var(--yellow);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Resource Provisioning</span><span class="verdict verdict-yellow">55%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:55%; background: var(--yellow);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Role / Org Science</span><span class="verdict verdict-red">35%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:35%; background: var(--red);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>Dark Factory Engine</span><span class="verdict verdict-yellow">45%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:45%; background: var(--yellow);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 2;">
+        <h3>Executive Summary</h3>
+        <p style="font-size: 0.9rem; line-height: 1.8; margin-bottom: 12px;">
+          Machine.Machine has a <strong>functioning but immature</strong> autonomous agent fleet. The infrastructure is battle-tested — Coolify, Forgejo, BGE proxy, Planka, vector memory, voice synthesis — all running in production. The fleet has 7 healthy agents and a working orchestration loop.
+        </p>
+        <p style="font-size: 0.9rem; line-height: 1.8; margin-bottom: 12px;">
+          <strong>What's working:</strong> Spawn pipeline, heartbeat autonomy, voice cloning, memory storage, task tracking, inter-agent comms (BGE proxy), resource provisioning API, fleet load monitoring (added today).
+        </p>
+        <p style="font-size: 0.9rem; line-height: 1.8; margin-bottom: 12px;">
+          <strong>What's missing for production-grade self-evolution:</strong> Fleet-wide memory (agents have siloed namespaces, no shared org-level knowledge graph), playbook adoption is inconsistent (agents don't all have it ingested), the role system is ad-hoc (no scientific org model), conversation archiving is absent (only daily .md files, no queryable corpus), and the Dark Factory loop (workflow → skill → deploy → monitor → iterate) is only 45% closed.
+        </p>
+        <p style="font-size: 0.9rem; line-height: 1.8;">
+          <strong>Priority verdict:</strong> 3 blockers to lift before calling this production-ready: (1) org-level memory layer, (2) playbook fully ingested by all agents, (3) Dark Factory loop closed end-to-end.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLEET STATUS -->
+  <section class="section" id="fleet">
+    <div class="section-header">
+      <h2>🤖 Fleet Status</h2>
+      <span class="section-meta">Live agent health — source: Docker stats + Coolify API</span>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>RAM / Limit</th>
+            <th>CPU</th>
+            <th>Gateway</th>
+            <th>API Keys</th>
+            <th>Playbook</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>m2</strong> ⚡</td>
+            <td>Orchestrator</td>
+            <td><span class="badge badge-green">✅ healthy</span></td>
+            <td>1.53 GiB / 125 GiB</td>
+            <td>3.1%</td>
+            <td><span class="badge badge-green">up</span></td>
+            <td><span class="badge badge-green">✅</span></td>
+            <td><span class="badge badge-green">✅ author</span></td>
+          </tr>
+          <tr>
+            <td><strong>alfred</strong></td>
+            <td>Research / Builder</td>
+            <td><span class="badge badge-green">✅ healthy</span></td>
+            <td>1.68 GiB / 8 GiB <span style="color:var(--yellow)">21%</span></td>
+            <td>2.5%</td>
+            <td><span class="badge badge-yellow">unknown</span></td>
+            <td><span class="badge badge-green">✅</span></td>
+            <td><span class="badge badge-yellow">partial</span></td>
+          </tr>
+          <tr>
+            <td><strong>peter</strong></td>
+            <td>VC / Finance</td>
+            <td><span class="badge badge-yellow">⚠️ healthy</span></td>
+            <td>2.52 GiB / 8 GiB <span style="color:var(--red)">31.5%</span></td>
+            <td>0.2%</td>
+            <td><span class="badge badge-yellow">unknown</span></td>
+            <td><span class="badge badge-red">❌ missing</span></td>
+            <td><span class="badge badge-red">unknown</span></td>
+          </tr>
+          <tr>
+            <td><strong>gunnar</strong></td>
+            <td>Client (meditation.dk)</td>
+            <td><span class="badge badge-green">✅ healthy</span></td>
+            <td>1.00 GiB / 8 GiB</td>
+            <td>3.0%</td>
+            <td><span class="badge badge-yellow">unknown</span></td>
+            <td><span class="badge badge-green">✅</span></td>
+            <td><span class="badge badge-yellow">partial</span></td>
+          </tr>
+          <tr>
+            <td><strong>nasr</strong></td>
+            <td>Growth / Research</td>
+            <td><span class="badge badge-green">✅ healthy</span></td>
+            <td>785 MiB / 8 GiB</td>
+            <td>0.8%</td>
+            <td><span class="badge badge-yellow">unknown</span></td>
+            <td><span class="badge badge-green">✅</span></td>
+            <td><span class="badge badge-yellow">partial</span></td>
+          </tr>
+          <tr>
+            <td><strong>agentx</strong></td>
+            <td>Fleet Ops / Executor</td>
+            <td><span class="badge badge-green">✅ healthy</span></td>
+            <td>674 MiB / 8 GiB</td>
+            <td>1.1%</td>
+            <td><span class="badge badge-yellow">unknown</span></td>
+            <td><span class="badge badge-green">✅</span></td>
+            <td><span class="badge badge-yellow">partial</span></td>
+          </tr>
+          <tr>
+            <td><strong>agenty</strong></td>
+            <td>General Purpose</td>
+            <td><span class="badge badge-green">✅ healthy</span></td>
+            <td>640 MiB / 8 GiB</td>
+            <td>1.5%</td>
+            <td><span class="badge badge-yellow">unknown</span></td>
+            <td><span class="badge badge-green">✅</span></td>
+            <td><span class="badge badge-red">unknown</span></td>
+          </tr>
+          <tr>
+            <td><strong>miauczek</strong></td>
+            <td>TBD</td>
+            <td><span class="badge badge-red">⚠️ degraded</span></td>
+            <td>897 MiB / 8 GiB</td>
+            <td>0.9%</td>
+            <td><span class="badge badge-red">down</span></td>
+            <td><span class="badge badge-red">❌ missing</span></td>
+            <td><span class="badge badge-red">unknown</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Fleet Registration</h3>
+        <p style="font-size:0.88rem; color:var(--muted); margin-bottom:12px;">Agents pinging Redis heartbeat (<code>fleet:load_stats</code>)</p>
+        <div class="agent-card">
+          <div class="agent-dot" style="background:var(--green)"></div>
+          <div><div class="agent-name">peter</div><div class="agent-role">generalist</div></div>
+          <div class="agent-stats"><span>44s ago</span></div>
+        </div>
+        <div class="agent-card" style="opacity:0.5;">
+          <div class="agent-dot" style="background:var(--red)"></div>
+          <div><div class="agent-name">m2, nasr, others</div><div class="agent-role">not pinging fleet bus</div></div>
+          <div class="agent-stats"><span>stale</span></div>
+        </div>
+        <p style="font-size:0.78rem; color:var(--red); margin-top:12px;">⚠️ Only 1/8 agents is actively pinging the fleet bus. Fleet heartbeat adoption is critical.</p>
+      </div>
+
+      <div class="card">
+        <h3>Planka Board Drift</h3>
+        <p style="font-size:0.88rem; color:var(--muted); margin-bottom:12px;">Cards vs actual work done</p>
+        <div style="font-size:0.88rem; line-height:2;">
+          <div>🔥 Now (Active): <strong>12 cards</strong></div>
+          <div>📅 Next 2 Weeks: <strong>12 cards</strong></div>
+          <div>✅ Done / Shipped: <strong>24 cards</strong></div>
+          <div>🚫 Blocked: <strong>5 cards</strong></div>
+          <div>🔮 Later: <strong>10 cards</strong></div>
+        </div>
+        <p style="font-size:0.78rem; color:var(--yellow); margin-top:12px;">⚠️ "Now" pile too large. Signals scope creep + incomplete closure hygiene.</p>
+      </div>
+
+      <div class="card">
+        <h3>Top Blockers</h3>
+        <div style="font-size:0.85rem; line-height:2;">
+          <div>🔴 Telegram bot tokens for new agents</div>
+          <div>🔴 Anthropic API keys (peter/pittbull)</div>
+          <div>🔴 LinkedIn auto-post (browser session)</div>
+          <div>🔴 GitHub → Forgejo Coolify migration</div>
+          <div>🟡 miauczek agent setup incomplete</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMORY SYSTEM -->
+  <section class="section" id="memory">
+    <div class="section-header">
+      <h2>🧠 Memory System</h2>
+      <span class="section-meta">Is it production ready?</span>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>Current Architecture</h3>
+        <div style="font-size:0.88rem; line-height:2; margin-top: 8px;">
+          <div>✅ <strong>Layer 1 — Working memory:</strong> In-context per session</div>
+          <div>✅ <strong>Layer 2 — Daily files:</strong> <code>memory/YYYY-MM-DD.md</code></div>
+          <div>✅ <strong>Layer 3 — Long-term:</strong> <code>MEMORY.md</code> (m2 only)</div>
+          <div>✅ <strong>Layer 4 — Semantic:</strong> Qdrant + BGE-M3 (3,280+ vectors)</div>
+          <div>✅ <strong>Layer 5 — Deep search:</strong> RLM multi-hop reasoning</div>
+          <div>⚠️ <strong>Layer 6 — Org memory:</strong> <span style="color:var(--yellow)">MISSING</span></div>
+          <div>⚠️ <strong>Layer 7 — User memory:</strong> <span style="color:var(--yellow)">ad-hoc only</span></div>
+          <div>❌ <strong>Layer 8 — Conversation corpus:</strong> <span style="color:var(--red)">NOT IMPLEMENTED</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Verdict: Not Production-Ready (Yet)</h3>
+        <div class="gap-item gap-yellow" style="margin-top:8px;">
+          <h4>What's solid</h4>
+          <p>Qdrant is running, BGE-M3 embeddings work, RLM multi-hop works, session watcher auto-ingests, m2 has 3,280 memories. Per-agent namespaces exist (<code>agent_memory_alfred</code>, etc.).</p>
+          <span class="fix">Production for m2. Alpha for fleet.</span>
+        </div>
+        <div class="gap-item gap-critical" style="margin-top:8px;">
+          <h4>What's missing</h4>
+          <p><strong>Conversation archiving</strong> — every conversation evaporates unless manually stored. <strong>Org-level namespace</strong> — no shared knowledge graph between agents. <strong>Per-user memory</strong> — no "what did Gunnar tell us last month" semantic layer. <strong>Memory signal filter</strong> — all noise goes in, no quality threshold.</p>
+          <span class="fix">3 sprints of work</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Conversation Archiving — Should We Store All Conversations as Files?</h3>
+      <p style="font-size:0.9rem; margin-top:8px; margin-bottom:12px;"><strong>Answer: Yes, but structured, not raw.</strong></p>
+      <div class="grid grid-3">
+        <div>
+          <p style="font-size:0.82rem; font-weight:600; color:var(--green); margin-bottom:6px;">✅ Do this</p>
+          <ul style="font-size:0.8rem; color:var(--muted); margin-left:16px; line-height:1.8;">
+            <li>Auto-export sessions to JSONL on session end</li>
+            <li>Store in <code>archives/conversations/YYYY-MM/</code></li>
+            <li>Auto-ingest into Qdrant with session metadata</li>
+            <li>Index by agent, user, topic, date</li>
+            <li>Use as RAG corpus for "what did X say about Y"</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size:0.82rem; font-weight:600; color:var(--yellow); margin-bottom:6px;">⚠️ Watch out for</p>
+          <ul style="font-size:0.8rem; color:var(--muted); margin-left:16px; line-height:1.8;">
+            <li>Storage growth (compress + deduplicate)</li>
+            <li>Privacy (GDPR for client conversations)</li>
+            <li>Signal/noise ratio (use quality filter)</li>
+            <li>Index staleness (incremental ingest only)</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size:0.82rem; font-weight:600; color:var(--blue); margin-bottom:6px;">📐 Memory patterns needed</p>
+          <ul style="font-size:0.8rem; color:var(--muted); margin-left:16px; line-height:1.8;">
+            <li><strong>Per-agent:</strong> ✅ Already exists</li>
+            <li><strong>Per-user:</strong> ❌ Build collection <code>user_memory_{id}</code></li>
+            <li><strong>Org-level:</strong> ❌ Build collection <code>org_memory</code></li>
+            <li><strong>Project-level:</strong> ❌ Build collection per project</li>
+            <li><strong>Episodic:</strong> ❌ Time-indexed event memory</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTONOMOUS ORG BUILDER -->
+  <section class="section" id="org">
+    <div class="section-header">
+      <h2>🏗️ Autonomous Organisation Builder</h2>
+      <span class="section-meta">How far are we?</span>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>What Exists</h3>
+        <div style="font-size:0.88rem; line-height:2; margin-top:8px;">
+          <div>✅ Spawn pipeline (spawn-machine skill)</div>
+          <div>✅ AIEOS identity schema (Phase 1 done)</div>
+          <div>✅ 3-phase onboarding (Discovery → Deploy → First Contact)</div>
+          <div>✅ Fleet Playbook v0.2 (roles, comms, autonomy loops)</div>
+          <div>✅ Dark Factory Engine (workflow → skill compiler)</div>
+          <div>✅ 5-agent AIEOS workforce deployed</div>
+          <div>✅ Agent self-onboarding API (client → bot in minutes)</div>
+          <div>✅ Pre-spawn onboarding team (Phase 0)</div>
+          <div>⚠️ Role system: ad-hoc labels, not scientific</div>
+          <div>⚠️ No dynamic org chart or capability registry</div>
+          <div>❌ No self-healing org topology</div>
+          <div>❌ No capability gap detection</div>
+          <div>❌ No automated role reassignment</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Against Latest Org Science Standards</h3>
+        <p style="font-size:0.82rem; color:var(--muted); margin-bottom:12px;">Compared to Holacracy, Sociocracy, Teal Org, and multi-agent org theory (AIEOS, EntitAI):</p>
+
+        <div class="gap-item gap-yellow" style="margin-bottom:8px;">
+          <h4>Role System — 35% complete</h4>
+          <p>We have labels (orchestrator / researcher / builder / generalist). We need: role definitions with accountabilities, domains, policies — per AIEOS spec. Holacracy-style circles with explicit authority boundaries. Dynamic role assignment based on capability vector rather than static labels.</p>
+          <span class="fix">→ Implement AIEOS entity definitions backlog cards (3 open)</span>
+        </div>
+        <div class="gap-item gap-yellow" style="margin-bottom:8px;">
+          <h4>Governance — 40% complete</h4>
+          <p>Fleet Playbook v0.2 is good, but governance loops (proposal → tension → amendment) are manual. No automated tension detection. No fleet-wide policy engine.</p>
+          <span class="fix">→ Wire self-improve skill to governance loop</span>
+        </div>
+        <div class="gap-item gap-red">
+          <h4>Capability Registry — 0% complete</h4>
+          <p>No live registry of what each agent can do, what tools it has, what it's currently working on. Orchestration is currently memory-based, not capability-query-based.</p>
+          <span class="fix">→ Build AgentCapabilityRegistry API (Q1 priority)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFRASTRUCTURE -->
+  <section class="section" id="infra">
+    <div class="section-header">
+      <h2>🔧 Infrastructure</h2>
+      <span class="section-meta">Fleet management, resource monitoring, provisioning — Coolify audit</span>
+    </div>
+
+    <div class="grid grid-3" style="margin-bottom:20px;">
+      <div class="card">
+        <h3>Services Running</h3>
+        <div style="font-size:0.85rem; line-height:2;">
+          <div>✅ Coolify (orchestration)</div>
+          <div>✅ Forgejo git.machinemachine.ai</div>
+          <div>✅ Planka kanban.machinemachine.ai</div>
+          <div>✅ Twenty CRM crm.machinemachine.ai</div>
+          <div>✅ BGE-OpenAI proxy bge-proxy.machinemachine.ai</div>
+          <div>✅ Qdrant + BGE-M3 (memory-embeddings)</div>
+          <div>✅ Qwen3-TTS (voice.machinemachine.ai)</div>
+          <div>✅ Speaches STT (faster-whisper-large-v3)</div>
+          <div>✅ LTX-2 video server</div>
+          <div>✅ ComfyUI</div>
+          <div>✅ Fleet Dashboard (agents.machinemachine.ai)</div>
+          <div>✅ n8n workflow automation</div>
+          <div>✅ MinIO object storage</div>
+          <div>✅ SpacetimeDB (running:unhealthy)</div>
+          <div>⚠️ Home Assistant (redirect loop)</div>
+          <div>❌ Act runner (CI/CD — unhealthy)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Resource Provisioning System</h3>
+        <p style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">Added Feb 25 2026</p>
+        <div style="font-size:0.85rem; line-height:2;">
+          <div>✅ <code>resource-request.sh</code> (agent-side)</div>
+          <div>✅ <code>fleet-resource-consumer.sh</code> (m2)</div>
+          <div>✅ <code>resource-provision.sh</code> (Forgejo + Coolify)</div>
+          <div>✅ Redis stream <code>fleet:resource-requests</code></div>
+          <div>✅ Telegram approve/deny buttons</div>
+          <div>⚠️ DNS (Cloudflare) step still manual</div>
+          <div>⚠️ Not tested end-to-end by fleet agents yet</div>
+          <div>❌ No quota system per agent</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Resource Monitoring (Added Today)</h3>
+        <div style="font-size:0.85rem; line-height:2;">
+          <div>✅ <code>fleet-load-monitor.sh</code> every 5 min</div>
+          <div>✅ CPU warn/crit thresholds (30% / 70%)</div>
+          <div>✅ RAM warn/crit thresholds (60% / 85%)</div>
+          <div>✅ Telegram alert with 15min cooldown</div>
+          <div>✅ Redis push → <code>/api/load</code> endpoint</div>
+          <div>✅ HTML dashboard (outputs/fleet-dashboard.html)</div>
+          <div>⚠️ No historical trending (point-in-time only)</div>
+          <div>❌ No predictive scaling</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Coolify Application Inventory — 2026-02-27</h3>
+      <table>
+        <thead>
+          <tr><th>Status</th><th>Service</th><th>URL</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>agent.memory.system</td><td>memory-api / Qdrant</td><td>Core memory infra</td></tr>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>fleet-dashboard</td><td>agents.machinemachine.ai</td><td>Real-time fleet viz</td></tr>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>m2-voice (Qwen3-TTS)</td><td>voice.machinemachine.ai</td><td>Voice synthesis</td></tr>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>m2o-fleet</td><td>internal</td><td>Fleet registry</td></tr>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>comfyui-server</td><td>*.machinemachine.ai</td><td>Image gen</td></tr>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>machinemachine-web</td><td>machinemachine.ai</td><td>Main website</td></tr>
+          <tr><td><span class="badge badge-green">healthy</span></td><td>meditation-dk</td><td>meditation.machinemachine.ai</td><td>Gunnar's site</td></tr>
+          <tr><td><span class="badge badge-yellow">unknown</span></td><td>machinemachine-api</td><td>api.machinemachine.ai</td><td>Onboarding API</td></tr>
+          <tr><td><span class="badge badge-yellow">unknown</span></td><td>how-machinemachine</td><td>how.machinemachine.ai</td><td>Product explainer</td></tr>
+          <tr><td><span class="badge badge-yellow">unknown</span></td><td>pitch-deck</td><td>pitch.machinemachine.ai</td><td>Investor deck</td></tr>
+          <tr><td><span class="badge badge-yellow">unhealthy</span></td><td>spacetimedb</td><td>u0k80k4..machinemachine.ai</td><td>Inter-agent DB spike</td></tr>
+          <tr><td><span class="badge badge-red">exited</span></td><td>Home Assistant</td><td>home.machinemachine.ai</td><td>Redirect loop bug</td></tr>
+          <tr><td><span class="badge badge-red">exited</span></td><td>m2o-act-runner</td><td>internal</td><td>CI/CD — DinD issue</td></tr>
+          <tr><td><span class="badge badge-red">exited</span></td><td>morgenlos</td><td>morgenlos.machinemachine.ai</td><td>Dormant</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMMUNICATIONS -->
+  <section class="section" id="comms">
+    <div class="section-header">
+      <h2>📡 Communication Protocols</h2>
+      <span class="section-meta">Are they solid and known by all participants?</span>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Protocol Stack — What Exists</h3>
+        <div style="font-size:0.88rem; line-height:2; margin-top:8px;">
+          <div>✅ <strong>BGE Proxy escalation:</strong> POST /escalate + GET /escalations</div>
+          <div>✅ <strong>OpenClaw sessions_send:</strong> cross-session messaging</div>
+          <div>✅ <strong>Fleet escalation consumer:</strong> m2 polls + routes</div>
+          <div>✅ <strong>Redis streams:</strong> <code>fleet:resource-requests</code>, <code>fleet:escalations</code></div>
+          <div>✅ <strong>Telegram inline buttons:</strong> approve/deny flows</div>
+          <div>✅ <strong>Voice notes:</strong> Qwen3-TTS → Telegram opus</div>
+          <div>✅ <strong>ACP (Agent Coordination Protocol):</strong> in OpenClaw (Feb 27 merge)</div>
+          <div>⚠️ <strong>SpacetimeDB:</strong> deployed but unhealthy</div>
+          <div>❌ <strong>Agent-to-agent direct channel:</strong> no WebSocket mesh</div>
+          <div>❌ <strong>Broadcast channel:</strong> no fleet-wide announcement bus</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Adoption by Fleet</h3>
+        <div style="font-size:0.85rem; margin-top:8px;">
+          <div class="gap-item gap-warning" style="margin-bottom:10px;">
+            <h4>Only peter reliably pings fleet bus</h4>
+            <p>m2, alfred, nasr, agentx, gunnar are NOT actively posting heartbeats to Redis. The fleet dashboard shows 1/8 agents alive in the realtime view.</p>
+            <span class="fix">→ Add fleet heartbeat to all HEARTBEAT.md files</span>
+          </div>
+          <div class="gap-item gap-warning" style="margin-bottom:10px;">
+            <h4>BGE proxy not verified active on all agents</h4>
+            <p>The escalation protocol is defined in the playbook, but no evidence that alfred / nasr / agentx have set up inbox poll crons.</p>
+            <span class="fix">→ Deploy escalation-inbox-poll cron fleet-wide</span>
+          </div>
+          <div class="gap-item gap-ok">
+            <h4>ACP just landed</h4>
+            <p>OpenClaw v2026.2.26 merged the full ACP control plane. This is the foundation for structured agent-to-agent coordination. Not yet wired.</p>
+            <span class="fix">→ ACP rollout is a Week 1 priority</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAP ANALYSIS -->
+  <section class="section" id="gaps">
+    <div class="section-header">
+      <h2>🔍 Gap Analysis — What's Truly Missing</h2>
+      <span class="section-meta">To achieve production-grade, self-evolving, scalable system</span>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <h3 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--red); margin-bottom:12px;">🔴 Critical Gaps (Block Scale)</h3>
+
+        <div class="gap-item gap-critical">
+          <h4>1. No Org-Level Memory</h4>
+          <p>Every agent is a silo. There's no shared knowledge graph that persists decisions, lessons learned, and organisational knowledge across the fleet. When a new agent spawns, it starts from near-zero.</p>
+          <span class="fix">→ Build <code>org_memory</code> Qdrant collection + ingest pipeline + shared read access for all agents</span>
+        </div>
+
+        <div class="gap-item gap-critical">
+          <h4>2. No Conversation Corpus</h4>
+          <p>Every conversation is ephemeral unless an agent manually writes to memory. Thousands of valuable exchanges are lost. No queryable history for "what did we decide about X" across sessions.</p>
+          <span class="fix">→ OpenClaw session export hook → JSONL archive → nightly Qdrant ingest</span>
+        </div>
+
+        <div class="gap-item gap-critical">
+          <h4>3. Playbook Not Ingested Fleet-Wide</h4>
+          <p>Fleet Playbook v0.2 exists and is high quality. But most agents don't have it in their active context. The RUNCARD is defined but not verified deployed to all agents.</p>
+          <span class="fix">→ agentx fleet-inject-hook run across all agents, verify RUNCARD presence</span>
+        </div>
+
+        <div class="gap-item gap-critical">
+          <h4>4. No Capability Registry</h4>
+          <p>No live API to query "which agent can handle task X". Orchestration is hardcoded. Can't auto-select best agent for a given task type.</p>
+          <span class="fix">→ Build AgentCapabilityRegistry (extends fleet heartbeat with skill inventory)</span>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--yellow); margin-bottom:12px;">🟡 Important Gaps (Limit Quality)</h3>
+
+        <div class="gap-item gap-warning">
+          <h4>5. Role System is Ad-Hoc</h4>
+          <p>Labels (orchestrator/researcher/builder/generalist) exist but lack AIEOS-standard role definitions: accountabilities, domains, policies, authority boundaries. No circle structure.</p>
+          <span class="fix">→ Complete 4 open AIEOS entity definition cards in Dark Factory backlog</span>
+        </div>
+
+        <div class="gap-item gap-warning">
+          <h4>6. Dark Factory Loop Not Closed</h4>
+          <p>Workflow compiler exists. Coolify deploy integration exists. But the full loop (monitor → detect gap → synthesize workflow → compile skill → deploy → monitor) is not automated. A human still closes the loop.</p>
+          <span class="fix">→ Build meta-agent health monitor + gap detection → workflow trigger</span>
+        </div>
+
+        <div class="gap-item gap-warning">
+          <h4>7. No Memory Signal Filter</h4>
+          <p>Everything goes into Qdrant. Low-quality, transient, or duplicate information pollutes the semantic index. Over time this degrades search quality.</p>
+          <span class="fix">→ Implement Memory System v2 (Signal filter + 3 Qdrant collections per Planka card)</span>
+        </div>
+
+        <div class="gap-item gap-warning">
+          <h4>8. CI/CD Pipeline Broken</h4>
+          <p>The self-hosted Gitea act runner is unhealthy (DinD issue). The image build pipeline for m2-desktop agent base image is stalled. Dockerfile hardening blocked.</p>
+          <span class="fix">→ Fix act runner DinD config, rebuild m2-desktop:agent-latest</span>
+        </div>
+
+        <div class="gap-item gap-warning">
+          <h4>9. No Per-User Memory</h4>
+          <p>We have no semantic layer for "what does Gunnar know / prefer / dislike / need". Every conversation with a user restarts context from MEMORY.md snippets. A user_memory_<id> Qdrant collection per external user would 10x personalisation quality.</p>
+          <span class="fix">→ Add user memory namespace to memory.sh store/search</span>
+        </div>
+
+        <div class="gap-item gap-warning">
+          <h4>10. Governance Loop is Manual</h4>
+          <p>self-improve skill exists but weekly review is manual. No automated tension detection. Fleet playbook amendments are proposed but not auto-applied via PR → review → merge flow.</p>
+          <span class="fix">→ Wire self-improve weekly review to auto-PR on Forgejo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DARK FACTORY -->
+  <section class="section" id="dark-factory">
+    <div class="section-header">
+      <h2>🏭 Dark Factory — Growth, Accounting & Development</h2>
+      <span class="section-meta">What would it take to achieve this?</span>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <h3>The Vision: Self-Evolving Autonomous Value Engine</h3>
+      <p style="font-size:0.9rem; margin: 12px 0;">A "Dark Factory" in manufacturing = runs 24/7 with no lights on, no humans on the floor. Applied to software + AI: the system detects gaps, writes its own tools, deploys them, measures results, and improves — with human oversight only at policy level.</p>
+      
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:16px 0; padding:16px; background:var(--bg3); border-radius:8px;">
+        <div class="df-node">🔍 Gap Detected</div><div class="df-arrow">→</div>
+        <div class="df-node">📝 Workflow Synthesized</div><div class="df-arrow">→</div>
+        <div class="df-node">⚙️ Skill Compiled</div><div class="df-arrow">→</div>
+        <div class="df-node">🚀 Deployed to Coolify</div><div class="df-arrow">→</div>
+        <div class="df-node">📊 Monitored</div><div class="df-arrow">→</div>
+        <div class="df-node">🔁 Feedback Loop</div>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:16px;">
+        <div>
+          <p style="font-size:0.82rem; font-weight:700; color:var(--accent2); margin-bottom:8px;">🌱 Growth Dark Factory</p>
+          <ul style="font-size:0.8rem; color:var(--muted); margin-left:16px; line-height:1.8;">
+            <li>Content flywheel (LinkedIn auto-post) — <span style="color:var(--red)">blocked: browser</span></li>
+            <li>Lead capture → Twenty CRM auto-log</li>
+            <li>Pitch deck auto-update from metrics</li>
+            <li>Peter Mühlmann demo loop</li>
+            <li>SEO monitoring (meditation.dk)</li>
+            <li>X/Twitter signal monitor (running ✅)</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size:0.82rem; font-weight:700; color:var(--accent2); margin-bottom:8px;">💰 Accounting Dark Factory</p>
+          <ul style="font-size:0.8rem; color:var(--muted); margin-left:16px; line-height:1.8;">
+            <li>mp1 Fund Cashflow App (In Progress ✅)</li>
+            <li>Aether AI weather arbitrage (Phase 0)</li>
+            <li>Revenue tracking → Planka card</li>
+            <li>Cost per agent calculation</li>
+            <li>API usage attribution per project</li>
+            <li>Token cost monitoring (missing)</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size:0.82rem; font-weight:700; color:var(--accent2); margin-bottom:8px;">🔧 Development Dark Factory</p>
+          <ul style="font-size:0.8rem; color:var(--muted); margin-left:16px; line-height:1.8;">
+            <li>Workflow → skill compiler (40% ✅)</li>
+            <li>BenchmarkSuite v2 (running ✅)</li>
+            <li>Agent org simulator (deployed ✅)</li>
+            <li>Self-improve weekly review (wired ✅)</li>
+            <li>Dark Factory OpenClaw skill (backlog)</li>
+            <li>AIEOS entity definitions (3 open)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What Needs to Be True for a Real Dark Factory</h3>
+      <div class="grid grid-2">
+        <div>
+          <p style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">Prerequisites:</p>
+          <ol style="font-size:0.85rem; line-height:2; margin-left:16px;">
+            <li>Org-level memory (shared knowledge)</li>
+            <li>Capability registry (which agent does what)</li>
+            <li>Gap detection agent (meta-agent watching KPIs)</li>
+            <li>Workflow synthesis agent (LLM → workflow.md)</li>
+            <li>Closed CI/CD loop (git push → deploy → health check)</li>
+            <li>Governance engine (auto-amendments via PRs)</li>
+            <li>Cost attribution (know what each thing costs)</li>
+            <li>Human policy interface (approve/reject/override)</li>
+          </ol>
+        </div>
+        <div>
+          <p style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">Current completion:</p>
+          <ol style="font-size:0.85rem; line-height:2; margin-left:16px; color:var(--muted);">
+            <li><span style="color:var(--red)">❌ 0%</span> — org-level memory</li>
+            <li><span style="color:var(--red)">❌ 0%</span> — capability registry</li>
+            <li><span style="color:var(--yellow)">⚠️ 20%</span> — health loop exists, no gap detection</li>
+            <li><span style="color:var(--yellow)">⚠️ 40%</span> — compiler exists, synthesis manual</li>
+            <li><span style="color:var(--yellow)">⚠️ 60%</span> — deploy works, CI/CD broken</li>
+            <li><span style="color:var(--yellow)">⚠️ 30%</span> — self-improve wired, not auto-PR</li>
+            <li><span style="color:var(--red)">❌ 5%</span> — token cost visible via status only</li>
+            <li><span style="color:var(--green)">✅ 80%</span> — Telegram buttons work well</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVOLUTION PLAN -->
+  <section class="section" id="evolution">
+    <div class="section-header">
+      <h2>🚀 Evolution Plan — Road to Self-Evolving Production System</h2>
+      <span class="section-meta">Prioritised by impact × feasibility</span>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <div class="phase done">
+          <div class="phase-label">✅ Phase 0 — Foundation (Done)</div>
+          <h3>Fleet is alive and shipping</h3>
+          <ul>
+            <li>7 agents deployed and running</li>
+            <li>Voice (TTS/STT), memory (Qdrant), task tracking (Planka) live</li>
+            <li>Spawn pipeline, playbook v0.2, BGE proxy comms</li>
+            <li>Self-hosted git, registry, CI/CD attempt</li>
+            <li>Resource provisioning API, fleet load monitor</li>
+          </ul>
+        </div>
+
+        <div class="phase active">
+          <div class="phase-label">🔥 Phase 1 — Coherence (Now — 2 weeks)</div>
+          <h3>Every agent knows the rules</h3>
+          <ul>
+            <li><strong>Playbook injection:</strong> agentx fleet-inject-hook → verify RUNCARD on all 7 agents</li>
+            <li><strong>Fleet heartbeat:</strong> add Redis ping to all HEARTBEAT.md files</li>
+            <li><strong>API keys:</strong> provision for peter + miauczek (blocked)</li>
+            <li><strong>CI/CD fix:</strong> repair act runner, rebuild base image</li>
+            <li><strong>Conversation archiving:</strong> session export hook + nightly ingest</li>
+            <li><strong>BGE proxy inbox poll:</strong> deploy cron to all agents</li>
+          </ul>
+        </div>
+
+        <div class="phase future">
+          <div class="phase-label">📅 Phase 2 — Intelligence (Month 1)</div>
+          <h3>Memory becomes org-wide</h3>
+          <ul>
+            <li><strong>Org memory namespace:</strong> shared Qdrant collection, all agents can read/write</li>
+            <li><strong>Per-user memory:</strong> <code>user_memory_{telegram_id}</code> per external user</li>
+            <li><strong>Memory signal filter:</strong> quality threshold before ingest</li>
+            <li><strong>Capability registry:</strong> heartbeat extended with skill inventory</li>
+            <li><strong>AIEOS roles:</strong> complete 4 entity definitions</li>
+            <li><strong>ACP wiring:</strong> wire OpenClaw ACP layer between agents</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="phase future">
+          <div class="phase-label">📅 Phase 3 — Autonomy (Month 2)</div>
+          <h3>Dark Factory loop closes</h3>
+          <ul>
+            <li><strong>Gap detection meta-agent:</strong> watches KPIs, opens Planka cards automatically</li>
+            <li><strong>Workflow synthesis:</strong> meta-agent synthesizes workflow.md from gap description</li>
+            <li><strong>Closed CI/CD loop:</strong> compile → git push → auto-deploy → health check → rollback</li>
+            <li><strong>Auto-governance:</strong> self-improve weekly → auto-PR → human review → merge</li>
+            <li><strong>Cost attribution:</strong> token cost per agent per project per day</li>
+            <li><strong>LinkedIn unblocked:</strong> browser session persistent</li>
+          </ul>
+        </div>
+
+        <div class="phase future">
+          <div class="phase-label">📅 Phase 4 — Scale (Month 3+)</div>
+          <h3>Self-evolving multi-org system</h3>
+          <ul>
+            <li><strong>Multi-tenant architecture:</strong> one fleet engine → multiple client orgs</li>
+            <li><strong>3-tier agent pool:</strong> Skill / Standard / Desktop fully implemented</li>
+            <li><strong>Dynamic role assignment:</strong> capability-query-based orchestration</li>
+            <li><strong>Self-healing topology:</strong> detects agent failures → spawns replacements</li>
+            <li><strong>Aether AI Phase 1:</strong> first autonomous revenue stream</li>
+            <li><strong>Series A prep:</strong> metrics, story, deck auto-updated</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:20px; border-color: rgba(167,139,250,0.3);">
+          <h3>The Single Most Important Next Action</h3>
+          <p style="font-size:0.95rem; line-height:1.8; margin-top:8px;">
+            <strong>Deploy playbook RUNCARD to all agents.</strong> Everything else builds on agents knowing the protocol. Run <code>agentx fleet-inject-hook</code> with the updated HEARTBEAT.md + RUNCARD block across all 7 agents. This single action unlocks: shared memory writes, proper escalation, board hygiene, and ACP readiness.
+          </p>
+          <div style="margin-top:12px;">
+            <span class="badge badge-purple">Est. effort: 2h</span>
+            <span class="badge badge-green" style="margin-left:8px;">Impact: Fleet-wide coherence</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px; background: linear-gradient(135deg, #10001a, #0a0a12); border-color: rgba(124,58,237,0.2);">
+      <h3>Summary Verdict</h3>
+      <p style="font-size:0.95rem; line-height:1.8; margin-top:8px;">
+        Machine.Machine has <strong>exceptional infrastructure depth for its age</strong>. The foundation pieces — multi-agent orchestration, voice, memory, task management, self-hosted git, CI/CD attempt, resource provisioning — are rare to see this far along in a pre-Series A AI company.
+      </p>
+      <p style="font-size:0.95rem; line-height:1.8; margin-top:8px;">
+        The gap is in <strong>coherence and loop closure</strong>. The pieces exist but don't reliably talk to each other. Agents are somewhat aware of the playbook but not consistently running it. Memory is excellent for m2 but siloed. The Dark Factory loop is 40% closed.
+      </p>
+      <p style="font-size:0.95rem; line-height:1.8; margin-top:8px;">
+        <strong>2-week sprint to cross 80% readiness:</strong> playbook injection fleet-wide + conversation archiving + capability registry v0.1 + CI/CD fix. After that, the self-evolution loop is real.
+      </p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <span>⚡ Machine.Machine Fleet Report — Generated by m2 (orchestrator) — 2026-02-27 22:30 UTC</span>
+  <span>Next report: Friday 2026-03-06 22:00 UTC</span>
+</footer>
+
+</body>
+</html>
