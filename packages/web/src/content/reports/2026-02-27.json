@@ -1,0 +1,83 @@
+{
+  "date": "2026-02-27",
+  "week": 9,
+  "year": 2026,
+  "title": "Fleet Coherence Sprint",
+  "overall": 62,
+  "scores": {
+    "fleetManagement": 65,
+    "memorySystem": 55,
+    "orgBuilder": 40,
+    "commsProtocol": 60,
+    "playbookAdoption": 50,
+    "resourceProvisioning": 55,
+    "roleSystem": 35,
+    "darkFactory": 45
+  },
+  "fleet": {
+    "agentsHealthy": 7,
+    "agentsDegraded": 3,
+    "totalContainers": 70,
+    "memoryVectors": 3280,
+    "activeCrons": 12
+  },
+  "shipped": [
+    "Fleet load monitor cron (CPU/RAM alerts every 5min)",
+    "Weekly system report at machinemachine.ai/report",
+    "Fleet dashboard /api/load endpoint (Redis-backed)",
+    "Voice clone demo for Rico (Qwen3-TTS reference audio)",
+    "Gunnar bot onboarding completed (@Innerstanding_bot)",
+    "Upstream OpenClaw merge (ACP, Secrets, SSRF guard)",
+    "Fleet escalation consumer (end-to-end tested)",
+    "OpenClaw TTS Opus support working",
+    "RLM memory multi-hop reasoning",
+    "Resource provisioning API (agent-side requests)"
+  ],
+  "blocked": [
+    "Telegram bot tokens for new agents",
+    "Anthropic API keys for peter/pittbull",
+    "LinkedIn auto-post (no persistent browser session)",
+    "GitHub → Forgejo Coolify migration",
+    "Home Assistant redirect loop"
+  ],
+  "topGaps": [
+    {
+      "severity": "critical",
+      "title": "No org-level memory",
+      "description": "Agents are silos. No shared knowledge graph across the fleet."
+    },
+    {
+      "severity": "critical",
+      "title": "No conversation corpus",
+      "description": "Conversations evaporate unless manually stored to memory files."
+    },
+    {
+      "severity": "critical",
+      "title": "Playbook not fleet-wide",
+      "description": "Only m2 reliably runs the fleet playbook. 6/7 agents need injection."
+    },
+    {
+      "severity": "critical",
+      "title": "No capability registry",
+      "description": "Can't query which agent handles what task. Orchestration is hardcoded."
+    },
+    {
+      "severity": "warning",
+      "title": "CI/CD pipeline broken",
+      "description": "Act runner DinD issue — base image rebuild stalled."
+    },
+    {
+      "severity": "warning",
+      "title": "Dark Factory loop not closed",
+      "description": "Compiler + deploy exist but meta-agent gap detection is missing."
+    }
+  ],
+  "nextActions": [
+    "Deploy playbook RUNCARD to all 7 agents via agentx fleet-inject-hook",
+    "Add Redis fleet heartbeat to all HEARTBEAT.md files",
+    "Provision API keys for peter + miauczek",
+    "Fix act runner DinD — rebuild m2-desktop base image",
+    "Build org_memory Qdrant namespace + shared read access",
+    "Wire OpenClaw session export → nightly Qdrant ingest"
+  ]
+}

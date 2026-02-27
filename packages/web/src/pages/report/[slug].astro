@@ -1,0 +1,234 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
+
+export async function getStaticPaths() {
+  const reportsDir = join(process.cwd(), 'src/content/reports');
+  try {
+    const files = readdirSync(reportsDir).filter(f => f.endsWith('.json'));
+    return files.map(f => ({ params: { slug: f.replace('.json', '') } }));
+  } catch {
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+const reportsDir = join(process.cwd(), 'src/content/reports');
+const report = JSON.parse(readFileSync(join(reportsDir, `${slug}.json`), 'utf-8'));
+
+// Load all reports for nav
+const allFiles = readdirSync(reportsDir).filter(f => f.endsWith('.json')).sort().reverse();
+const allSlugs = allFiles.map(f => f.replace('.json', ''));
+const currentIdx = allSlugs.indexOf(slug as string);
+const prevSlug = allSlugs[currentIdx + 1];
+const nextSlug = allSlugs[currentIdx - 1];
+
+function scoreColor(s: number) {
+  if (s >= 75) return '#4ade80';
+  if (s >= 50) return '#fbbf24';
+  return '#f87171';
+}
+---
+
+<BaseLayout title={`Report ${report.date} | Machine.Machine`} description={`Weekly system report: ${report.title}`}>
+  <style>
+    * { box-sizing: border-box; }
+    .page { background: #0a0a12; min-height: 100vh; color: #e2e8f0; font-family: 'Space Grotesk', system-ui, sans-serif; }
+    .top-nav { background: #10101e; border-bottom: 1px solid #1e1e38; padding: 12px 48px; display: flex; align-items: center; gap: 16px; font-size: 0.82rem; }
+    .top-nav a { color: #64748b; text-decoration: none; }
+    .top-nav a:hover { color: #a78bfa; }
+    .top-nav .sep { color: #1e1e38; }
+    .top-nav .curr { color: #e2e8f0; }
+    .nav-btns { margin-left: auto; display: flex; gap: 8px; }
+    .nav-btn { padding: 6px 14px; border-radius: 6px; background: #1a1a2e; border: 1px solid #1e1e38; color: #94a3b8; text-decoration: none; font-size: 0.8rem; font-weight: 500; transition: all 0.2s; }
+    .nav-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+    
+    .hero { padding: 48px 48px 32px; border-bottom: 1px solid #1e1e38; background: linear-gradient(135deg, #0a0a12, #10001a40); }
+    .hero .meta { font-size: 0.78rem; color: #64748b; margin-bottom: 8px; display: flex; gap: 16px; flex-wrap: wrap; }
+    .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .hero .overall { display: inline-flex; align-items: center; gap: 8px; }
+    .hero .score-big { font-size: 3rem; font-weight: 800; line-height: 1; }
+    .hero .score-label { font-size: 0.85rem; color: #64748b; }
+    
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 48px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { background: #10101e; border: 1px solid #1e1e38; border-radius: 12px; padding: 20px; }
+    .card h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; margin-bottom: 12px; }
+    .section { margin-bottom: 40px; }
+    .section-hdr { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: #7c3aed; font-weight: 700; border-bottom: 1px solid #1e1e38; padding-bottom: 10px; margin-bottom: 16px; }
+    
+    .bar-wrap { margin-bottom: 12px; }
+    .bar-row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; }
+    .bar-track { height: 7px; background: #1a1a2e; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; }
+    
+    .item-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(30,30,56,0.6); font-size: 0.86rem; }
+    .item-row:last-child { border-bottom: none; }
+    
+    .gap-block { padding: 14px; border-radius: 8px; margin-bottom: 10px; }
+    .gap-crit { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.15); }
+    .gap-warn { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15); }
+    .gap-block h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+    .gap-block p { font-size: 0.8rem; color: #64748b; }
+    
+    .badge { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
+    .badge-red { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+    .badge-yellow { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+    .badge-green { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+    
+    footer { border-top: 1px solid #1e1e38; padding: 20px 48px; color: #475569; font-size: 0.78rem; display: flex; justify-content: space-between; }
+    
+    @media (max-width: 768px) {
+      .top-nav, .hero, .container, footer { padding-left: 20px; padding-right: 20px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="page">
+    <nav class="top-nav">
+      <a href="/report">All Reports</a>
+      <span class="sep">/</span>
+      <span class="curr">{report.date} — {report.title}</span>
+      <div class="nav-btns">
+        {prevSlug && <a href={`/report/${prevSlug}`} class="nav-btn">← Previous</a>}
+        {nextSlug && <a href={`/report/${nextSlug}`} class="nav-btn">Next →</a>}
+      </div>
+    </nav>
+
+    <div class="hero">
+      <div class="meta">
+        <span>📅 Week {report.week} · {report.date}</span>
+        <span>⚡ Generated by m2 (orchestrator)</span>
+        <span>🔒 Internal</span>
+      </div>
+      <h1>{report.title}</h1>
+      <div class="overall">
+        <div>
+          <div class="score-big" style={`color: ${scoreColor(report.overall)}`}>{report.overall}%</div>
+          <div class="score-label">Overall production readiness</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-left:24px; flex-wrap:wrap;">
+          <span class="badge badge-green">{report.fleet.agentsHealthy} agents healthy</span>
+          <span class="badge badge-yellow">{report.fleet.agentsDegraded} degraded</span>
+          <span class="badge badge-red">{report.blocked.length} blocked</span>
+          <span class="badge" style="background:rgba(167,139,250,0.1);color:#a78bfa;border:1px solid rgba(167,139,250,0.2)">{report.shipped.length} shipped</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="section">
+        <div class="section-hdr">Subsystem Scores</div>
+        <div class="grid-2">
+          <div class="card">
+            {Object.entries(report.scores).map(([key, val]: [string, any]) => {
+              const labels: Record<string, string> = {
+                fleetManagement: 'Fleet Management',
+                memorySystem: 'Memory System',
+                orgBuilder: 'Autonomous Org Builder',
+                commsProtocol: 'Communication Protocols',
+                playbookAdoption: 'Playbook Adoption',
+                resourceProvisioning: 'Resource Provisioning',
+                roleSystem: 'Role / Org Science',
+                darkFactory: 'Dark Factory Engine'
+              };
+              return (
+                <div class="bar-wrap">
+                  <div class="bar-row">
+                    <span>{labels[key] || key}</span>
+                    <span style={`color: ${scoreColor(val)}; font-weight: 700`}>{val}%</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill" style={`width:${val}%; background:${scoreColor(val)}`}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="card" style="flex:1">
+              <h3>Fleet Numbers</h3>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                {[
+                  ['Healthy Agents', report.fleet.agentsHealthy, '#4ade80'],
+                  ['Degraded', report.fleet.agentsDegraded, '#f87171'],
+                  ['Containers', report.fleet.totalContainers, '#a78bfa'],
+                  ['Memory Vectors', `${report.fleet.memoryVectors.toLocaleString()}+`, '#60a5fa'],
+                ].map(([label, val, color]) => (
+                  <div style="text-align:center; padding:12px; background:#1a1a2e; border-radius:8px;">
+                    <div style={`font-size:1.6rem; font-weight:800; color:${color}`}>{val}</div>
+                    <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-hdr">Shipped This Week</div>
+        <div class="card">
+          {report.shipped.map((item: string) => (
+            <div class="item-row">
+              <span style="color:#4ade80">✅</span>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-hdr">Gaps & Blockers</div>
+        <div class="grid-2">
+          <div>
+            <div style="font-size:0.8rem; font-weight:600; color:#f87171; margin-bottom:10px;">Critical Gaps</div>
+            {report.topGaps.filter((g: any) => g.severity === 'critical').map((gap: any) => (
+              <div class="gap-block gap-crit">
+                <h4>{gap.title}</h4>
+                <p>{gap.description}</p>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div style="font-size:0.8rem; font-weight:600; color:#fbbf24; margin-bottom:10px;">Warnings & Blocked</div>
+            {report.topGaps.filter((g: any) => g.severity === 'warning').map((gap: any) => (
+              <div class="gap-block gap-warn">
+                <h4>{gap.title}</h4>
+                <p>{gap.description}</p>
+              </div>
+            ))}
+            <div style="margin-top:12px;">
+              {report.blocked.map((item: string) => (
+                <div class="item-row">
+                  <span style="color:#f87171">🔴</span>
+                  <span style="font-size:0.85rem;">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-hdr">Priority Actions</div>
+        <div class="card">
+          {report.nextActions.map((action: string, i: number) => (
+            <div class="item-row">
+              <span style="color:#7c3aed; font-weight:700; min-width:20px">{i+1}.</span>
+              <span>{action}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+    <footer>
+      <span>⚡ Machine.Machine Fleet Report — {report.date} — m2 (orchestrator)</span>
+      <a href="/report" style="color:#7c3aed; text-decoration:none;">← All Reports</a>
+    </footer>
+  </div>
+</BaseLayout>
