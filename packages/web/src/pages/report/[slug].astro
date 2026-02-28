@@ -4,7 +4,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 export async function getStaticPaths() {
-  const reportsDir = join(process.cwd(), 'src/content/reports');
+  const reportsDir = join(process.cwd(), 'src/data/reports');
   try {
     const files = readdirSync(reportsDir).filter(f => f.endsWith('.json'));
     return files.map(f => ({ params: { slug: f.replace('.json', '') } }));
@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const reportsDir = join(process.cwd(), 'src/content/reports');
+const reportsDir = join(process.cwd(), 'src/data/reports');
 const report = JSON.parse(readFileSync(join(reportsDir, `${slug}.json`), 'utf-8'));
 
 // Load all reports for nav

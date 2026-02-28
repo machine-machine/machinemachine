@@ -4,7 +4,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 // Load all weekly reports from content/reports/*.json
-const reportsDir = join(process.cwd(), 'src/content/reports');
+const reportsDir = join(process.cwd(), 'src/data/reports');
 let reports: any[] = [];
 try {
   const files = readdirSync(reportsDir).filter(f => f.endsWith('.json')).sort().reverse();
