@@ -37,6 +37,17 @@ function trendColor(curr: number, prev: number | undefined) {
   if (curr < prev) return '#f87171';
   return '#64748b';
 }
+const scoreLabels: Record<string, string> = {
+  fleetManagement: 'Fleet Management',
+  memorySystem: 'Memory System',
+  orgBuilder: 'Autonomous Org Builder',
+  commsProtocol: 'Communication Protocols',
+  playbookAdoption: 'Playbook Adoption',
+  resourceProvisioning: 'Resource Provisioning',
+  roleSystem: 'Role / Org Science',
+  darkFactory: 'Dark Factory Engine'
+};
+
 ---
 
 <BaseLayout title="Weekly Report | Machine.Machine" description="Internal weekly system report tracking fleet health, memory system, org builder progress, and evolution roadmap.">
@@ -179,17 +190,8 @@ function trendColor(curr: number, prev: number | undefined) {
             <div class="subsystems">
               <div class="card">
                 <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#64748b; margin-bottom:16px;">Subsystem Readiness</div>
-                {Object.entries(latest.scores).map(([key, val]: [string, any]) => {
-                  const labels: Record<string, string> = {
-                    fleetManagement: 'Fleet Management',
-                    memorySystem: 'Memory System',
-                    orgBuilder: 'Autonomous Org Builder',
-                    commsProtocol: 'Communication Protocols',
-                    playbookAdoption: 'Playbook Adoption',
-                    resourceProvisioning: 'Resource Provisioning',
-                    roleSystem: 'Role / Org Science',
-                    darkFactory: 'Dark Factory Engine'
-                  };
+                {Object.entries(latest.scores).map(([key, val]) => {
+                  const labels = scoreLabels;
                   return (
                     <div class="subsystem-bar">
                       <div class="row">
@@ -283,7 +285,7 @@ function trendColor(curr: number, prev: number | undefined) {
               <div class="wc-score-row">
                 <div class="wc-score" style={`color: ${scoreColor(report.overall)}`}>{report.overall}%</div>
                 <div class="wc-bars">
-                  {Object.values(report.scores as Record<string, number>).slice(0, 4).map((s) => (
+                  {Object.values(report.scores).slice(0, 4).map((s) => (
                     <div class="mini-bar">
                       <div class="mini-fill" style={`width:${s}%; background:${scoreColor(s)}`}></div>
                     </div>
