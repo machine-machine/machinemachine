@@ -124,8 +124,8 @@ function scoreColor(s: number) {
         <div class="section-hdr">Subsystem Scores</div>
         <div class="grid-2">
           <div class="card">
-            {Object.entries(report.scores).map(([key, val]: [string, any]) => {
-              const labels: Record<string, string> = {
+            {Object.entries(report.scores).map(([key, val]) => {
+              const labels = {
                 fleetManagement: 'Fleet Management',
                 memorySystem: 'Memory System',
                 orgBuilder: 'Autonomous Org Builder',
@@ -134,7 +134,7 @@ function scoreColor(s: number) {
                 resourceProvisioning: 'Resource Provisioning',
                 roleSystem: 'Role / Org Science',
                 darkFactory: 'Dark Factory Engine'
-              };
+              } as Record<string, string>;
               return (
                 <div class="bar-wrap">
                   <div class="bar-row">
