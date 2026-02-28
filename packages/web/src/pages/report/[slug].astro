@@ -29,6 +29,17 @@ function scoreColor(s: number) {
   if (s >= 50) return '#fbbf24';
   return '#f87171';
 }
+
+const scoreLabels: Record<string, string> = {
+  fleetManagement: 'Fleet Management',
+  memorySystem: 'Memory System',
+  orgBuilder: 'Autonomous Org Builder',
+  commsProtocol: 'Communication Protocols',
+  playbookAdoption: 'Playbook Adoption',
+  resourceProvisioning: 'Resource Provisioning',
+  roleSystem: 'Role / Org Science',
+  darkFactory: 'Dark Factory Engine'
+};
 ---
 
 <BaseLayout title={`Report ${report.date} | Machine.Machine`} description={`Weekly system report: ${report.title}`}>
@@ -125,16 +136,7 @@ function scoreColor(s: number) {
         <div class="grid-2">
           <div class="card">
             {Object.entries(report.scores).map(([key, val]) => {
-              const labels = {
-                fleetManagement: 'Fleet Management',
-                memorySystem: 'Memory System',
-                orgBuilder: 'Autonomous Org Builder',
-                commsProtocol: 'Communication Protocols',
-                playbookAdoption: 'Playbook Adoption',
-                resourceProvisioning: 'Resource Provisioning',
-                roleSystem: 'Role / Org Science',
-                darkFactory: 'Dark Factory Engine'
-              } as Record<string, string>;
+              const labels = scoreLabels;
               return (
                 <div class="bar-wrap">
                   <div class="bar-row">
