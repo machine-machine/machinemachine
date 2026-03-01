@@ -63,11 +63,11 @@ export const translations = {
     // Proof
     proof_h2: "Real results. No promises.",
     proof_sub: "Measured on real projects — not marketing demos.",
-    proof_stat1_label: "Benchmark score<br/>on first run",
-    proof_stat2_label: "Benchmark score<br/>after learning",
-    proof_stat3_label: "Iterations<br/>until improvement",
-    proof_stat4_label: "Human intervention<br/>needed",
-    proof_footnote: "The system improved itself. No one intervened. From negative to positive, in 6 rounds.",
+    proof_stat1_label: "Single-agent score<br/>contract review",
+    proof_stat2_label: "Multi-agent score<br/>contract review",
+    proof_stat3_label: "Enterprise tasks<br/>benchmarked",
+    proof_stat4_label: "Human decisions<br/>needed",
+    proof_footnote: "BenchmarkSuite v2 · Blinded evaluation · Real API cost: $1.94 · Reproducible · <a href='/benchmark' style='color:inherit'>View full results →</a>",
 
     // Use cases
     usecases_h2: "What your AI team actually does",

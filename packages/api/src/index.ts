@@ -483,10 +483,10 @@ Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
     pitch.progress = 100;
     pitch.status = 'ready';
     pitch.html = htmlContent;
-    pitch.url = `https://machinemachine.ai/pitch/${uuid}`;
+    pitch.url = `https://machinemachine.ai/pitch/?id=${uuid}`;
     savePitches();
 
-    notifyTelegram(`✅ Pitch ready for ${pitch.email}: machinemachine.ai/pitch/${uuid}`);
+    notifyTelegram(`✅ Pitch ready for ${pitch.email}: machinemachine.ai/pitch/?id=${uuid}`);
 
     // Send personalized confirmation email via Brevo
     sendConfirmationEmail(pitch).catch(() => {/* best effort */});
@@ -567,7 +567,7 @@ app.post('/v1/pitch/submit', async (c) => {
     status: 'generating',
     progress: 0,
     createdAt: new Date().toISOString(),
-    url: `https://machinemachine.ai/pitch/${uuid}`,
+    url: `https://machinemachine.ai/pitch/?id=${uuid}`,
   };
 
   pitches.set(uuid, pitch);
@@ -575,7 +575,7 @@ app.post('/v1/pitch/submit', async (c) => {
 
   // Fire-and-forget background generation + CRM tracking
   generatePitch(uuid);
-  trackLead({ email, text, links, pitchUrl: `https://machinemachine.ai/pitch/${uuid}` });
+  trackLead({ email, text, links, pitchUrl: `https://machinemachine.ai/pitch/?id=${uuid}` });
   track(email, 'pitch_submitted', { uuid, has_links: links.length > 0, text_length: text.length });
 
   const truncatedText = text.length > 100 ? text.slice(0, 100) + '...' : text;
@@ -585,7 +585,7 @@ app.post('/v1/pitch/submit', async (c) => {
 
   return c.json({
     uuid,
-    url: `https://machinemachine.ai/pitch/${uuid}`,
+    url: `https://machinemachine.ai/pitch/?id=${uuid}`,
     progress: 0,
     message: 'Your pitch is being generated. This page will update automatically.',
   });
