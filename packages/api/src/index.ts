@@ -424,7 +424,10 @@ async function generatePitch(uuid: string) {
     const useAnthropic = !!process.env.ANTHROPIC_API_KEY;
     const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
 
-    const userPrompt = `Generate a personalised pitch deck in German OR English (match the language of the submission) for the following team/company:
+    const langMap: Record<string, string> = { en: 'English', de: 'German', pl: 'Polish' };
+    const pitchLanguage = langMap[locale] || 'English';
+
+    const userPrompt = `Generate a personalised pitch deck in ${pitchLanguage} for the following team/company:
 
 Context: ${pitch.text}
 Links: ${pitch.links.join(', ')}
@@ -452,7 +455,7 @@ CRITICAL CSS rules (must include verbatim — do NOT override these):
 
 Make it feel written specifically for them — use their industry terms, their use cases, their team context.
 Keep the Machine.Machine brand but frame everything around THEIR world.
-End with: "Bereit? → machinemachine.ai" CTA.
+End with a CTA in ${pitchLanguage} pointing to machinemachine.ai.
 
 Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
 
@@ -525,6 +528,7 @@ app.post('/v1/pitch/submit', async (c) => {
   let text = '';
   let linksRaw: unknown = [];
   let audioBase64: string | undefined;
+  let locale = 'en';
 
   const contentType = c.req.header('content-type') || '';
 
@@ -540,6 +544,7 @@ app.post('/v1/pitch/submit', async (c) => {
     text = body.text || '';
     linksRaw = body.links;
     audioBase64 = body.audioBase64 || body.audio || undefined;
+    locale = body.locale || locale;
   }
 
   if (!email) return c.json({ error: 'email is required' }, 400);

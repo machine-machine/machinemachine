@@ -225,7 +225,7 @@ const { locale } = Astro.props;
     btnSubmit.textContent = i18n.formSending;
 
     try {
-      const body: Record<string, unknown> = { email, text, links };
+      const body: Record<string, unknown> = { email, text, links, locale: i18n.locale };
       if (audioBase64) body.audioBase64 = audioBase64;
 
       const res = await fetch(`${API_URL}/v1/pitch/submit`, {
