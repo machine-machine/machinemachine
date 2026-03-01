@@ -9,12 +9,266 @@ const { locale } = Astro.props;
 
 const backHref = locale === 'en' ? '/dries' : `/${locale}/dries`;
 const mmUrl = "https://machinemachine.ai";
+
+const t = {
+  en: {
+    title: "Dries Cleaning — Market Analysis, Competitors & 5-Year Business Plan",
+    desc: "Full market analysis, competitive landscape and 5-year financial projections for Dries Cleaning.",
+    badge: "Dries Cleaning × Machine.Machine",
+    h1a: "Market Analysis, Competitive Landscape",
+    h1b: "5-Year Business Plan",
+    lead: "A full strategic assessment for launching an AI-powered dry ice cleaning business in the PL/DE border region (Lubuskie / Brandenburg). Prepared by Machine.Machine.",
+    s1_tag: "01 — Market Analysis",
+    s1_h: "Dry Ice Cleaning — Global & European Market",
+    s1_p: "Dry ice (CO₂) blasting is a rapidly growing industrial cleaning method. It leaves no secondary waste, requires no water, no chemicals, and can clean equipment in operation — making it highly attractive across regulated industries.",
+    stat1_v: "$1.3B", stat1_l: "Global dry ice blasting market size (2024)",
+    stat2_v: "7.8%", stat2_l: "CAGR forecast 2024–2030 (Global)",
+    stat3_v: "€420M", stat3_l: "European market (2024 est.)",
+    stat4_v: "€28M+", stat4_l: "PL + DE (Brandenburg) addressable market",
+    drivers_h: "Market Drivers",
+    d1_t: "Industrial Compliance Pressure", d1: "EU food safety (HACCP) and pharma (GMP) regulations increasingly prohibit chemical cleaning agents. Dry ice is the clean alternative.",
+    d2_t: "Sustainability Mandates", d2: "Zero chemical waste, zero water runoff. ESG-driven procurement in DE and large PL manufacturers pushes CO₂ cleaning to the front.",
+    d3_t: "Rising Labor Costs", d3: "PL min wage +20% in 2024. DE above €13/hr. Automated AI sales removes headcount from the most expensive part: customer acquisition.",
+    seg_h: "Target Segments — Lubuskie / Brandenburg Region",
+    seg_cols: ["Segment","Est. Addressable (Region)","Avg. Job Value","Frequency","Priority"],
+    seg_rows: [
+      ["Food & Beverage Manufacturing","€4.2M / year","€800–€3,500","Monthly–Quarterly","HIGH"],
+      ["Automotive / Industrial Machinery","€6.8M / year","€1,200–€8,000","Quarterly–Annual","HIGH"],
+      ["Pharma & Medical","€2.1M / year","€1,500–€6,000","Bi-annual","MEDIUM"],
+      ["Logistics / Warehousing","€1.8M / year","€400–€1,200","Quarterly","MEDIUM"],
+      ["Historical Restoration / Construction","€3.4M / year","€600–€4,000","One-off / Project","OPPORTUNISTIC"],
+    ],
+    border_box: "<strong>Border Region Advantage:</strong> The Lubuskie–Brandenburg corridor (Frankfurt Oder / Słubice) gives Dries unique dual-market access. Polish operating costs + German pricing = significantly higher margins than either market alone. EU Interreg funding programs are also available for cross-border industrial SMEs.",
+    s2_tag: "02 — Competitive Landscape",
+    s2_h: "Who Else Is Playing",
+    s2_p: "The dry ice cleaning market is highly fragmented. Most operators are small regional firms with no digital presence, no automated sales, and limited scalability. This is the gap Dries exploits.",
+    comp_h: "Key Competitors",
+    comp_cols: ["Company","Region","Scale","AI / Automation","Weakness"],
+    comp_rows: [
+      ["Cold Jet (USA/EU)","Pan-European","Large (equipment manufacturer + services)","MINIMAL","Focuses on equipment sales, not service delivery. High prices."],
+      ["IceTech (Denmark)","EU-wide","Medium","NONE","Equipment manufacturer only. No AI sales layer. Manual B2B only."],
+      ["Local DE operators","Brandenburg, Berlin","Small (1–5 techs)","NONE","No website SEO, phone-only sales, no CRM, no follow-up automation."],
+      ["Local PL operators","Lubuskie, Wielkopolska","Small (1–3 techs)","NONE","No cross-border capability, limited to PL market, no English/German materials."],
+      ["Chemical cleaning firms","Regional","Medium–Large","CRM ONLY","Legacy chemistry-based approach. Losing regulatory favour in food & pharma."],
+    ],
+    pos_h: "Competitive Positioning",
+    adv_h: "✅ Dries Advantages",
+    adv: ["AI sales robot — 24/7 lead handling, zero headcount","Dual-market access (PL cost base + DE pricing)","Automated lead generation + nurturing","Pocket assistant for techs = faster on-site decisions","First mover on AI automation in this niche","Interreg EU cross-border funding eligibility"],
+    risk_h: "⚠️ Risks to Monitor",
+    risks_comp: ["Cold Jet / IceTech could add AI sales layer","CO₂ supply chain dependency (price volatility)","German market requires formal GmbH + CE certifications","Initial capital for equipment (machine: €15–€50k)","Trust gap: industrial clients slow to onboard AI negotiation"],
+    s3_tag: "03 — Business Plan",
+    s3_h: "5-Year Financial Projections",
+    s3_p: "Conservative model. Assumes Lubuskie base, cross-border DE expansion in Year 2, second machine in Year 3, franchise/licensing model from Year 4.",
+    model_box: "<strong>Revenue Model:</strong> Service jobs (€600–€8,000 each) booked by AI sales robot. Operating costs: CO₂ pellets (~€3–5/kg), equipment depreciation, 1–2 techs in Year 1 scaling to 4–6 by Year 5. Machine.Machine automation fee: fixed monthly retainer + % of incremental revenue growth.",
+    years: [
+      { label: "Year 1 — 2025", rev: "€120K", title: "Setup phase", body: "PL market only. 1 machine, 1 tech + AI sales bot. ~60 jobs @ avg €2,000. Focus: food & industrial. AI bot handles all inbound. CRM live.", net: "Net: ~€35K", costs: "Costs: ~€85K" },
+      { label: "Year 2 — 2026", rev: "€290K", title: "DE expansion", body: "Cross-border DE clients. GmbH registered. 2 techs, AI marketing live. ~130 jobs @ avg €2,200. Pharma + automotive added.", net: "Net: ~€95K", costs: "Costs: ~€195K" },
+      { label: "Year 3 — 2027", rev: "€580K", title: "Scale phase", body: "2nd machine. 4 techs. AI pocket assistant for field. Recurring contracts with 3–5 large industrial clients. ~240 jobs @ avg €2,400.", net: "Net: ~€210K", costs: "Costs: ~€370K" },
+      { label: "Year 4 — 2028", rev: "€1.1M", title: "Licensing model", body: "Franchise playbook sold to 2 partner operators. AI stack licensed. 6 techs own-ops + 2 franchisees. Recurring revenue from annual contracts +30%.", net: "Net: ~€420K", costs: "Costs: ~€680K" },
+      { label: "Year 5 — 2029", rev: "€2.0M", title: "Regional leader", body: "5 franchise partners across PL/DE/CZ. Own ops: 3 machines, 8 techs. AI stack fully autonomous. Exit / PE acquisition target.", net: "Net: ~€900K", costs: "Costs: ~€1.1M" },
+    ],
+    invest_h: "Startup Investment Required",
+    invest_cols: ["Item","Cost (est.)","Notes"],
+    invest_rows: [
+      ["Dry ice blasting machine (1x)","€18,000–€45,000","Cold Jet, IceTech, or Karcher. Leasing available."],
+      ["CO₂ pellet supply (3 months)","€4,000–€8,000","Contract with Air Products or Messer"],
+      ["Van / transport","€8,000–€20,000","Used Mercedes Sprinter sufficient Y1"],
+      ["GmbH registration (DE)","€1,500–€3,000","Year 2 — required for DE invoicing"],
+      ["Certifications (CE, HACCP training)","€2,000–€5,000","Required for food & pharma contracts"],
+      ["Machine.Machine AI stack setup","Monthly retainer","Sales bot, marketing AI, pocket assistant"],
+      ["Total Y1 capital needed","€35,000–€80,000","Lower end with equipment leasing"],
+    ],
+    fund_h: "Funding Sources",
+    f1_t: "EU Interreg PL-BB", f1: "Cross-border business grants for PL/DE SMEs. Lubuskie–Brandenburg program targets industrial services. Up to 85% co-financing.",
+    f2_t: "PFR / BGK Loans (PL)", f2: "Polish Development Fund SME loans at 2–4% interest. BGK has specific green-tech / low-emission programs.",
+    f3_t: "Equipment Leasing", f3: "Cold Jet and IceTech both offer leasing programs. Reduces upfront capital to €5–15K.",
+    riskm_h: "Key Risks & Mitigations",
+    risk_rows: [
+      { icon: "🧊", t: "CO₂ supply disruption", m: "Multi-supplier contracts, 30-day buffer stock, pricing clauses in client contracts." },
+      { icon: "🤖", t: "AI sales trust gap", m: "Human handoff available for high-value deals (€5K+). AI qualifies, human closes." },
+      { icon: "⚖️", t: "German regulatory entry", m: "Partner with DE steuerberater from Y1. Budget €3K for legal setup." },
+      { icon: "📉", t: "Slow ramp in Y1", m: "AI bot runs outbound from day 1, building pipeline 6 weeks ahead. Target 10 pilot customers." },
+      { icon: "🏭", t: "Large competitor enters AI", m: "Lock in annual contracts early. Local operator advantage hard to replicate from USA HQ." },
+    ],
+    cta_h: "This is your 5-year roadmap.",
+    cta_p: "Machine.Machine handles the entire AI stack. You focus on the machines and the clients.",
+    cta_btn: "Get Your AI Agent →",
+    back_btn: "← Back to Dries Cleaning",
+  },
+  pl: {
+    title: "Dries Cleaning — Analiza rynku, konkurencji i 5-letni plan biznesowy",
+    desc: "Pełna analiza rynku, krajobrazu konkurencyjnego i 5-letnich projekcji finansowych dla Dries Cleaning.",
+    badge: "Dries Cleaning × Machine.Machine",
+    h1a: "Analiza rynku i konkurencji",
+    h1b: "5-letni plan biznesowy",
+    lead: "Pełna ocena strategiczna dla uruchomienia firmy czyszczącej suchym lodem z AI w regionie granicznym PL/DE (Lubuskie / Brandenburgia). Przygotowane przez Machine.Machine.",
+    s1_tag: "01 — Analiza rynku",
+    s1_h: "Czyszczenie suchym lodem — rynek globalny i europejski",
+    s1_p: "Czyszczenie suchym lodem (CO₂) to dynamicznie rosnąca metoda przemysłowego czyszczenia. Nie pozostawia wtórnych odpadów, nie wymaga wody ani chemikaliów i może czyścić urządzenia w trakcie pracy — co czyni ją wyjątkowo atrakcyjną w regulowanych branżach.",
+    stat1_v: "$1,3 mld", stat1_l: "Globalny rynek czyszczenia suchym lodem (2024)",
+    stat2_v: "7,8%", stat2_l: "CAGR prognoza 2024–2030 (globalnie)",
+    stat3_v: "€420 mln", stat3_l: "Rynek europejski (szac. 2024)",
+    stat4_v: "€28 mln+", stat4_l: "Rynek PL + DE (Brandenburgia) — adresowalny",
+    drivers_h: "Czynniki wzrostu rynku",
+    d1_t: "Presja regulacyjna w przemyśle", d1: "Przepisy UE dotyczące bezpieczeństwa żywności (HACCP) i farmacji (GMP) coraz częściej zabraniają stosowania środków chemicznych do czyszczenia. Suchy lód jest czystą alternatywą.",
+    d2_t: "Wymogi zrównoważonego rozwoju", d2: "Zero odpadów chemicznych, zero ścieków. Zamówienia ESG w DE i dużych producentach PL przyspiesza przejście na czyszczenie CO₂.",
+    d3_t: "Rosnące koszty pracy", d3: "Płaca minimalna w PL +20% w 2024 r. DE powyżej €13/godz. Zautomatyzowana sprzedaż AI usuwa koszty pracownicze z najdroższego etapu: pozyskiwania klientów.",
+    seg_h: "Docelowe segmenty — region Lubuskie / Brandenburgia",
+    seg_cols: ["Segment","Szac. rynek (region)","Śr. wartość zlecenia","Częstotliwość","Priorytet"],
+    seg_rows: [
+      ["Przemysł spożywczy i napojowy","€4,2 mln / rok","€800–€3 500","Miesięcznie–kwartalnie","WYSOKI"],
+      ["Motoryzacja / maszyny przemysłowe","€6,8 mln / rok","€1 200–€8 000","Kwartalnie–rocznie","WYSOKI"],
+      ["Farmacja i medycyna","€2,1 mln / rok","€1 500–€6 000","Co pół roku","ŚREDNI"],
+      ["Logistyka / magazyny","€1,8 mln / rok","€400–€1 200","Kwartalnie","ŚREDNI"],
+      ["Renowacja historyczna / budownictwo","€3,4 mln / rok","€600–€4 000","Jednorazowo / projekt","OKAZJONALNY"],
+    ],
+    border_box: "<strong>Przewaga regionu przygranicznego:</strong> Korytarz Lubuskie–Brandenburgia (Frankfurt nad Odrą / Słubice) daje Dries wyjątkowy dostęp do dwóch rynków. Polskie koszty operacyjne + niemieckie ceny = znacząco wyższe marże niż na każdym rynku osobno. Dostępne są też programy unijne Interreg dla transgranicznych MŚP.",
+    s2_tag: "02 — Krajobraz konkurencyjny",
+    s2_h: "Kto jest na rynku",
+    s2_p: "Rynek czyszczenia suchym lodem jest mocno rozdrobniony. Większość operatorów to małe firmy regionalne bez obecności cyfrowej, bez automatycznej sprzedaży i o ograniczonej skalowalności. To właśnie tę lukę wykorzystuje Dries.",
+    comp_h: "Kluczowi konkurenci",
+    comp_cols: ["Firma","Region","Skala","AI / Automatyzacja","Słabości"],
+    comp_rows: [
+      ["Cold Jet (USA/EU)","Pan-europejski","Duży (producent urządzeń + usługi)","MINIMALNA","Skupia się na sprzedaży urządzeń, nie na świadczeniu usług. Wysokie ceny."],
+      ["IceTech (Dania)","EU","Średni","BRAK","Tylko producent urządzeń. Brak warstwy sprzedaży AI. Tylko ręczne B2B."],
+      ["Lokalni operatorzy DE","Brandenburgia, Berlin","Mały (1–5 techników)","BRAK","Brak SEO, sprzedaż tylko telefoniczna, brak CRM i automatycznego follow-up."],
+      ["Lokalni operatorzy PL","Lubuskie, Wielkopolska","Mały (1–3 techników)","BRAK","Brak możliwości transgranicznej, ograniczeni do rynku PL, brak materiałów w j. angielskim/niemieckim."],
+      ["Firmy chemicznego czyszczenia","Regionalny","Średni–Duży","TYLKO CRM","Przestarzałe podejście chemiczne. Tracą przychylność regulacyjną w branży spożywczej i farmaceutycznej."],
+    ],
+    pos_h: "Pozycjonowanie konkurencyjne",
+    adv_h: "✅ Przewagi Dries",
+    adv: ["Robot sprzedażowy AI — obsługa leadów 24/7, zero zatrudnienia","Dostęp do dwóch rynków (koszty PL + ceny DE)","Zautomatyzowane generowanie i pielęgnowanie leadów","Asystent kieszonkowy dla techników = szybsze decyzje w terenie","Pionier automatyzacji AI w tej niszy","Kwalifikacja do unijnego finansowania Interreg"],
+    risk_h: "⚠️ Ryzyka do monitorowania",
+    risks_comp: ["Cold Jet / IceTech może dodać warstwę sprzedaży AI","Zależność od łańcucha dostaw CO₂ (zmienność cen)","Rynek DE wymaga GmbH i certyfikatów CE","Kapitał początkowy na urządzenia (maszyna: €15–€50k)","Luka zaufania: klienci przemysłowi powoli akceptują negocjacje AI"],
+    s3_tag: "03 — Plan biznesowy",
+    s3_h: "5-letnie projekcje finansowe",
+    s3_p: "Model konserwatywny. Zakłada bazę w Lubuskiem, ekspansję transgraniczną do DE w roku 2., drugą maszynę w roku 3., model franczyzowy od roku 4.",
+    model_box: "<strong>Model przychodów:</strong> Zlecenia usługowe (€600–€8 000 każde) rezerwowane przez robota sprzedażowego AI. Koszty operacyjne: granulat CO₂ (~€3–5/kg), amortyzacja urządzeń, 1–2 techników w roku 1. rosnąco do 4–6 w roku 5. Opłata Machine.Machine: stały miesięczny abonament + % od przyrostowego wzrostu przychodów.",
+    years: [
+      { label: "Rok 1 — 2025", rev: "€120 tys.", title: "Faza konfiguracji", body: "Tylko rynek PL. 1 maszyna, 1 technik + bot sprzedażowy AI. ~60 zleceń śr. €2 000. Fokus: spożywczy i przemysłowy. Bot AI obsługuje cały ruch przychodzący. CRM uruchomiony.", net: "Zysk netto: ~€35 tys.", costs: "Koszty: ~€85 tys." },
+      { label: "Rok 2 — 2026", rev: "€290 tys.", title: "Ekspansja do DE", body: "Klienci transgraniczni DE. Rejestracja GmbH. 2 techników, marketing AI uruchomiony. ~130 zleceń śr. €2 200. Dodanie farmacji i motoryzacji.", net: "Zysk netto: ~€95 tys.", costs: "Koszty: ~€195 tys." },
+      { label: "Rok 3 — 2027", rev: "€580 tys.", title: "Faza skalowania", body: "2. maszyna. 4 techników. Asystent AI dla techników w terenie. Umowy cykliczne z 3–5 dużymi klientami przemysłowymi. ~240 zleceń śr. €2 400.", net: "Zysk netto: ~€210 tys.", costs: "Koszty: ~€370 tys." },
+      { label: "Rok 4 — 2028", rev: "€1,1 mln", title: "Model licencyjny", body: "Sprzedaż podręcznika franczyzowego 2 partnerom. Licencjonowanie stosu AI. 6 techników własnych + 2 franczyzobiorców. Przychody cykliczne z umów rocznych +30%.", net: "Zysk netto: ~€420 tys.", costs: "Koszty: ~€680 tys." },
+      { label: "Rok 5 — 2029", rev: "€2,0 mln", title: "Lider regionalny", body: "5 partnerów franczyzowych w PL/DE/CZ. Własne operacje: 3 maszyny, 8 techników. Stos AI w pełni autonomiczny. Cel przejęcia / PE exit.", net: "Zysk netto: ~€900 tys.", costs: "Koszty: ~€1,1 mln" },
+    ],
+    invest_h: "Wymagany kapitał startowy",
+    invest_cols: ["Pozycja","Koszt (szac.)","Uwagi"],
+    invest_rows: [
+      ["Maszyna do czyszczenia suchym lodem (1x)","€18 000–€45 000","Cold Jet, IceTech lub Karcher. Leasing dostępny."],
+      ["Zapas granulatu CO₂ (3 miesiące)","€4 000–€8 000","Kontrakt z Air Products lub Messer"],
+      ["Van / transport","€8 000–€20 000","Używany Mercedes Sprinter wystarczający w roku 1."],
+      ["Rejestracja GmbH (DE)","€1 500–€3 000","Rok 2 — wymagany do fakturowania w DE"],
+      ["Certyfikaty (CE, szkolenie HACCP)","€2 000–€5 000","Wymagane dla kontraktów spożywczych i farmaceutycznych"],
+      ["Konfiguracja stosu AI Machine.Machine","Miesięczny abonament","Bot sprzedażowy, marketing AI, asystent kieszonkowy"],
+      ["Łączny kapitał potrzebny w roku 1.","€35 000–€80 000","Dolna granica przy leasingu urządzeń"],
+    ],
+    fund_h: "Źródła finansowania",
+    f1_t: "EU Interreg PL-BB", f1: "Granty transgraniczne dla MŚP PL/DE. Program Lubuskie–Brandenburgia celuje w usługi przemysłowe. Dofinansowanie do 85%.",
+    f2_t: "Pożyczki PFR / BGK (PL)", f2: "Pożyczki MŚP Polskiego Funduszu Rozwoju na 2–4% rocznie. BGK ma specjalne programy dla czystych technologii.",
+    f3_t: "Leasing urządzeń", f3: "Cold Jet i IceTech oferują programy leasingowe. Redukuje kapitał startowy do €5–15 tys.",
+    riskm_h: "Kluczowe ryzyka i środki zaradcze",
+    risk_rows: [
+      { icon: "🧊", t: "Zakłócenia dostaw CO₂", m: "Umowy z wieloma dostawcami, 30-dniowy bufor zapasów, klauzule cenowe w kontraktach klientów." },
+      { icon: "🤖", t: "Luka zaufania do sprzedaży AI", m: "Dostępne przekazanie do człowieka dla dużych zleceń (€5K+). AI kwalifikuje, człowiek zamyka." },
+      { icon: "⚖️", t: "Wejście na rynek niemiecki", m: "Współpraca z niemieckim doradcą podatkowym od roku 1. Budżet €3 tys. na konfigurację prawną." },
+      { icon: "📉", t: "Powolny start w roku 1.", m: "Bot AI uruchamia sprzedaż wychodzącą od pierwszego dnia, budując lejek 6 tygodni przed startem. Cel: 10 klientów pilotażowych." },
+      { icon: "🏭", t: "Duży konkurent wchodzi w AI", m: "Wczesne blokowanie umów rocznych. Przewaga lokalnego operatora trudna do replikacji z USA." },
+    ],
+    cta_h: "To jest Twój 5-letni plan działania.",
+    cta_p: "Machine.Machine zajmuje się całym stosem AI. Ty skupiasz się na maszynach i klientach.",
+    cta_btn: "Zdobądź swojego agenta AI →",
+    back_btn: "← Powrót do Dries Cleaning",
+  },
+  de: {
+    title: "Dries Cleaning — Marktanalyse, Wettbewerb & 5-Jahres-Businessplan",
+    desc: "Vollständige Marktanalyse, Wettbewerbslandschaft und 5-Jahres-Finanzprognosen für Dries Cleaning.",
+    badge: "Dries Cleaning × Machine.Machine",
+    h1a: "Marktanalyse & Wettbewerbslandschaft",
+    h1b: "5-Jahres-Businessplan",
+    lead: "Eine vollständige strategische Bewertung für die Gründung eines KI-gestützten Trockeneis-Reinigungsunternehmens in der PL/DE-Grenzregion (Lubuskie / Brandenburg). Erstellt von Machine.Machine.",
+    s1_tag: "01 — Marktanalyse",
+    s1_h: "Trockeneisstrahlen — Globaler & Europäischer Markt",
+    s1_p: "Trockeneis (CO₂)-Strahlen ist eine schnell wachsende industrielle Reinigungsmethode. Es hinterlässt keinen Sekundärabfall, benötigt kein Wasser, keine Chemikalien und kann Geräte im Betrieb reinigen — was es in regulierten Branchen äußerst attraktiv macht.",
+    stat1_v: "$1,3 Mrd.", stat1_l: "Globaler Markt für Trockeneisstrahlen (2024)",
+    stat2_v: "7,8%", stat2_l: "CAGR Prognose 2024–2030 (Global)",
+    stat3_v: "€420 Mio.", stat3_l: "Europäischer Markt (Schätzung 2024)",
+    stat4_v: "€28 Mio.+", stat4_l: "Adressierbarer Markt PL + DE (Brandenburg)",
+    drivers_h: "Markttreiber",
+    d1_t: "Regulatorischer Druck in der Industrie", d1: "EU-Lebensmittelsicherheit (HACCP) und Pharma (GMP) verbieten zunehmend chemische Reinigungsmittel. Trockeneis ist die saubere Alternative.",
+    d2_t: "Nachhaltigkeitspflichten", d2: "Null Chemieabfall, null Abwasser. ESG-getriebene Beschaffung in DE und großen PL-Herstellern treibt CO₂-Reinigung nach vorne.",
+    d3_t: "Steigende Arbeitskosten", d3: "PL-Mindestlohn +20% in 2024. DE über €13/Std. KI-Automatisierung eliminiert Personalkosten beim teuersten Teil: der Kundengewinnung.",
+    seg_h: "Zielsegmente — Region Lubuskie / Brandenburg",
+    seg_cols: ["Segment","Gesch. Adressierbarer Markt","Durchschn. Auftragswert","Häufigkeit","Priorität"],
+    seg_rows: [
+      ["Lebensmittel & Getränke","€4,2 Mio. / Jahr","€800–€3.500","Monatlich–Quartalsweise","HOCH"],
+      ["Automotive / Industriemaschinen","€6,8 Mio. / Jahr","€1.200–€8.000","Quartalsweise–Jährlich","HOCH"],
+      ["Pharma & Medizin","€2,1 Mio. / Jahr","€1.500–€6.000","Halbjährlich","MITTEL"],
+      ["Logistik / Lager","€1,8 Mio. / Jahr","€400–€1.200","Quartalsweise","MITTEL"],
+      ["Historische Restaurierung / Bau","€3,4 Mio. / Jahr","€600–€4.000","Einmalig / Projekt","OPPORTUNISTISCH"],
+    ],
+    border_box: "<strong>Vorteil Grenzregion:</strong> Der Korridor Lubuskie–Brandenburg (Frankfurt Oder / Słubice) gibt Dries einzigartigen Dual-Marktzugang. Polnische Betriebskosten + deutsche Preise = deutlich höhere Margen als auf jedem Markt allein. EU Interreg-Förderprogramme für grenzüberschreitende KMU sind ebenfalls verfügbar.",
+    s2_tag: "02 — Wettbewerbslandschaft",
+    s2_h: "Wer ist am Markt",
+    s2_p: "Der Markt für Trockeneisstrahlen ist stark fragmentiert. Die meisten Betreiber sind kleine regionale Unternehmen ohne digitale Präsenz, ohne automatisierten Vertrieb und mit begrenzter Skalierbarkeit. Diese Lücke nutzt Dries.",
+    comp_h: "Wichtigste Wettbewerber",
+    comp_cols: ["Unternehmen","Region","Größe","KI / Automatisierung","Schwäche"],
+    comp_rows: [
+      ["Cold Jet (USA/EU)","Pan-europäisch","Groß (Gerätehersteller + Dienstleistungen)","MINIMAL","Fokus auf Geräteverkauf, nicht Dienstleistungserbringung. Hohe Preise."],
+      ["IceTech (Dänemark)","EU-weit","Mittel","KEINE","Nur Gerätehersteller. Keine KI-Vertriebsschicht. Nur manuelles B2B."],
+      ["Lokale DE-Betreiber","Brandenburg, Berlin","Klein (1–5 Techniker)","KEINE","Kein SEO, nur Telefonverkauf, kein CRM, keine Follow-up-Automatisierung."],
+      ["Lokale PL-Betreiber","Lubuskie, Großpolen","Klein (1–3 Techniker)","KEINE","Keine grenzüberschreitende Kapazität, auf PL-Markt beschränkt, keine englischen/deutschen Materialien."],
+      ["Chemische Reinigungsunternehmen","Regional","Mittel–Groß","NUR CRM","Veralteter chemiebasierter Ansatz. Verlieren regulatorische Gunst in Lebensmittel & Pharma."],
+    ],
+    pos_h: "Wettbewerbspositionierung",
+    adv_h: "✅ Vorteile von Dries",
+    adv: ["KI-Verkaufsroboter — 24/7 Lead-Betreuung, kein Personal","Dual-Marktzugang (PL-Kostenbasis + DE-Preise)","Automatisierte Lead-Generierung und -Pflege","Pocket-Assistent für Techniker = schnellere Entscheidungen vor Ort","First Mover bei KI-Automatisierung in dieser Nische","Förderfähigkeit durch EU Interreg"],
+    risk_h: "⚠️ Zu beobachtende Risiken",
+    risks_comp: ["Cold Jet / IceTech könnte KI-Vertriebsschicht hinzufügen","CO₂-Lieferketten-Abhängigkeit (Preisvolatilität)","Deutscher Markt erfordert GmbH + CE-Zertifizierungen","Anfangskapital für Geräte (Maschine: €15–€50k)","Vertrauenslücke: Industriekunden akzeptieren KI-Verhandlung langsam"],
+    s3_tag: "03 — Businessplan",
+    s3_h: "5-Jahres-Finanzprognosen",
+    s3_p: "Konservatives Modell. Basis in Lubuskie, grenzüberschreitende DE-Expansion in Jahr 2, zweite Maschine in Jahr 3, Franchise-/Lizenzmodell ab Jahr 4.",
+    model_box: "<strong>Umsatzmodell:</strong> Serviceaufträge (€600–€8.000 je Auftrag) gebucht durch KI-Verkaufsroboter. Betriebskosten: CO₂-Pellets (~€3–5/kg), Geräteabschreibung, 1–2 Techniker in Jahr 1 auf 4–6 bis Jahr 5 skalierend. Machine.Machine-Automatisierungsgebühr: feste monatliche Pauschale + % des inkrementellen Umsatzwachstums.",
+    years: [
+      { label: "Jahr 1 — 2025", rev: "€120T", title: "Aufbauphase", body: "Nur PL-Markt. 1 Maschine, 1 Techniker + KI-Verkaufsbot. ~60 Aufträge à Ø €2.000. Fokus: Lebensmittel & Industrie. KI-Bot bearbeitet alle eingehenden Anfragen. CRM live.", net: "Netto: ~€35T", costs: "Kosten: ~€85T" },
+      { label: "Jahr 2 — 2026", rev: "€290T", title: "DE-Expansion", body: "Grenzüberschreitende DE-Kunden. GmbH registriert. 2 Techniker, KI-Marketing live. ~130 Aufträge à Ø €2.200. Pharma + Automotive hinzugefügt.", net: "Netto: ~€95T", costs: "Kosten: ~€195T" },
+      { label: "Jahr 3 — 2027", rev: "€580T", title: "Skalierungsphase", body: "2. Maschine. 4 Techniker. KI-Pocket-Assistent für Außendienst. Laufende Verträge mit 3–5 großen Industriekunden. ~240 Aufträge à Ø €2.400.", net: "Netto: ~€210T", costs: "Kosten: ~€370T" },
+      { label: "Jahr 4 — 2028", rev: "€1,1 Mio.", title: "Lizenzmodell", body: "Franchise-Handbuch an 2 Partnerunternehmer verkauft. KI-Stack lizenziert. 6 Techniker Eigenbetrieb + 2 Franchisenehmer. Wiederkehrende Einnahmen aus Jahresverträgen +30%.", net: "Netto: ~€420T", costs: "Kosten: ~€680T" },
+      { label: "Jahr 5 — 2029", rev: "€2,0 Mio.", title: "Regionaler Marktführer", body: "5 Franchise-Partner in PL/DE/CZ. Eigenbetrieb: 3 Maschinen, 8 Techniker. KI-Stack vollständig autonom. Exit / PE-Übernahmeziel.", net: "Netto: ~€900T", costs: "Kosten: ~€1,1 Mio." },
+    ],
+    invest_h: "Erforderliches Startkapital",
+    invest_cols: ["Position","Kosten (Schätz.)","Anmerkungen"],
+    invest_rows: [
+      ["Trockeneis-Strahlmaschine (1x)","€18.000–€45.000","Cold Jet, IceTech oder Karcher. Leasing verfügbar."],
+      ["CO₂-Pellet-Vorrat (3 Monate)","€4.000–€8.000","Vertrag mit Air Products oder Messer"],
+      ["Transporter","€8.000–€20.000","Gebrauchter Mercedes Sprinter für Jahr 1 ausreichend"],
+      ["GmbH-Registrierung (DE)","€1.500–€3.000","Jahr 2 — erforderlich für DE-Rechnungsstellung"],
+      ["Zertifizierungen (CE, HACCP-Schulung)","€2.000–€5.000","Erforderlich für Lebensmittel- & Pharmaverträge"],
+      ["Machine.Machine KI-Stack-Setup","Monatliche Pauschale","Verkaufsbot, Marketing-KI, Pocket-Assistent"],
+      ["Gesamtkapitalbedarf Jahr 1","€35.000–€80.000","Untere Grenze mit Geräteleasing"],
+    ],
+    fund_h: "Finanzierungsquellen",
+    f1_t: "EU Interreg PL-BB", f1: "Grenzüberschreitende Unternehmensförderung für PL/DE-KMU. Lubuskie–Brandenburg-Programm zielt auf Industriedienstleistungen. Bis zu 85% Kofinanzierung.",
+    f2_t: "PFR / BGK Darlehen (PL)", f2: "KMU-Darlehen des Polnischen Entwicklungsfonds zu 2–4% Zinsen. BGK hat spezifische Grüntechnologie-Programme.",
+    f3_t: "Geräteleasing", f3: "Cold Jet und IceTech bieten Leasingprogramme. Reduziert Startkapital auf €5–15T.",
+    riskm_h: "Wichtigste Risiken & Gegenmaßnahmen",
+    risk_rows: [
+      { icon: "🧊", t: "CO₂-Lieferunterbrechung", m: "Mehrlieferantenverträge, 30-Tage-Pufferlager, Preisklauseln in Kundenverträgen." },
+      { icon: "🤖", t: "Vertrauenslücke KI-Vertrieb", m: "Menschliche Übergabe für hochwertige Aufträge (€5K+) verfügbar. KI qualifiziert, Mensch schließt ab." },
+      { icon: "⚖️", t: "Deutscher Markteintritt", m: "Partnerschaft mit DE-Steuerberater ab Jahr 1. Budget €3T für rechtliche Einrichtung." },
+      { icon: "📉", t: "Langsamer Start in Jahr 1", m: "KI-Bot startet Outbound ab Tag 1 und baut Pipeline 6 Wochen im Voraus auf. Ziel: 10 Pilotkunden." },
+      { icon: "🏭", t: "Großer Wettbewerber setzt auf KI", m: "Früh Jahresverträge sichern. Lokaler Betreibervorteil von USA-Zentrale kaum replizierbar." },
+    ],
+    cta_h: "Das ist Ihre 5-Jahres-Roadmap.",
+    cta_p: "Machine.Machine übernimmt den gesamten KI-Stack. Sie konzentrieren sich auf die Maschinen und die Kunden.",
+    cta_btn: "Ihren KI-Agenten holen →",
+    back_btn: "← Zurück zu Dries Cleaning",
+  },
+};
+
+const c = t[locale];
 ---
 
-<BaseLayout
-  title="Dries Cleaning — Market Analysis, Competitors & 5-Year Business Plan"
-  description="Full market analysis, competitive landscape and 5-year financial projections for Dries Cleaning — AI-powered dry ice cleaning in PL/DE border region."
->
+<BaseLayout title={c.title} description={c.desc}>
 <style>
   :root { --blue: #3b82f6; --purple: #8b5cf6; --bg: #0a0a0f; --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08); }
   body { background: var(--bg); color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; }
@@ -61,349 +315,155 @@ const mmUrl = "https://machinemachine.ai";
   .btn-outline { display: inline-block; border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; text-decoration: none; margin-left: 12px; }
   @media (max-width: 600px) { .btn-outline { margin-left: 0; margin-top: 10px; display: block; } }
 </style>
+</style>
 
 <div style="background: #0a0a0f; min-height: 100vh;">
 <nav class="nav">
   <a href="/" class="nav-logo">M²</a>
   <div style="display:flex;gap:20px;align-items:center;">
-    <a href={backHref}>← Dries Cleaning</a>
-    <a href={mmUrl} class="btn-primary" style="padding:8px 18px;font-size:13px;">Get Your Agent →</a>
+    <a href={backHref}>{c.back_btn}</a>
+    <a href={mmUrl} class="btn-primary" style="padding:8px 18px;font-size:13px;">{c.cta_btn}</a>
   </div>
 </nav>
 
 <div class="page">
   <div style="margin-top: 20px;">
-    <div class="tag">Dries Cleaning × Machine.Machine</div>
-    <h1>Market Analysis, Competitive Landscape<br/>&amp; <span class="gradient">5-Year Business Plan</span></h1>
-    <p class="lead">A full strategic assessment for launching an AI-powered dry ice cleaning business in the PL/DE border region (Lubuskie / Brandenburg). Prepared by Machine.Machine.</p>
+    <div class="tag">{c.badge}</div>
+    <h1>{c.h1a}<br/>&amp; <span class="gradient">{c.h1b}</span></h1>
+    <p class="lead">{c.lead}</p>
   </div>
 
   <!-- ─── MARKET ANALYSIS ─── -->
   <div class="divider"></div>
-  <div class="tag">01 — Market Analysis</div>
-  <h2>Dry Ice Cleaning — Global &amp; European Market</h2>
-  <p style="color:#94a3b8;line-height:1.7;max-width:780px;">Dry ice (CO₂) blasting is a rapidly growing industrial cleaning method. It leaves no secondary waste, requires no water, no chemicals, and can clean equipment in operation — making it highly attractive across regulated industries.</p>
+  <div class="tag">{c.s1_tag}</div>
+  <h2>{c.s1_h}</h2>
+  <p style="color:#94a3b8;line-height:1.7;max-width:780px;">{c.s1_p}</p>
 
   <div class="grid-4" style="margin-top:28px;">
-    <div class="stat-card">
-      <div class="stat-big">$1.3B</div>
-      <div class="stat-label">Global dry ice blasting market size (2024)</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-big">7.8%</div>
-      <div class="stat-label">CAGR forecast 2024–2030 (Global)</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-big">€420M</div>
-      <div class="stat-label">European market (2024 est.)</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-big">€28M</div>
-      <div class="stat-big" style="font-size:1.4rem;">+</div>
-      <div class="stat-label">PL + DE (Brandenburg) addressable market</div>
-    </div>
+    <div class="stat-card"><div class="stat-big">{c.stat1_v}</div><div class="stat-label">{c.stat1_l}</div></div>
+    <div class="stat-card"><div class="stat-big">{c.stat2_v}</div><div class="stat-label">{c.stat2_l}</div></div>
+    <div class="stat-card"><div class="stat-big">{c.stat3_v}</div><div class="stat-label">{c.stat3_l}</div></div>
+    <div class="stat-card"><div class="stat-big">{c.stat4_v}</div><div class="stat-label">{c.stat4_l}</div></div>
   </div>
 
-  <h3 style="margin-top:40px;">Market Drivers</h3>
+  <h3 style="margin-top:40px;">{c.drivers_h}</h3>
   <div class="grid-3">
-    <div class="card">
-      <div style="font-size:1.6rem;margin-bottom:10px;">🏭</div>
-      <h3>Industrial Compliance Pressure</h3>
-      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">EU food safety (HACCP) and pharma (GMP) regulations increasingly prohibit chemical cleaning agents. Dry ice is the clean alternative.</p>
-    </div>
-    <div class="card">
-      <div style="font-size:1.6rem;margin-bottom:10px;">♻️</div>
-      <h3>Sustainability Mandates</h3>
-      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">Zero chemical waste, zero water runoff. ESG-driven procurement in DE and large PL manufacturers pushes CO₂ cleaning to the front.</p>
-    </div>
-    <div class="card">
-      <div style="font-size:1.6rem;margin-bottom:10px;">📈</div>
-      <h3>Rising Labor Costs</h3>
-      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">PL min wage +20% in 2024. DE above €13/hr. Automated AI sales removes headcount from the most expensive part: customer acquisition.</p>
-    </div>
+    <div class="card"><div style="font-size:1.6rem;margin-bottom:10px;">🏭</div><h3>{c.d1_t}</h3><p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">{c.d1}</p></div>
+    <div class="card"><div style="font-size:1.6rem;margin-bottom:10px;">♻️</div><h3>{c.d2_t}</h3><p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">{c.d2}</p></div>
+    <div class="card"><div style="font-size:1.6rem;margin-bottom:10px;">📈</div><h3>{c.d3_t}</h3><p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">{c.d3}</p></div>
   </div>
 
-  <h3 style="margin-top:40px;">Target Segments — Lubuskie / Brandenburg Region</h3>
+  <h3 style="margin-top:40px;">{c.seg_h}</h3>
   <table>
-    <thead>
-      <tr>
-        <th>Segment</th>
-        <th>Est. Addressable (Region)</th>
-        <th>Avg. Job Value</th>
-        <th>Frequency</th>
-        <th>Priority</th>
-      </tr>
-    </thead>
+    <thead><tr>{c.seg_cols.map(col => <th>{col}</th>)}</tr></thead>
     <tbody>
-      <tr>
-        <td>Food &amp; Beverage Manufacturing</td>
-        <td>€4.2M / year</td>
-        <td>€800–€3,500</td>
-        <td>Monthly–Quarterly</td>
-        <td><span class="badge badge-green">HIGH</span></td>
-      </tr>
-      <tr>
-        <td>Automotive / Industrial Machinery</td>
-        <td>€6.8M / year</td>
-        <td>€1,200–€8,000</td>
-        <td>Quarterly–Annual</td>
-        <td><span class="badge badge-green">HIGH</span></td>
-      </tr>
-      <tr>
-        <td>Pharma &amp; Medical</td>
-        <td>€2.1M / year</td>
-        <td>€1,500–€6,000</td>
-        <td>Bi-annual</td>
-        <td><span class="badge badge-blue">MEDIUM</span></td>
-      </tr>
-      <tr>
-        <td>Logistics / Warehousing</td>
-        <td>€1.8M / year</td>
-        <td>€400–€1,200</td>
-        <td>Quarterly</td>
-        <td><span class="badge badge-blue">MEDIUM</span></td>
-      </tr>
-      <tr>
-        <td>Historical Restoration / Construction</td>
-        <td>€3.4M / year</td>
-        <td>€600–€4,000</td>
-        <td>One-off / Project</td>
-        <td><span class="badge badge-yellow">OPPORTUNISTIC</span></td>
-      </tr>
+      {c.seg_rows.map(([seg, val, avg, freq, prio]) => (
+        <tr>
+          <td>{seg}</td><td>{val}</td><td>{avg}</td><td>{freq}</td>
+          <td><span class={`badge badge-${prio === 'HIGH' || prio === 'WYSOKI' || prio === 'HOCH' ? 'green' : prio === 'MEDIUM' || prio === 'ŚREDNI' || prio === 'MITTEL' ? 'blue' : 'yellow'}`}>{prio}</span></td>
+        </tr>
+      ))}
     </tbody>
   </table>
 
-  <div class="highlight-box" style="margin-top:32px;">
-    <strong>Border Region Advantage:</strong> The Lubuskie–Brandenburg corridor (Frankfurt Oder / Słubice) gives Dries unique dual-market access. Polish operating costs + German pricing = significantly higher margins than either market alone. EU Interreg funding programs are also available for cross-border industrial SMEs.
-  </div>
+  <div class="highlight-box" style="margin-top:32px;" set:html={c.border_box} />
 
-  <!-- ─── COMPETITOR ANALYSIS ─── -->
+  <!-- ─── COMPETITIVE LANDSCAPE ─── -->
   <div class="divider"></div>
-  <div class="tag">02 — Competitive Landscape</div>
-  <h2>Who Else Is Playing</h2>
-  <p style="color:#94a3b8;line-height:1.7;max-width:780px;">The dry ice cleaning market is highly fragmented. Most operators are small regional firms with no digital presence, no automated sales, and limited scalability. This is the gap Dries exploits.</p>
+  <div class="tag">{c.s2_tag}</div>
+  <h2>{c.s2_h}</h2>
+  <p style="color:#94a3b8;line-height:1.7;max-width:780px;">{c.s2_p}</p>
 
-  <h3 style="margin-top:32px;">Key Competitors</h3>
+  <h3 style="margin-top:32px;">{c.comp_h}</h3>
   <table>
-    <thead>
-      <tr>
-        <th>Company</th>
-        <th>Region</th>
-        <th>Scale</th>
-        <th>AI / Automation</th>
-        <th>Weakness</th>
-      </tr>
-    </thead>
+    <thead><tr>{c.comp_cols.map(col => <th>{col}</th>)}</tr></thead>
     <tbody>
-      <tr>
-        <td><strong>Cold Jet</strong> (USA/EU)</td>
-        <td>Pan-European</td>
-        <td>Large (equipment manufacturer + services)</td>
-        <td><span class="badge badge-yellow">MINIMAL</span></td>
-        <td>Focuses on equipment sales, not service delivery. High prices.</td>
-      </tr>
-      <tr>
-        <td><strong>IceTech</strong> (Denmark)</td>
-        <td>EU-wide</td>
-        <td>Medium</td>
-        <td><span class="badge badge-red">NONE</span></td>
-        <td>Equipment manufacturer only. No AI sales layer. Manual B2B only.</td>
-      </tr>
-      <tr>
-        <td><strong>Local DE operators</strong><br/>(e.g. Trockeneis-Service.de)</td>
-        <td>Brandenburg, Berlin</td>
-        <td>Small (1–5 techs)</td>
-        <td><span class="badge badge-red">NONE</span></td>
-        <td>No website SEO, phone-only sales, no CRM, no follow-up automation.</td>
-      </tr>
-      <tr>
-        <td><strong>Local PL operators</strong><br/>(Suchy Lód cleaning)</td>
-        <td>Lubuskie, Wielkopolska</td>
-        <td>Small (1–3 techs)</td>
-        <td><span class="badge badge-red">NONE</span></td>
-        <td>No cross-border capability, limited to PL market, no English/German materials.</td>
-      </tr>
-      <tr>
-        <td><strong>Chemical cleaning firms</strong></td>
-        <td>Regional</td>
-        <td>Medium–Large</td>
-        <td><span class="badge badge-yellow">CRM ONLY</span></td>
-        <td>Legacy chemistry-based approach. Losing regulatory favour in food &amp; pharma.</td>
-      </tr>
+      {c.comp_rows.map(([name, region, scale, ai, weakness]) => (
+        <tr>
+          <td><strong>{name}</strong></td><td>{region}</td><td>{scale}</td>
+          <td><span class={`badge badge-${ai === 'NONE' || ai === 'BRAK' || ai === 'KEINE' ? 'red' : ai === 'MINIMAL' || ai === 'MINIMALNA' ? 'yellow' : 'blue'}`}>{ai}</span></td>
+          <td style="color:#94a3b8;font-size:13px;">{weakness}</td>
+        </tr>
+      ))}
     </tbody>
   </table>
 
-  <h3 style="margin-top:40px;">Competitive Positioning</h3>
+  <h3 style="margin-top:40px;">{c.pos_h}</h3>
   <div class="grid-2" style="margin-top:20px;">
     <div class="card">
-      <h3 style="color:#4ade80;">✅ Dries Advantages</h3>
+      <h3 style="color:#4ade80;">{c.adv_h}</h3>
       <ul style="color:#94a3b8;line-height:2;margin-top:12px;padding-left:20px;font-size:14px;">
-        <li>AI sales robot — 24/7 lead handling, zero headcount</li>
-        <li>Dual-market access (PL cost base + DE pricing)</li>
-        <li>Automated lead generation + nurturing</li>
-        <li>Pocket assistant for techs = faster on-site decisions</li>
-        <li>First mover on AI automation in this niche</li>
-        <li>Interreg EU cross-border funding eligibility</li>
+        {c.adv.map(a => <li>{a}</li>)}
       </ul>
     </div>
     <div class="card">
-      <h3 style="color:#f87171;">⚠️ Risks to Monitor</h3>
+      <h3 style="color:#f87171;">{c.risk_h}</h3>
       <ul style="color:#94a3b8;line-height:2;margin-top:12px;padding-left:20px;font-size:14px;">
-        <li>Cold Jet / IceTech could add AI sales layer</li>
-        <li>CO₂ supply chain dependency (price volatility)</li>
-        <li>German market requires formal GmbH + CE certifications</li>
-        <li>Initial capital for equipment (machine: €15–€50k)</li>
-        <li>Trust gap: industrial clients slow to onboard AI negotiation</li>
+        {c.risks_comp.map(r => <li>{r}</li>)}
       </ul>
     </div>
   </div>
 
   <!-- ─── BUSINESS PLAN ─── -->
   <div class="divider"></div>
-  <div class="tag">03 — Business Plan</div>
-  <h2>5-Year Financial Projections</h2>
-  <p style="color:#94a3b8;line-height:1.7;max-width:780px;">Conservative model. Assumes Lubuskie base, cross-border DE expansion in Year 2, second machine in Year 3, franchise/licensing model from Year 4.</p>
+  <div class="tag">{c.s3_tag}</div>
+  <h2>{c.s3_h}</h2>
+  <p style="color:#94a3b8;line-height:1.7;max-width:780px;">{c.s3_p}</p>
 
-  <div class="highlight-box">
-    <strong>Revenue Model:</strong> Service jobs (€600–€8,000 each) booked by AI sales robot. Operating costs: CO₂ pellets (~€3–5/kg), equipment depreciation, 1–2 techs in Year 1 scaling to 4–6 by Year 5. Machine.Machine automation fee: fixed monthly retainer + % of incremental revenue growth.
-  </div>
+  <div class="highlight-box" set:html={c.model_box} />
 
   <div class="grid-3" style="margin-top:32px;gap:16px;">
-    <div class="year-card">
-      <div class="year-label">Year 1 — 2025</div>
-      <div class="year-rev">€120K</div>
-      <div class="year-detail">
-        <strong style="color:#e2e8f0;">Setup phase</strong><br/>
-        PL market only. 1 machine, 1 tech + AI sales bot.
-        ~60 jobs @ avg €2,000. Focus: food &amp; industrial.
-        AI bot handles all inbound. CRM live.
-        <br/><br/>
-        Costs: ~€85K (equipment, CO₂, wages, MM fee)<br/>
-        <strong style="color:#4ade80;">Net: ~€35K</strong>
+    {c.years.map(y => (
+      <div class="year-card">
+        <div class="year-label">{y.label}</div>
+        <div class="year-rev">{y.rev}</div>
+        <div class="year-detail">
+          <strong style="color:#e2e8f0;">{y.title}</strong><br/>
+          {y.body}<br/><br/>
+          {y.costs}<br/>
+          <strong style="color:#4ade80;">{y.net}</strong>
+        </div>
       </div>
-    </div>
-    <div class="year-card">
-      <div class="year-label">Year 2 — 2026</div>
-      <div class="year-rev">€290K</div>
-      <div class="year-detail">
-        <strong style="color:#e2e8f0;">DE expansion</strong><br/>
-        Cross-border DE clients. GmbH registered. 
-        2 techs, AI marketing live (outbound campaigns).
-        ~130 jobs @ avg €2,200. Pharma + automotive added.
-        <br/><br/>
-        Costs: ~€195K<br/>
-        <strong style="color:#4ade80;">Net: ~€95K</strong>
-      </div>
-    </div>
-    <div class="year-card">
-      <div class="year-label">Year 3 — 2027</div>
-      <div class="year-rev">€580K</div>
-      <div class="year-detail">
-        <strong style="color:#e2e8f0;">Scale phase</strong><br/>
-        2nd machine. 4 techs. AI pocket assistant for field.
-        Recurring contracts with 3–5 large industrial clients.
-        ~240 jobs @ avg €2,400.
-        <br/><br/>
-        Costs: ~€370K<br/>
-        <strong style="color:#4ade80;">Net: ~€210K</strong>
-      </div>
-    </div>
-    <div class="year-card">
-      <div class="year-label">Year 4 — 2028</div>
-      <div class="year-rev">€1.1M</div>
-      <div class="year-detail">
-        <strong style="color:#e2e8f0;">Licensing model</strong><br/>
-        Franchise playbook sold to 2 partner operators.
-        AI stack licensed. 6 techs own-ops + 2 franchisees.
-        Recurring revenue from annual contracts +30%.
-        <br/><br/>
-        Costs: ~€680K<br/>
-        <strong style="color:#4ade80;">Net: ~€420K</strong>
-      </div>
-    </div>
-    <div class="year-card">
-      <div class="year-label">Year 5 — 2029</div>
-      <div class="year-rev">€2.0M</div>
-      <div class="year-detail">
-        <strong style="color:#e2e8f0;">Regional leader</strong><br/>
-        5 franchise partners across PL/DE/CZ.
-        Own ops: 3 machines, 8 techs.
-        AI stack fully autonomous — minimal manual oversight.
-        Exit / PE acquisition target.
-        <br/><br/>
-        Costs: ~€1.1M<br/>
-        <strong style="color:#4ade80;">Net: ~€900K</strong>
-      </div>
-    </div>
+    ))}
   </div>
 
-  <h3 style="margin-top:48px;">Startup Investment Required</h3>
+  <h3 style="margin-top:48px;">{c.invest_h}</h3>
   <table>
-    <thead>
-      <tr><th>Item</th><th>Cost (est.)</th><th>Notes</th></tr>
-    </thead>
+    <thead><tr>{c.invest_cols.map(col => <th>{col}</th>)}</tr></thead>
     <tbody>
-      <tr><td>Dry ice blasting machine (1x)</td><td>€18,000–€45,000</td><td>Cold Jet, IceTech, or Karcher. Leasing available.</td></tr>
-      <tr><td>CO₂ pellet supply (3 months)</td><td>€4,000–€8,000</td><td>Contract with Air Products or Messer</td></tr>
-      <tr><td>Van / transport</td><td>€8,000–€20,000</td><td>Used Mercedes Sprinter sufficient Y1</td></tr>
-      <tr><td>GmbH registration (DE)</td><td>€1,500–€3,000</td><td>Year 2 — required for DE invoicing</td></tr>
-      <tr><td>Certifications (CE, HACCP training)</td><td>€2,000–€5,000</td><td>Required for food &amp; pharma contracts</td></tr>
-      <tr><td>Machine.Machine AI stack setup</td><td>Monthly retainer</td><td>Sales bot, marketing AI, pocket assistant</td></tr>
-      <tr><td><strong>Total Y1 capital needed</strong></td><td><strong>€35,000–€80,000</strong></td><td>Lower end with equipment leasing</td></tr>
+      {c.invest_rows.map(([item, cost, note], i) => (
+        <tr>
+          <td>{i === c.invest_rows.length - 1 ? <strong>{item}</strong> : item}</td>
+          <td>{i === c.invest_rows.length - 1 ? <strong>{cost}</strong> : cost}</td>
+          <td style="color:#94a3b8;font-size:13px;">{note}</td>
+        </tr>
+      ))}
     </tbody>
   </table>
 
-  <h3 style="margin-top:40px;">Funding Sources</h3>
+  <h3 style="margin-top:40px;">{c.fund_h}</h3>
   <div class="grid-3" style="margin-top:20px;">
-    <div class="card">
-      <div style="font-size:1.5rem;margin-bottom:10px;">🇪🇺</div>
-      <h3>EU Interreg PL-BB</h3>
-      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">Cross-border business grants for PL/DE SMEs. Lubuskie–Brandenburg program specifically targets industrial services. Up to 85% co-financing.</p>
-    </div>
-    <div class="card">
-      <div style="font-size:1.5rem;margin-bottom:10px;">🏦</div>
-      <h3>PFR / BGK Loans (PL)</h3>
-      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">Polish Development Fund SME loans at 2–4% interest. BGK (Bank Gospodarstwa Krajowego) has specific green-tech / low-emission programs.</p>
-    </div>
-    <div class="card">
-      <div style="font-size:1.5rem;margin-bottom:10px;">💼</div>
-      <h3>Equipment Leasing</h3>
-      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">Cold Jet and IceTech both offer leasing programs. Reduces upfront capital to €5–15K and preserves cash for working capital and MM automation fees.</p>
-    </div>
+    <div class="card"><div style="font-size:1.5rem;margin-bottom:10px;">🇪🇺</div><h3>{c.f1_t}</h3><p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">{c.f1}</p></div>
+    <div class="card"><div style="font-size:1.5rem;margin-bottom:10px;">🏦</div><h3>{c.f2_t}</h3><p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">{c.f2}</p></div>
+    <div class="card"><div style="font-size:1.5rem;margin-bottom:10px;">💼</div><h3>{c.f3_t}</h3><p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-top:6px;">{c.f3}</p></div>
   </div>
 
-  <h3 style="margin-top:40px;">Key Risks &amp; Mitigations</h3>
+  <h3 style="margin-top:40px;">{c.riskm_h}</h3>
   <div class="card" style="margin-top:20px;">
-    <div class="risk-row">
-      <div class="risk-icon">🧊</div>
-      <div><strong>CO₂ supply disruption</strong> — Gas shortages hit EU in 2022. <span style="color:#94a3b8;">Mitigation: multi-supplier contracts, 30-day buffer stock, pricing clauses in client contracts.</span></div>
-    </div>
-    <div class="risk-row">
-      <div class="risk-icon">🤖</div>
-      <div><strong>AI sales trust gap</strong> — Some industrial buyers resist robot negotiation. <span style="color:#94a3b8;">Mitigation: human handoff available for high-value deals (€5K+). AI qualifies, human closes.</span></div>
-    </div>
-    <div class="risk-row">
-      <div class="risk-icon">⚖️</div>
-      <div><strong>German regulatory entry</strong> — GmbH, VAT registration, GDPR for AI calls. <span style="color:#94a3b8;">Mitigation: partner with DE steuerberater from Y1. Budget €3K for legal setup.</span></div>
-    </div>
-    <div class="risk-row">
-      <div class="risk-icon">📉</div>
-      <div><strong>Slow ramp in Y1</strong> — Industrial sales cycles are 2–8 weeks. <span style="color:#94a3b8;">Mitigation: AI bot runs outbound from day 1, building pipeline 6 weeks ahead. Target 10 pilot customers for case studies.</span></div>
-    </div>
-    <div class="risk-row" style="border-bottom:none;">
-      <div class="risk-icon">🏭</div>
-      <div><strong>Large competitor enters AI</strong> — Cold Jet adds AI sales layer. <span style="color:#94a3b8;">Mitigation: lock in annual contracts early. Local operator advantage (PL speed, personal service) hard to replicate from HQ in USA.</span></div>
-    </div>
+    {c.risk_rows.map((r, i) => (
+      <div class="risk-row" style={i === c.risk_rows.length - 1 ? 'border-bottom:none;' : ''}>
+        <div class="risk-icon">{r.icon}</div>
+        <div><strong>{r.t}</strong> — <span style="color:#94a3b8;">{r.m}</span></div>
+      </div>
+    ))}
   </div>
 
-  <!-- CTA -->
   <div class="cta-section">
-    <div class="tag">Ready</div>
-    <h2 style="margin:8px 0 16px;">This is your 5-year roadmap.</h2>
-    <p style="color:#94a3b8;font-size:1.05rem;max-width:560px;margin:0 auto 32px;line-height:1.7;">Machine.Machine handles the entire AI stack. You focus on the machines and the clients. We handle everything else.</p>
-    <a href={mmUrl} class="btn-primary">Get Your AI Agent →</a>
-    <a href={backHref} class="btn-outline">← Back to Dries Cleaning</a>
+    <div class="tag">{c.badge}</div>
+    <h2 style="margin:8px 0 16px;">{c.cta_h}</h2>
+    <p style="color:#94a3b8;font-size:1.05rem;max-width:560px;margin:0 auto 32px;line-height:1.7;">{c.cta_p}</p>
+    <a href={mmUrl} class="btn-primary">{c.cta_btn}</a>
+    <a href={backHref} class="btn-outline">{c.back_btn}</a>
   </div>
 </div>
 </div>
-</BaseLayout>
