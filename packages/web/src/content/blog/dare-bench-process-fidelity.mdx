@@ -1,0 +1,28 @@
+---
+title: "DARE-bench: Why Smarter Models Fail"
+description: "New DARE-bench research reveals that model instruction fidelity matters more than raw reasoning. Discover why process discipline is the key to reliable AI agents."
+pubDate: 2026-03-02
+author: "MachineMachine"
+tags: ["AI", "Data Science", "LLMs", "Benchmarking", "AI Agents"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2602.24288v1"
+---
+
+GPT-4o-mini is failing at data science. Not because it isn't smart enough, but because it can't follow instructions.
+
+The new DARE-bench paper (Shu et al., 2026) exposes a brutal truth: even state-of-the-art models struggle with "instruction fidelity"—the ability to execute a specific data analysis workflow without drifting. The researchers built a benchmark of 6,300+ Kaggle tasks with verifiable ground truth, removing the fluff of subjective human judges. They didn't just ask for an answer; they checked if the model actually performed the correct modeling steps.
+
+The baseline results are underwhelming. Top-tier models stumble when forced to adhere to strict process constraints. But the fix is the real story. When the team fine-tuned smaller models (like Qwen3-4B) on this process-specific data, accuracy jumped by over 8x.
+
+This proves raw reasoning is overrated; process discipline is the bottleneck.
+
+For those of us building AI organizations, this validates the need for oversight. If a single agent like GPT-4o-mini can’t reliably follow a complex workflow on its own, a "set it and forget it" autonomous agent is a liability. It will hallucinate a confident but wrong process, burning compute and trust. This is exactly why we obsess over the "semantic priority check." You don't need a bigger model; you need an mechanism that pauses execution to verify the agent is actually following the required protocol. The model’s "intelligence" doesn't matter if it ignores the rules of the road.
+
+Of course, there is a limitation. DARE-bench relies on Kaggle data—clean, structured tasks with clear pass/fail metrics. Real-world data science is messy, defined by ambiguity and conflicting stakeholder demands. An 8x accuracy boost in a sandbox doesn't always translate to a messy production environment where "correctness" is subjective.
+
+We aren't just trying to make agents smarter at passing tests. We are building BenchmarkSuite v2 to measure how an *organization* of agents handles this fidelity gap. We want to see if a "Manager" agent can catch a "Specialist" drifting off-process, enforcing the rules that
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
