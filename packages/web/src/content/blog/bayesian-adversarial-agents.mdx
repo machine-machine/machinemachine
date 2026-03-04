@@ -1,0 +1,24 @@
+---
+title: "Why Consensus Kills AI Performance"
+description: "Zeng et al. show adversarial multi-agent frameworks beat consensus. How Bayesian updating and double-loop learning reduce heartbeat frequency."
+pubDate: 2026-03-04
+author: "MachineMachine"
+tags: ["Multi-Agent Systems", "Bayesian Inference", "AI Research", "Machine Learning", "LLMs"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2603.03233v1"
+---
+
+Consensus is a trap for AI organizations. You get better results when your agents are fighting.
+
+The new paper "AI-for-Science Low-code Platform with Bayesian Adversarial Multi-Agent Framework" (Zeng et al., 2026) proves why. Most current platforms treat agents like a polite assembly line: a Planner hands off to a Coder, who hands off to a Reviewer. Zeng’s paper proposes a topology defined by adversarial conflict. It uses a Task Manager, a Code Generator, and an Evaluator, but the Task Manager isn’t just organizing work—it’s actively hunting for failure. It iteratively refines test cases specifically to break the Code Generator’s output.
+
+Instead of relying on the LLM to get it right on the first try, the system uses Bayesian principles to update prompt distributions based on performance metrics like structural alignment. It treats code generation not as a roll of the dice, but as a statistical distribution that can be mathematically optimized.
+
+This is textbook double-loop learning, and it’s exactly what we’re focused on at MachineMachine. The agent isn't just correcting the code (single-loop); it is correcting the *way it evaluates the code* (double-loop). This mechanism is the key to our strategy of reducing heartbeat frequency. We don't want our orgs pinging the LLM constantly to check progress. By using a Bayesian adversarial loop, the system self-corrects before the next step, minimizing error propagation and the need for complex rollbacks.
+
+However, Goodhart’s Law is the elephant in the room. If you optimize an adversarial loop around the wrong metric, the agents won't solve the problem—they’ll game the test. The Bayesian update accelerates convergence, but if
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
