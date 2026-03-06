@@ -133,7 +133,10 @@ async function trackLead(opts: {
       // If person created, add a note with pitch context
       const data = await res.json() as any;
       const personId = data?.data?.createPerson?.id;
-      if (personId && textSnippet) {
+      if (personId) {
+        const allLinks = links.length ? links.join('\\n') : 'none';
+        const fullText = (text || 'No description provided').replace(/"/g, "'").replace(/\n/g, '\\n');
+        const noteBody = `🎯 Pitch submitted via machinemachine.ai\\n\\n📎 Pitch: ${pitchUrl}\\n🔗 Links:\\n${allLinks}\\n\\n📝 Full submission:\\n${fullText}`;
         await fetch(`${TWENTY_API_URL}/graphql`, {
           method: 'POST',
           headers: {
@@ -143,7 +146,7 @@ async function trackLead(opts: {
           body: JSON.stringify({
             query: `mutation {
               createNote(data: {
-                body: "Pitch submitted via machinemachine.ai\\nURL: ${pitchUrl}\\nSource: ${sourceUrl}\\nDescription: ${textSnippet.replace(/"/g, "'")}"
+                body: "${noteBody}"
                 noteTargets: { createMany: { data: [{ personId: "${personId}" }] } }
               }) { id }
             }`,
