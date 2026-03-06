@@ -437,7 +437,7 @@ Design system (copy EXACTLY):
 - Dark navy background: #0F1729
 - Purple accent: #7C3AED, cyan accent: #00D9FF
 - Font: Inter (Google Fonts)
-- scroll-snap full-height slides (.deck > .slide)
+- scroll-snap full-height slides (.deck > .slide with scroll-snap-align:start on each .slide)
 - Left 4px gradient bar on non-title slides
 - Same component classes: .label, .stat-grid, .card-grid, .comparison, .cta
 - MUST be mobile responsive: font sizes use clamp(), grids collapse to 1 column on mobile, no horizontal overflow
@@ -627,7 +627,7 @@ app.get('/v1/pitch/:uuid/html', (c) => {
     // Inject CSS fix for slide alignment + mobile responsiveness (retroactive fix for all pitches)
     const cssfix = `<style>
 /* === Pitch alignment fixes === */
-.slide{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important}
+.slide{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;scroll-snap-align:start!important}
 .slide h1,.slide h2,.slide h3,.slide h4{text-align:center!important}
 .slide>p{text-align:center!important;margin-left:auto!important;margin-right:auto!important;max-width:720px!important}
 .slide .label,.slide span.label{display:block!important;text-align:center!important;width:100%!important}
