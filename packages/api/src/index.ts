@@ -455,7 +455,7 @@ CRITICAL CSS rules (must include verbatim — do NOT override these):
 
 Make it feel written specifically for them — use their industry terms, their use cases, their team context.
 Keep the Machine.Machine brand but frame everything around THEIR world.
-End with a CTA in ${pitchLanguage} pointing to machinemachine.ai.
+Do NOT include any "Bereit?" or machinemachine.ai CTA buttons — navigation buttons will be injected automatically. End with a final slide that invites them to start a conversation.
 
 Output ONLY the complete HTML document starting with <!DOCTYPE html>`;
 
@@ -683,6 +683,45 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   </a>
 </div>
 <style>#m2-cta-bar+*,body{padding-bottom:70px}</style>
+<style>
+/* === Slide navigation === */
+.slide-nav{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;text-decoration:none;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;letter-spacing:0.3px;box-shadow:0 0 20px #7c3aed55;cursor:pointer;border:none;transition:opacity .2s;margin-top:1.5rem}
+.slide-nav:hover{opacity:.85}
+</style>
+<script>
+(function(){
+  const deck=document.querySelector('.deck');
+  if(!deck)return;
+  const slides=[...deck.querySelectorAll('.slide')];
+  const tgUrl='https://t.me/m2_onboarding_bot';
+  
+  // Remove existing CTA links that point to machinemachine.ai (not the bottom bar)
+  slides.forEach(s=>{
+    s.querySelectorAll('a.cta, a[href="https://machinemachine.ai"]').forEach(a=>{
+      if(!a.closest('#m2-cta-bar'))a.remove();
+    });
+  });
+  
+  // Add nav buttons to each slide
+  slides.forEach((slide,i)=>{
+    const isLast=i===slides.length-1;
+    const btn=document.createElement(isLast?'a':'button');
+    btn.className='slide-nav';
+    if(isLast){
+      btn.href=tgUrl;
+      btn.target='_blank';
+      btn.rel='noopener';
+      btn.textContent='Start Talking to Your Agent →';
+    }else{
+      btn.textContent='Next →';
+      btn.addEventListener('click',()=>{
+        slides[i+1].scrollIntoView({behavior:'smooth'});
+      });
+    }
+    slide.appendChild(btn);
+  });
+})();
+</script>
 </body>`;
     const fixedHtml = pitch.html
       .replace('</head>', cssfix)
