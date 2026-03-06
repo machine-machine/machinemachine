@@ -640,9 +640,12 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   if (pitch.status === 'ready' && pitch.html) {
     // Inject CSS fix for slide alignment + mobile responsiveness (retroactive fix for all pitches)
     const cssfix = `<style>
+/* === Override Astro wrapper constraints === */
+.pitch-page,.pitch-container,#state-ready{max-width:none!important;width:100vw!important;padding:0!important;margin:0!important}
+.pitch-page{position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;z-index:999!important}
 /* === Deck scroll enforcement === */
 html,body{margin:0!important;padding:0!important;height:100%!important;overflow:hidden!important}
-.deck{height:100vh!important;overflow-y:auto!important;scroll-snap-type:y mandatory!important;-webkit-overflow-scrolling:touch!important}
+.deck{height:100vh!important;width:100%!important;overflow-y:auto!important;scroll-snap-type:y mandatory!important;-webkit-overflow-scrolling:touch!important}
 .slide{min-height:100vh!important;scroll-snap-align:start!important;box-sizing:border-box!important}
 /* === Scrollbar styling === */
 .deck::-webkit-scrollbar{width:6px}
@@ -726,8 +729,9 @@ html,body{margin:0!important;padding:0!important;height:100%!important;overflow:
     });
   });
   
-  // Add nav buttons to each slide
+  // Add nav buttons to each slide (skip slides with data-no-nav)
   slides.forEach((slide,i)=>{
+    if(slide.dataset.noNav)return;
     const isLast=i===slides.length-1;
     const btn=document.createElement(isLast?'a':'button');
     btn.className='slide-nav';
