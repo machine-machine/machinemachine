@@ -229,6 +229,43 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
         pitchContainer.style.maxWidth = 'none';
         pitchContainer.style.padding = '0';
       }
+
+      // --- Post-injection: nav buttons + CTA cleanup ---
+      const deck = document.querySelector('.deck') as HTMLElement;
+      if (deck) {
+        const slides = [...deck.querySelectorAll('.slide')] as HTMLElement[];
+        const tgUrl = 'https://t.me/m2_onboarding_bot';
+        // Remove AI-generated CTAs (not the bottom bar)
+        slides.forEach(s => {
+          s.querySelectorAll('a.cta').forEach(a => {
+            if (!a.closest('#m2-cta-bar')) a.remove();
+          });
+        });
+        // Add nav buttons
+        slides.forEach((slide, i) => {
+          const isLast = i === slides.length - 1;
+          const btn = document.createElement(isLast ? 'a' : 'button');
+          btn.className = 'slide-nav';
+          if (isLast) {
+            (btn as HTMLAnchorElement).href = tgUrl;
+            (btn as HTMLAnchorElement).target = '_blank';
+            (btn as HTMLAnchorElement).rel = 'noopener';
+            btn.textContent = 'Start Talking to Your Agent \u2192';
+          } else {
+            btn.textContent = 'Next \u2192';
+            btn.addEventListener('click', () => {
+              deck.scrollTo({ top: (slides[i + 1] as HTMLElement).offsetTop, behavior: 'smooth' });
+            });
+          }
+          slide.appendChild(btn);
+        });
+        // Enforce scroll on deck
+        deck.style.height = '100vh';
+        deck.style.overflowY = 'auto';
+        deck.style.scrollSnapType = 'y mandatory';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+      }
     } catch (err) {
       showState('error');
     }

@@ -426,7 +426,7 @@ async function generatePitch(uuid: string) {
 
   try {
     const useAnthropic = !!process.env.ANTHROPIC_API_KEY;
-    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
+    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929'; // Consider claude-3-5-sonnet or opus for better quality
 
     const langMap: Record<string, string> = { en: 'English', de: 'German', pl: 'Polish' };
     const pitchLanguage = langMap[pitch.locale || 'en'] || 'English';
@@ -452,8 +452,17 @@ CRITICAL CSS rules (must include verbatim — do NOT override these):
 .slide h1,.slide h2,.slide h3,.slide h4 { text-align:center; }
 .slide > p { text-align:center; margin-left:auto; margin-right:auto; max-width:720px; }
 .slide .label, .slide span.label { display:block; text-align:center; width:100%; }
-.org-chart { justify-content:center; width:100%; }
+.org-chart { justify-content:center; width:100%; display:flex; flex-direction:column; align-items:center; gap:0; }
 .org-node { text-align:center; }
+.org-chart .org-connector { width:2px; height:24px; background:linear-gradient(to bottom, #7C3AED, #00D9FF); margin:0 auto; }
+.org-chart .org-row { display:flex; justify-content:center; gap:1.5rem; align-items:flex-start; }
+.org-chart .org-row::before { display:none; }
+
+IMPORTANT for org charts / hierarchy diagrams:
+- Use .org-connector divs (thin vertical gradient lines) between hierarchy levels to show connections
+- Group same-level nodes in .org-row divs
+- Structure: top node → .org-connector → middle row → .org-connector → bottom row
+- Use SVG lines or CSS borders if horizontal connections are needed between siblings
 .stat-item { text-align:center; }
 .stat-item h3,.stat-item p { text-align:center; }
 
