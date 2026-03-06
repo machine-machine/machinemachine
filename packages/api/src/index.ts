@@ -631,6 +631,10 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   if (pitch.status === 'ready' && pitch.html) {
     // Inject CSS fix for slide alignment + mobile responsiveness (retroactive fix for all pitches)
     const cssfix = `<style>
+/* === Deck scroll enforcement === */
+html,body{margin:0!important;padding:0!important;height:100%!important;overflow:hidden!important}
+.deck{height:100vh!important;overflow-y:auto!important;scroll-snap-type:y mandatory!important;-webkit-overflow-scrolling:touch!important}
+.slide{min-height:100vh!important;scroll-snap-align:start!important;box-sizing:border-box!important}
 /* === Scrollbar styling === */
 .deck::-webkit-scrollbar{width:6px}
 .deck::-webkit-scrollbar-track{background:transparent}
@@ -726,7 +730,9 @@ app.get('/v1/pitch/:uuid/html', (c) => {
     }else{
       btn.textContent='Next →';
       btn.addEventListener('click',()=>{
-        slides[i+1].scrollIntoView({behavior:'smooth'});
+        const target=slides[i+1];
+        if(deck){deck.scrollTo({top:target.offsetTop,behavior:'smooth'})}
+        else{target.scrollIntoView({behavior:'smooth'})}
       });
     }
     slide.appendChild(btn);
