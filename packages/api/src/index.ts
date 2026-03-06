@@ -23,6 +23,7 @@ interface PitchSubmission {
   links: string[];
   audioTranscript?: string;
   audioBase64?: string;
+  locale?: string;
   status: 'generating' | 'ready' | 'error';
   progress: number; // 0-100
   createdAt: string;
@@ -425,7 +426,7 @@ async function generatePitch(uuid: string) {
     const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
 
     const langMap: Record<string, string> = { en: 'English', de: 'German', pl: 'Polish' };
-    const pitchLanguage = langMap[locale] || 'English';
+    const pitchLanguage = langMap[pitch.locale || 'en'] || 'English';
 
     const userPrompt = `Generate a personalised pitch deck in ${pitchLanguage} for the following team/company:
 
@@ -569,6 +570,7 @@ app.post('/v1/pitch/submit', async (c) => {
     links,
     audioTranscript,
     audioBase64,
+    locale,
     status: 'generating',
     progress: 0,
     createdAt: new Date().toISOString(),
