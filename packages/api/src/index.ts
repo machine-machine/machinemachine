@@ -631,6 +631,12 @@ app.get('/v1/pitch/:uuid/html', (c) => {
   if (pitch.status === 'ready' && pitch.html) {
     // Inject CSS fix for slide alignment + mobile responsiveness (retroactive fix for all pitches)
     const cssfix = `<style>
+/* === Scrollbar styling === */
+.deck::-webkit-scrollbar{width:6px}
+.deck::-webkit-scrollbar-track{background:transparent}
+.deck::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.2);border-radius:3px}
+.deck::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,0.4)}
+.deck{scrollbar-width:thin;scrollbar-color:rgba(124,58,237,0.2) transparent}
 /* === Pitch alignment fixes === */
 .slide{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;scroll-snap-align:start!important}
 .slide h1,.slide h2,.slide h3,.slide h4{text-align:center!important}
@@ -731,6 +737,8 @@ app.get('/v1/pitch/:uuid/html', (c) => {
     const fixedHtml = pitch.html
       .replace('</head>', cssfix)
       .replace('</body>', ctaBar);
+    c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+    c.header('Pragma', 'no-cache');
     return c.html(fixedHtml);
   }
 
