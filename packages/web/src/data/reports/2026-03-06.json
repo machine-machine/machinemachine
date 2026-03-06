@@ -1,0 +1,99 @@
+{
+  "date": "2026-03-06",
+  "week": 10,
+  "year": 2026,
+  "title": "Video Calls, Onboarding Engine & Fleet Expansion",
+  "overall": 68,
+  "scores": {
+    "fleetManagement": 72,
+    "memorySystem": 65,
+    "orgBuilder": 52,
+    "commsProtocol": 70,
+    "playbookAdoption": 60,
+    "resourceProvisioning": 62,
+    "roleSystem": 48,
+    "darkFactory": 50
+  },
+  "fleet": {
+    "agentsHealthy": 9,
+    "agentsDegraded": 2,
+    "totalContainers": 51,
+    "memoryVectors": 4100,
+    "activeCrons": 14
+  },
+  "shipped": [
+    "Joinly video call engine — screen share, viz presentations, auto-rejoin, mic management (20+ commits)",
+    "Fleet Playbook §14 Production Build Harness + §15 Model Selection Policy + §16 Video Calls",
+    "Full onboarding engine in m2-config — spawn machine, admin approval, contacts, templates, Superhero Capital group wiring",
+    "Agent-org-simulator benchmark run #8 complete",
+    "machinemachine.ai: Dries Cleaning landing page (PL/DE/EN) + market analysis + 5-year business plan",
+    "machinemachine.ai: pitch deck navigation overhaul — slide nav, scroll-snap, CRM note integration",
+    "5 auto-generated AI research blog posts (Safe-SAGE, Jacobian Regularization, Consensus, Multi-Attribution, DARE-bench)",
+    "Host monitor with peak alert tracking deployed",
+    "Fleet governance retro run_008 semantic priority check",
+    "OpenClaw upstream merge — cron stabilization, security fixes, Spanish locale, compaction safeguards",
+    "Forgejo→Coolify auto-deploy webhook instructions added to playbook §13",
+    "Daily backups running reliably (7/7 days)"
+  ],
+  "blocked": [
+    "Home Assistant still exited/unhealthy — redirect loop unresolved",
+    "Several services exited/unhealthy: Claude proxy, Pinokio, aicd-kokoro-tts, chatterbox-tts, claude-worker, joinly (original), vllm-docker, muninndb-pilot",
+    "LinkedIn auto-post still blocked (no persistent browser session)",
+    "SpacetimeDB running but unhealthy"
+  ],
+  "topGaps": [
+    {
+      "severity": "critical",
+      "title": "Container sprawl — 8 unhealthy services",
+      "description": "8 containers in exited:unhealthy state. Need cleanup or restart: Claude proxy, Home Assistant, Pinokio, aicd-kokoro-tts, claude-worker, joinly, vllm-docker, muninndb-pilot."
+    },
+    {
+      "severity": "critical",
+      "title": "No org-level memory",
+      "description": "Agents still siloed. Shared knowledge graph across fleet not yet deployed."
+    },
+    {
+      "severity": "warning",
+      "title": "Fleet dashboard CPU spike",
+      "description": "fleet-dashboard container at 80% CPU — likely a runaway process or infinite loop."
+    },
+    {
+      "severity": "warning",
+      "title": "m2-desktop high resource usage",
+      "description": "m2-desktop-worker using 5.9 GiB RAM (4.7% of host) and 66% CPU — heaviest single container."
+    },
+    {
+      "severity": "warning",
+      "title": "Dark Factory loop not closed",
+      "description": "Compiler + deploy exist but meta-agent gap detection still missing."
+    },
+    {
+      "severity": "info",
+      "title": "Memory embeddings model large",
+      "description": "memory-embeddings container using 11.7 GiB RAM (9.3% of host) — largest single allocation."
+    }
+  ],
+  "nextActions": [
+    "Triage 8 unhealthy containers — restart or decommission unused services",
+    "Investigate fleet-dashboard 80% CPU spike",
+    "Deploy org_memory shared Qdrant namespace for cross-agent knowledge",
+    "Close Dark Factory meta-agent gap detection loop",
+    "Fix Home Assistant redirect loop",
+    "Ship capability registry so orchestration isn't hardcoded"
+  ],
+  "gitActivity": [
+    { "repo": "joinly-fork", "commits": 20, "highlight": "Screen share, auto-rejoin, viz presentations, mic management" },
+    { "repo": "machinemachine", "commits": 21, "highlight": "Dries landing page, pitch nav, 5 blog posts, i18n" },
+    { "repo": "m2-config", "commits": 17, "highlight": "Full onboarding engine, Superhero Capital group, React Flow editor" },
+    { "repo": "openclaw", "commits": 18, "highlight": "Cron stabilization, security fixes, Spanish locale" },
+    { "repo": "fleet-playbook", "commits": 3, "highlight": "§14 Build Harness, §15 Model Selection, §16 Video Calls" },
+    { "repo": "m2-desktop", "commits": 3, "highlight": "Anti-backlog queue, env vars cleanup" },
+    { "repo": "host-monitor", "commits": 3, "highlight": "Peak alert checks, healthcheck, initial deploy" },
+    { "repo": "m2-backup", "commits": 7, "highlight": "Daily backups running 7/7" },
+    { "repo": "content-org", "commits": 1, "highlight": "LinkedIn agent switch to llama-3.3-70b" },
+    { "repo": "kiedis-repo", "commits": 1, "highlight": "Bookmark/note actions on interviews tab" },
+    { "repo": "fleet-governance", "commits": 1, "highlight": "Retro run_008 semantic priority check" },
+    { "repo": "agent-org-simulator", "commits": 2, "highlight": "Weekly enterprise benchmark run #8" },
+    { "repo": "dark-factory-engine", "commits": 1, "highlight": "Self-evolution plan doc" }
+  ]
+}
