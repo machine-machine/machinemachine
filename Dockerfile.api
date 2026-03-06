@@ -36,8 +36,8 @@ RUN pnpm install --prod
 # Copy built files
 COPY --from=builder /app/packages/api/dist ./dist
 
-# Declare /data as a volume so Docker creates a named volume automatically
-VOLUME /data
+# /data is mounted via Coolify custom_docker_run_options bind mount
+# Do NOT use VOLUME directive (creates anonymous volumes that don't persist across deploys)
 
 # Run the API
 CMD ["node", "dist/index.js"]

@@ -250,6 +250,22 @@ app.get('/health', (c) => {
   });
 });
 
+// Reload pitches from disk (for hot-loading after manual edits)
+app.post('/v1/admin/reload-pitches', (c) => {
+  const secret = c.req.header('x-admin-secret') || '';
+  if (secret !== (process.env.ADMIN_SECRET || '')) return c.json({ error: 'unauthorized' }, 401);
+  try {
+    const raw = fs.readFileSync(PITCHES_FILE, 'utf8');
+    const entries: [string, PitchSubmission][] = JSON.parse(raw);
+    const loaded = new Map(entries);
+    // Merge into existing pitches (don't lose in-progress ones)
+    for (const [k, v] of loaded) { pitches.set(k, v); }
+    return c.json({ ok: true, loaded: loaded.size, total: pitches.size });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // Root
 app.get('/', (c) => {
   return c.json({
