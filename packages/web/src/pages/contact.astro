@@ -1,0 +1,257 @@
+---
+import LandingPage from '../components/LandingPage.astro';
+---
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Machine.Machine</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .contact-container {
+      max-width: 560px;
+      width: 100%;
+      padding: 2rem;
+    }
+    .contact-header {
+      margin-bottom: 2rem;
+    }
+    .contact-header a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .contact-header a:hover { color: #fff; }
+    .contact-header h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      color: #fff;
+    }
+    .contact-header p {
+      color: #888;
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #4a9eff;
+    }
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    /* Honeypot - hidden from humans */
+    .hp-field { position: absolute; left: -9999px; opacity: 0; height: 0; }
+    .btn-submit {
+      padding: 0.85rem 2rem;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .btn-submit:hover { background: #e0e0e0; }
+    .btn-submit:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+    }
+    .form-status {
+      padding: 1rem;
+      border-radius: 8px;
+      display: none;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .form-status.success {
+      display: block;
+      background: #0a2a0a;
+      border: 1px solid #1a4a1a;
+      color: #4ade80;
+    }
+    .form-status.error {
+      display: block;
+      background: #2a0a0a;
+      border: 1px solid #4a1a1a;
+      color: #f87171;
+    }
+    .privacy-note {
+      font-size: 0.8rem;
+      color: #555;
+      line-height: 1.5;
+    }
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .contact-container { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="contact-container">
+    <div class="contact-header">
+      <a href="/">← Back to Machine.Machine</a>
+      <h1>Get in touch</h1>
+      <p>Tell us about your project or idea. We'll get back to you within 24 hours.</p>
+    </div>
+
+    <form id="contact-form" class="contact-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="you@company.com" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="company">Company <span style="color:#555">(optional)</span></label>
+        <input type="text" id="company" name="company" placeholder="Your company" />
+      </div>
+
+      <div class="form-group">
+        <label for="topic">What's this about?</label>
+        <select id="topic" name="topic" required>
+          <option value="" disabled selected>Select a topic</option>
+          <option value="partnership">Partnership / Collaboration</option>
+          <option value="services">AI Services Inquiry</option>
+          <option value="demo">Request a Demo</option>
+          <option value="careers">Careers / Working Together</option>
+          <option value="other">Something Else</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" required placeholder="Tell us what you're working on..."></textarea>
+      </div>
+
+      <!-- Honeypot -->
+      <div class="hp-field">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-submit">Send Message</button>
+
+      <div id="form-status" class="form-status"></div>
+
+      <p class="privacy-note">
+        Your message goes directly to our team. We don't share your data with third parties.
+      </p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('contact-form') as HTMLFormElement;
+    const btn = document.getElementById('btn-submit') as HTMLButtonElement;
+    const status = document.getElementById('form-status') as HTMLDivElement;
+    // Try API first, fall back to mailto
+    const API_URL = 'https://api.machinemachine.ai';
+    let lastSubmit = 0;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (Date.now() - lastSubmit < 30000) {
+        status.className = 'form-status error';
+        status.textContent = 'Please wait a moment before sending again.';
+        return;
+      }
+
+      // Honeypot
+      const hp = (document.getElementById('website') as HTMLInputElement).value;
+      if (hp) {
+        status.className = 'form-status success';
+        status.textContent = 'Thanks! We\'ll be in touch soon.';
+        return;
+      }
+
+      const name = (document.getElementById('name') as HTMLInputElement).value;
+      const email = (document.getElementById('email') as HTMLInputElement).value;
+      const company = (document.getElementById('company') as HTMLInputElement).value;
+      const topic = (document.getElementById('topic') as HTMLSelectElement).value;
+      const message = (document.getElementById('message') as HTMLTextAreaElement).value;
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      status.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_URL}/v1/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, company, topic, message, _ts: Date.now() })
+        });
+        if (res.ok) {
+          status.className = 'form-status success';
+          status.textContent = '✓ Message sent! We\'ll get back to you within 24 hours.';
+          form.reset();
+          lastSubmit = Date.now();
+          return;
+        }
+        throw new Error('API unavailable');
+      } catch {
+        // Fallback: open mailto
+        const subject = encodeURIComponent(`[Contact] ${topic} — ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nCompany: ${company}\nTopic: ${topic}\n\n${message}`);
+        window.location.href = `mailto:contact@machinemachine.ai?subject=${subject}&body=${body}`;
+        status.className = 'form-status success';
+        status.textContent = '✓ Opening your email client... If nothing happens, email contact@machinemachine.ai directly.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+      }
+    });
+  </script>
+</body>
+</html>
