@@ -253,28 +253,12 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
           });
           slide.appendChild(btn);
         });
-        // On mobile: free scroll (no snap). On desktop: keep snap.
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-          deck.style.height = 'auto';
-          deck.style.overflowY = 'visible';
-          deck.style.scrollSnapType = 'none';
-          document.body.style.overflow = 'auto';
-          document.documentElement.style.overflow = 'auto';
-          // Let slides size to content instead of forcing 100vh
-          slides.forEach(s => {
-            s.style.minHeight = 'auto';
-            s.style.scrollSnapAlign = 'none';
-            s.style.paddingTop = '2rem';
-            s.style.paddingBottom = '2rem';
-          });
-        } else {
-          deck.style.height = '100vh';
-          deck.style.overflowY = 'auto';
-          deck.style.scrollSnapType = 'y mandatory';
-          document.body.style.overflow = 'hidden';
-          document.documentElement.style.overflow = 'hidden';
-        }
+        // Enforce scroll on deck (mobile overrides handled by API-injected CSS)
+        deck.style.height = '100vh';
+        deck.style.overflowY = 'auto';
+        deck.style.scrollSnapType = 'y mandatory';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
       }
     } catch (err) {
       showState('error');

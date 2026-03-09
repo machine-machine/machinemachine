@@ -683,9 +683,10 @@ html,body{margin:0!important;padding:0!important;height:100%!important;overflow:
 .cta{display:block!important;text-align:center!important;margin-left:auto!important;margin-right:auto!important;width:fit-content!important}
 /* === Mobile responsiveness === */
 @media(max-width:768px){
-  html,body{overflow-x:hidden!important}
+  html,body{overflow:auto!important;overflow-x:hidden!important;height:auto!important}
+  .deck{height:auto!important;overflow-y:visible!important;scroll-snap-type:none!important}
   .deck,.slide{width:100%!important;min-width:0!important;overflow-x:hidden!important}
-  .slide{padding:1.5rem 1.25rem 5rem!important;min-height:100svh!important;box-sizing:border-box!important}
+  .slide{padding:2rem 1.25rem!important;min-height:auto!important;scroll-snap-align:none!important;box-sizing:border-box!important}
   .slide h1{font-size:clamp(1.6rem,6vw,3rem)!important;line-height:1.2!important}
   .slide h2{font-size:clamp(1.3rem,5vw,2.2rem)!important;line-height:1.3!important}
   .slide h3,.slide h4{font-size:clamp(1rem,4vw,1.5rem)!important}
