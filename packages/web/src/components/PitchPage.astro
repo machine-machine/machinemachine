@@ -454,4 +454,11 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
   .hidden {
     display: none !important;
   }
+
+  /* Hide slide-nav "Next" buttons on mobile — they cover content */
+  @media (max-width: 768px) {
+    :global(.slide-nav) {
+      display: none !important;
+    }
+  }
 </style>
