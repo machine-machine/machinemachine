@@ -1111,14 +1111,14 @@ async function sendOtpEmail(email: string, otp: string): Promise<void> {
 
 async function updateTwentyCrm(session: OnboardSession, note: string): Promise<void> {
   if (!TWENTY_API_URL || !TWENTY_API_KEY) return;
+  const headers = { Authorization: `Bearer ${TWENTY_API_KEY}`, 'Content-Type': 'application/json' };
   try {
     // Get or create contact
     let contactId = session.twentyCrmContactId;
     if (!contactId) {
       const firstName = session.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
       const res = await fetch(`${TWENTY_API_URL}/graphql`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${TWENTY_API_KEY}`, 'Content-Type': 'application/json' },
+        method: 'POST', headers,
         body: JSON.stringify({ query: `mutation { createPerson(data: { name: { firstName: "${firstName}", lastName: "" } emails: { primaryEmail: "${session.email}" } }) { id } }` }),
       });
       const data = await res.json() as any;
@@ -1126,10 +1126,20 @@ async function updateTwentyCrm(session: OnboardSession, note: string): Promise<v
       if (contactId) { session.twentyCrmContactId = contactId; saveSessions(); }
     }
     if (!contactId) return;
+    // Sync custom fields (bot token, agent name, preset) when available
+    const updates: string[] = [];
+    if (session.botToken)   updates.push(`botToken: "${session.botToken.replace(/"/g, '\\"')}"`);
+    if (session.agentName)  updates.push(`agentName: "${session.agentName.replace(/"/g, '\\"')}"`);
+    if (session.preset)     updates.push(`preset: "${String(session.preset).replace(/"/g, '\\"')}"`);
+    if (updates.length) {
+      await fetch(`${TWENTY_API_URL}/graphql`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ query: `mutation { updatePerson(id: "${contactId}", data: { ${updates.join(' ')} }) { id } }` }),
+      }).catch(() => {});
+    }
     // Add state note
     await fetch(`${TWENTY_API_URL}/graphql`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${TWENTY_API_KEY}`, 'Content-Type': 'application/json' },
+      method: 'POST', headers,
       body: JSON.stringify({ query: `mutation { createNote(data: { body: "${note}" noteTargets: { createMany: { data: [{ personId: "${contactId}" }] } } }) { id } }` }),
     });
   } catch { /* best effort */ }
