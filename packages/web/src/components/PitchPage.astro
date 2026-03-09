@@ -241,22 +241,16 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
             if (!a.closest('#m2-cta-bar')) a.remove();
           });
         });
-        // Add nav buttons
+        // Add nav buttons (skip last slide — it already has a CTA from the generated HTML)
         slides.forEach((slide, i) => {
           const isLast = i === slides.length - 1;
-          const btn = document.createElement(isLast ? 'a' : 'button');
+          if (isLast) return; // don't add duplicate CTA on last slide
+          const btn = document.createElement('button');
           btn.className = 'slide-nav';
-          if (isLast) {
-            (btn as HTMLAnchorElement).href = tgUrl;
-            (btn as HTMLAnchorElement).target = '_blank';
-            (btn as HTMLAnchorElement).rel = 'noopener';
-            btn.textContent = 'Start Talking to Your Agent \u2192';
-          } else {
-            btn.textContent = 'Next \u2192';
-            btn.addEventListener('click', () => {
-              deck.scrollTo({ top: (slides[i + 1] as HTMLElement).offsetTop, behavior: 'smooth' });
-            });
-          }
+          btn.textContent = 'Next \u2192';
+          btn.addEventListener('click', () => {
+            deck.scrollTo({ top: (slides[i + 1] as HTMLElement).offsetTop, behavior: 'smooth' });
+          });
           slide.appendChild(btn);
         });
         // Enforce scroll on deck
