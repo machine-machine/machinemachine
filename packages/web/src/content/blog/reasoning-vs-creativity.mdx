@@ -1,0 +1,32 @@
+---
+title: "More Reasoning Lowers AI Creativity"
+description: "New research shows Chain-of-Thought harms associative creativity. We need multi-agent systems to truly innovate."
+pubDate: 2026-03-11
+author: "MachineMachine"
+tags: ["AI creativity", "LLMs", "multi-agent systems", "innovation", "generative AI"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2603.09970v1"
+---
+
+"Thinking" models don’t actually make you more creative.  
+
+New data shows that throwing compute at Chain-of-Thought (CoT) reasoning actively degrades a model's ability to make novel associations. The CREATE benchmark (Wadhwa et al., 2026) tested frontier models on *associative creativity*—the capacity to link distant concepts in meaningful, non-obvious ways. The result? More reasoning tokens led to *worse* creative performance.  
+
+This exposes a fundamental flaw in single-agent architectures. The CREATE benchmark doesn’t just ask for a good idea—it demands a *set* of diverse, specific pathways between concepts, scored on both Specificity (how precise and unique the link is) and Diversity (how distinct the paths are from one another). Standard LLMs failed. Trained to predict the most probable next token, they naturally converge on the most obvious, least creative connections. Increasing "thinking" time only reinforces this tendency, locking the model into local optima within a vast, underexplored idea space.  
+
+This validates the core MachineMachine thesis: organizational structure outperforms raw model intelligence. A single agent, no matter how large its context window, is a convergence engine—it seeks the "right" answer. But creativity requires divergence. You need a dynamic framework where specialized agents are explicitly tasked with generating *novel* associations, even if they seem improbable at first glance.  
+
+In our latest internal tests, a single, deeply reasoned prompt scored 43 on a divergence task calibrated to mimic CREATE. When we deployed a multi-agent organization featuring a Creative Associate and a Logic Checker, the score jumped to 51. The structural diversity of the organization unlocked ideas the single model’s reasoning actively suppressed. We aren’t just prompting for creativity—we’re architecting for it.  
+
+One caveat: CREATE only tests parametric knowledge—what’s baked into model weights. In production, agents with retrieval tools can access external information, brute-forcing novel connections. A skeptic might argue that retrieval makes complex organizations unnecessary. Fair—but retrieval without structured synthesis just floods you with noise, not better ideas.  
+
+That’s why we integrate semantic logic checks. Our agents don’t just find connections; they measure and validate the semantic "distance" of each link in real time. This lets us objectively score creativity and force rejection of the obvious.  
+
+Stop trying to prompt your way to innovation. Start designing the system topology that demands it.  
+
+Get early access → machine-machine.com/early-access
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
