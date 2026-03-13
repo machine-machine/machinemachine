@@ -1,0 +1,102 @@
+{
+  "date": "2026-03-13",
+  "week": 11,
+  "year": 2026,
+  "title": "Memory Stack Expansion, Autoheal & Intent Engineering",
+  "overall": 71,
+  "scores": {
+    "fleetManagement": 76,
+    "memorySystem": 74,
+    "orgBuilder": 56,
+    "commsProtocol": 70,
+    "playbookAdoption": 64,
+    "resourceProvisioning": 60,
+    "roleSystem": 54,
+    "darkFactory": 57
+  },
+  "fleet": {
+    "agentsHealthy": 9,
+    "agentsDegraded": 2,
+    "totalContainers": 53,
+    "memoryVectors": 4600,
+    "activeCrons": 15
+  },
+  "shipped": [
+    "m2-memory-engine extension integrated into OpenClaw + Forgejo upstream-sync workflow (10 openclaw commits)",
+    "Memory-engine plugin fix rolled out fleet-wide — all agents now have semantic memory access",
+    "GLiNER NER microservice deployed — GPU-backed, multilingual, zero-shot named entity recognition",
+    "Memgraph knowledge graph service added to agent.memory.system stack",
+    "Enhanced agent-autoheal with LLM failover — baked into m2-desktop image",
+    "Two-layer config system: openclaw built at image time, config injected at runtime",
+    "Peter + master Telegram IDs auto-injected via fleet config generator",
+    "Fleet gateway watchdog v2 with deep repair logic (auto-restarts, deep health checks)",
+    "Natural-TTS skill added (HumeAI TADA model — emotional, expressive voice)",
+    "Intent-router skill — confidence scoring (0-100%), route to elicit/confirm/execute",
+    "m2-world: Intent Engineering architecture designs + Google ADK integration analysis (9 commits)",
+    "agent-org-simulator: enterprise benchmark run #9 complete — Dynamic Pentad Framework (retro run_009)",
+    "machinemachine.ai: /contact page + form + mailto fallback, mobile pitch fixes, CRM bot token sync",
+    "3 auto-generated AI research blog posts (Confused Deputy Problem, LLMGreenRec, Reasoning vs Creativity)",
+    "kokoro-tts CUDA optimisation — TF32/cuDNN warmup, larger chunks, parallel processing",
+    "m2-voice fleet DNS alias — agents can reach TTS via stable hostname"
+  ],
+  "blocked": [
+    "Home Assistant still exited/unhealthy — redirect loop unresolved",
+    "nasr-m2o at 260% CPU — likely runaway process, needs investigation",
+    "Persistent unhealthy containers: Claude proxy, claude-worker, joinly, qwen3-tts, chatterbox-tts, vllm-docker, muninndb-pilot, spacetimedb, Pinokio",
+    "kokoro-tts degraded:unhealthy (kokoro-tts container shows g4sw4g40 degraded)",
+    "vLLM Qwen3-14B-AWQ reverted from agent-memory-system — local inference still unstable"
+  ],
+  "topGaps": [
+    {
+      "severity": "critical",
+      "title": "nasr-m2o CPU runaway — 260%",
+      "description": "nasr-m2o container pegged at 260% CPU (3.9 GiB / 8 GiB RAM). Likely infinite loop or stuck LLM request. Needs restart/investigation."
+    },
+    {
+      "severity": "critical",
+      "title": "Container sprawl — 10+ unhealthy services",
+      "description": "Claude proxy, claude-worker, joinly, qwen3-tts, chatterbox-tts, vllm-docker, muninndb-pilot, spacetimedb, Pinokio, Home Assistant — all exited:unhealthy. Dead weight consuming Coolify slots."
+    },
+    {
+      "severity": "warning",
+      "title": "Memgraph hitting 1 GiB memory limit (65%)",
+      "description": "memory-memgraph container using 665 MiB / 1 GiB limit. Will OOM as the knowledge graph grows. Limit needs bumping to 2-4 GiB."
+    },
+    {
+      "severity": "warning",
+      "title": "memory-embeddings at 14.18 GiB RAM",
+      "description": "BGE embeddings model using 14.18 GiB (11.3% of host). Largest single allocation. Consider quantised model or dedicated GPU inference."
+    },
+    {
+      "severity": "warning",
+      "title": "vLLM local inference unstable",
+      "description": "Qwen3-14B-AWQ was added then reverted this week. Local LLM inference for memory/reasoning pipeline not yet stable."
+    },
+    {
+      "severity": "info",
+      "title": "No org-level shared memory namespace",
+      "description": "Agents are siloed — each has private memory. Shared Qdrant org_memory namespace not yet deployed despite Memgraph being available."
+    }
+  ],
+  "nextActions": [
+    "Restart nasr-m2o and investigate CPU runaway (260% for extended period)",
+    "Bump Memgraph memory limit to 2-4 GiB before it OOMs",
+    "Triage and decommission 10 persistent unhealthy containers",
+    "Re-attempt vLLM Qwen3 stable deployment — use dedicated service config",
+    "Deploy org_memory shared Qdrant namespace — Memgraph graph is ready",
+    "Fix Home Assistant redirect loop or decommission",
+    "Benchmark Intent-router skill accuracy across common task types"
+  ],
+  "gitActivity": [
+    { "repo": "openclaw", "commits": 10, "highlight": "m2-memory-engine extension, Forgejo upstream-sync, acpx refactor" },
+    { "repo": "m2-desktop", "commits": 10, "highlight": "Agent autoheal, two-layer config, Peter/master Telegram IDs, memory-engine plugin bake-in" },
+    { "repo": "m2-config", "commits": 9, "highlight": "Fleet gateway watchdog v2, memory-engine plugin fleet rollout, intent-router + natural-tts skills" },
+    { "repo": "m2-world", "commits": 9, "highlight": "Intent Engineering architecture, Google ADK integration, autonomous routing designs" },
+    { "repo": "machinemachine", "commits": 10, "highlight": "Contact page, mobile pitch fixes, CRM bot token sync, 3 AI research blog posts" },
+    { "repo": "agent-memory-system", "commits": 6, "highlight": "GLiNER NER microservice, Memgraph knowledge graph, vLLM attempt+revert" },
+    { "repo": "openclaw-tts-skill", "commits": 2, "highlight": "kokoro-tts CUDA optimisation, m2-voice fleet DNS alias" },
+    { "repo": "agent-org-simulator", "commits": 2, "highlight": "Enterprise benchmark run #9, evolution run complete" },
+    { "repo": "fleet-governance", "commits": 1, "highlight": "Retro run_009 — Dynamic Pentad Framework" },
+    { "repo": "m2-backup", "commits": 1, "highlight": "Daily backup 2026-03-13" }
+  ]
+}
