@@ -269,6 +269,10 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
   if (!uuid) {
     showState('notfound');
   } else {
+    // Track page load via parent PostHog (from BaseLayout)
+    if (typeof window.ph === 'function') {
+      window.ph('pitch_page_loaded', { uuid });
+    }
     checkStatus(uuid);
   }
 </script>

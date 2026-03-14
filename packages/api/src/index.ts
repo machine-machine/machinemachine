@@ -653,6 +653,12 @@ app.get('/v1/pitch/:uuid/html', (c) => {
 
   if (!pitch) return c.json({ error: 'Pitch not found' }, 404);
 
+  // Track pitch view server-side (fires on every HTML fetch — PostHog dedupes by distinct_id + session)
+  track(pitch.email, 'pitch_viewed', {
+    uuid, status: pitch.status,
+    time_since_creation_ms: Date.now() - new Date(pitch.createdAt).getTime(),
+  });
+
   if (pitch.status === 'ready' && pitch.html) {
     // Inject CSS fix for slide alignment + mobile responsiveness (retroactive fix for all pitches)
     const cssfix = `<style>
@@ -770,8 +776,53 @@ html,body{margin:0!important;padding:0!important;height:100%!important;overflow:
 })();
 </script>
 </body>`;
+    // PostHog client-side tracking — injected into served pitch HTML
+    const phKey = POSTHOG_API_KEY;
+    const phHost = POSTHOG_HOST;
+    const phScript = phKey ? `
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.push(["init",i,s,a]),n=0;n<u.length;n++){var l=u[n];0<l.length&&g(u,l)}},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('${phKey}',{api_host:'${phHost}',autocapture:true,capture_pageview:true,capture_pageleave:true,persistence:'localStorage'});
+posthog.capture('pitch_opened',{uuid:'${uuid}',email:'${pitch.email}'});
+// Scroll depth tracking per slide
+(function(){
+  var deck=document.querySelector('.deck');if(!deck)return;
+  var slides=[].slice.call(deck.querySelectorAll('.slide'));
+  var seen={};var maxSlide=0;
+  function check(){
+    var dRect=deck.getBoundingClientRect();
+    slides.forEach(function(s,i){
+      var r=s.getBoundingClientRect();
+      var vis=r.top<dRect.bottom&&r.bottom>dRect.top;
+      if(vis&&!seen[i]){
+        seen[i]=true;
+        if(i>maxSlide)maxSlide=i;
+        posthog.capture('pitch_slide_viewed',{uuid:'${uuid}',slide_index:i,slide_total:slides.length});
+      }
+    });
+  }
+  deck.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('scroll',check,{passive:true});
+  setTimeout(check,500);
+  // On page leave, report max depth
+  window.addEventListener('beforeunload',function(){
+    posthog.capture('pitch_max_depth',{uuid:'${uuid}',max_slide:maxSlide,total_slides:slides.length,depth_pct:Math.round((maxSlide+1)/slides.length*100)});
+  });
+})();
+// CTA click tracking
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a');
+  if(a){
+    var href=a.href||'';
+    if(href.includes('t.me/')||a.classList.contains('cta')||a.classList.contains('slide-nav')){
+      posthog.capture('pitch_cta_clicked',{uuid:'${uuid}',href:href,text:a.textContent.trim().slice(0,60)});
+    }
+  }
+});
+</script>` : '';
+
     const fixedHtml = pitch.html
-      .replace('</head>', cssfix)
+      .replace('</head>', phScript + cssfix)
       .replace('</body>', ctaBar);
     c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
     c.header('Pragma', 'no-cache');
