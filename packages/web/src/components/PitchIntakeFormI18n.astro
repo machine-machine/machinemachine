@@ -153,6 +153,7 @@ const { locale } = Astro.props;
       mediaRecorder.start();
       btnRecord.classList.add('hidden');
       recordingControls.classList.remove('hidden');
+      if (typeof window.ph === 'function') window.ph('form_audio_started');
 
       timerInterval = window.setInterval(() => {
         seconds++;
@@ -171,6 +172,7 @@ const { locale } = Astro.props;
 
   btnStop.addEventListener('click', () => {
     mediaRecorder?.stop();
+    if (typeof window.ph === 'function') window.ph('form_audio_recorded', { duration_sec: seconds });
   });
 
   btnRetake.addEventListener('click', () => {
@@ -190,6 +192,25 @@ const { locale } = Astro.props;
     `;
     row.querySelector('.btn-remove-link')?.addEventListener('click', () => row.remove());
     linksContainer.appendChild(row);
+  });
+
+  // --- PostHog: form field focus tracking ---
+  var fieldsSeen = {};
+  ['pitch-email', 'pitch-text'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('focus', function() {
+      if (!fieldsSeen[id] && typeof window.ph === 'function') {
+        fieldsSeen[id] = true;
+        window.ph('form_field_focused', { field: id });
+      }
+    });
+  });
+  // Track first link input focus
+  linksContainer.addEventListener('focusin', function(e) {
+    if (e.target.name === 'links[]' && !fieldsSeen['links'] && typeof window.ph === 'function') {
+      fieldsSeen['links'] = true;
+      window.ph('form_field_focused', { field: 'links' });
+    }
   });
 
   // --- Submit ---
@@ -238,6 +259,18 @@ const { locale } = Astro.props;
 
       const data = await res.json();
       const uuid = data.uuid || data.id;
+
+      if (typeof window.ph === 'function') {
+        window.ph('pitch_submitted', {
+          uuid: uuid,
+          has_audio: !!audioBase64,
+          has_links: links.length > 0,
+          has_text: !!text,
+          link_count: links.length,
+          text_length: text.length,
+          locale: i18n.locale,
+        });
+      }
 
       // Build pitch URL with locale prefix
       const localePrefix = i18n.locale === 'en' ? '' : `/${i18n.locale}`;

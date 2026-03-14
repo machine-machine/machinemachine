@@ -29,14 +29,33 @@ const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog
     if (posthogKey) {
       posthog.init(posthogKey, {
         api_host: posthogHost,
-        autocapture: false,
+        autocapture: true,
         capture_pageview: true,
         capture_pageleave: true,
+        capture_performance: true,
       });
     }
     window.ph = function(event, props) {
       try { if (window.posthog && posthog.capture) posthog.capture(event, props || {}); } catch(e) {}
     };
+
+    // Global scroll depth tracking (fires once per 25% threshold per page)
+    (function(){
+      var thresholds = [25, 50, 75, 100];
+      var fired = {};
+      function check(){
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        if (h <= 0) return;
+        var pct = Math.round(window.scrollY / h * 100);
+        thresholds.forEach(function(t){
+          if (pct >= t && !fired[t]) {
+            fired[t] = true;
+            window.ph('scroll_depth', { depth_pct: t, page: location.pathname });
+          }
+        });
+      }
+      window.addEventListener('scroll', check, { passive: true });
+    })();
   </script>
   <style is:global>
     :root {

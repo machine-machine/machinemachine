@@ -359,6 +359,57 @@ const aboutHref = locale === 'en' ? '/about' : `/${locale}/about`;
       window.location.href = '/pl/';
     }
   }
+
+  // --- PostHog: Section visibility tracking ---
+  (function(){
+    var sections = [
+      'problem', 'transformation', 'how-it-works', 'proof',
+      'use-cases', 'live-fleet', 'pitch-form'
+    ];
+    var seen = {};
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting && !seen[e.target.id]) {
+          seen[e.target.id] = true;
+          if (typeof window.ph === 'function') {
+            window.ph('section_viewed', { section: e.target.id, locale: lang });
+          }
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+  })();
+
+  // --- PostHog: CTA click tracking ---
+  document.addEventListener('click', function(e) {
+    var a = e.target.closest && e.target.closest('a.btn, button.btn');
+    if (!a) return;
+    var href = a.href || '';
+    var text = a.textContent.trim().slice(0, 60);
+    if (typeof window.ph === 'function') {
+      window.ph('cta_clicked', {
+        href: href,
+        text: text,
+        section: (a.closest('section') || {}).id || 'unknown',
+        locale: lang
+      });
+    }
+  });
+
+  // --- PostHog: Language switch ---
+  document.querySelectorAll('.lang-flag').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (typeof window.ph === 'function') {
+        window.ph('language_switched', {
+          from: lang,
+          to: el.getAttribute('data-lang')
+        });
+      }
+    });
+  });
 </script>
 
 <style>
