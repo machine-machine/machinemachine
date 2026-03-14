@@ -226,23 +226,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </div>
   </section>
 
-  <section class="team">
-    <div class="container">
-      <h2>Team</h2>
-      <div class="team-grid">
-        <div class="team-member">
-          <h3>Mariusz Ferdyn</h3>
-          <p class="team-role">CEO & CTO</p>
-          <p class="team-bio">Serial entrepreneur and AI researcher. Previously built and sold enterprise software companies.</p>
-        </div>
-        <div class="team-member">
-          <h3>Peter Mühlmann</h3>
-          <p class="team-role">Advisor</p>
-          <p class="team-bio">Founder & former CEO of Trustpilot. $1.4B exit. Expert in scaling technology platforms.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  
 
   <footer>
     <div class="container">
@@ -755,21 +739,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   /* Team */
-  .team {
-    background: var(--darker);
-  }
+  
 
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 3rem;
-    margin-top: 3rem;
-  }
+  
 
-  .team-member {
-    text-align: center;
-    padding: 2rem;
-  }
+  
 
   .team-member h3 {
     color: #fff;
@@ -777,16 +751,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-bottom: 0.5rem;
   }
 
-  .team-role {
-    color: var(--primary);
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
+  
 
-  .team-bio {
-    color: var(--gray);
-    line-height: 1.6;
-  }
+  
 
   /* Footer */
   footer {
