@@ -217,49 +217,73 @@ const pitchFormHref = locale === 'en' ? '/#pitch-form' : `/${locale}#pitch-form`
       if (!res.ok) throw new Error(`Failed to load pitch: ${res.status}`);
 
       const html = await res.text();
-      stateReady.innerHTML = html;
+
+      // Use an iframe with srcdoc so full HTML documents (<!DOCTYPE>, <head>, <style>)
+      // render correctly. innerHTML strips <html>/<head>/<body> and loses styles.
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'width:100%;height:100vh;border:none;display:block;';
+      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+
+      // Inject nav-button script into the HTML before closing </body>
+      const navScript = `<script>
+        (function(){
+          var deck = document.querySelector('.deck');
+          if (!deck) return;
+          var slides = [].slice.call(deck.querySelectorAll('.slide'));
+          // Remove AI-generated CTAs (not the bottom bar)
+          slides.forEach(function(s){
+            [].slice.call(s.querySelectorAll('a.cta')).forEach(function(a){
+              if (!a.closest('#m2-cta-bar')) a.remove();
+            });
+          });
+          // Add nav buttons (skip last slide)
+          slides.forEach(function(slide, i){
+            if (i === slides.length - 1) return;
+            var btn = document.createElement('button');
+            btn.className = 'slide-nav';
+            btn.textContent = 'Next \\u2192';
+            btn.style.cssText = 'position:absolute;bottom:5rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7C3AED,#4f46e5);color:#fff;border:none;padding:12px 28px;border-radius:50px;font-size:1rem;font-weight:600;cursor:pointer;z-index:10;box-shadow:0 0 20px rgba(124,58,237,0.3);';
+            btn.addEventListener('click', function(){
+              deck.scrollTo({top: slides[i+1].offsetTop, behavior:'smooth'});
+            });
+            slide.appendChild(btn);
+          });
+          deck.style.height = '100vh';
+          deck.style.overflowY = 'auto';
+          deck.style.scrollSnapType = 'y mandatory';
+          document.body.style.overflow = 'hidden';
+          document.documentElement.style.overflow = 'hidden';
+        })();
+      <\/script>`;
+
+      // Inject nav script before </body> (or append at end)
+      let enrichedHtml = html;
+      if (enrichedHtml.includes('</body>')) {
+        enrichedHtml = enrichedHtml.replace('</body>', navScript + '</body>');
+      } else {
+        enrichedHtml += navScript;
+      }
+
+      iframe.srcdoc = enrichedHtml;
+      stateReady.innerHTML = '';
+      stateReady.appendChild(iframe);
       showState('ready');
 
       const pitchPage = document.querySelector('.pitch-page') as HTMLElement;
       if (pitchPage) {
         pitchPage.style.padding = '0';
+        pitchPage.style.minHeight = '100vh';
       }
       const pitchContainer = document.querySelector('.pitch-container') as HTMLElement;
       if (pitchContainer) {
         pitchContainer.style.maxWidth = 'none';
         pitchContainer.style.padding = '0';
+        pitchContainer.style.width = '100%';
       }
 
-      // --- Post-injection: nav buttons + CTA cleanup ---
-      const deck = document.querySelector('.deck') as HTMLElement;
-      if (deck) {
-        const slides = [...deck.querySelectorAll('.slide')] as HTMLElement[];
-        const tgUrl = 'https://t.me/m2_onboarding_bot';
-        // Remove AI-generated CTAs (not the bottom bar)
-        slides.forEach(s => {
-          s.querySelectorAll('a.cta').forEach(a => {
-            if (!a.closest('#m2-cta-bar')) a.remove();
-          });
-        });
-        // Add nav buttons (skip last slide — it already has a CTA from the generated HTML)
-        slides.forEach((slide, i) => {
-          const isLast = i === slides.length - 1;
-          if (isLast) return; // don't add duplicate CTA on last slide
-          const btn = document.createElement('button');
-          btn.className = 'slide-nav';
-          btn.textContent = 'Next \u2192';
-          btn.addEventListener('click', () => {
-            deck.scrollTo({ top: (slides[i + 1] as HTMLElement).offsetTop, behavior: 'smooth' });
-          });
-          slide.appendChild(btn);
-        });
-        // Enforce scroll on deck (mobile overrides handled by API-injected CSS)
-        deck.style.height = '100vh';
-        deck.style.overflowY = 'auto';
-        deck.style.scrollSnapType = 'y mandatory';
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-      }
+      // Hide parent scrollbar — iframe handles everything
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
     } catch (err) {
       showState('error');
     }
