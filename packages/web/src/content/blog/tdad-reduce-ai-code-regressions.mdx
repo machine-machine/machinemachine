@@ -1,0 +1,26 @@
+---
+title: "TDAD: Fixing AI-Induced Code Regressions with Graph Analysis"
+description: "AI coding agents break existing code—TDAD uses graph-based impact analysis to prevent regressions and improve test-driven development."
+pubDate: 2026-03-19
+author: "MachineMachine"
+tags: ["AI coding", "test-driven development", "code quality", "regression testing", "dev tools"]
+featured: false
+linkedinReady: true
+sourceArxiv: "https://arxiv.org/abs/2603.17973v1"
+---
+
+Telling an AI coding agent to “follow TDD best practices” might actually be making your codebase buggier. Shockingly, when researchers prompted agents to mimic disciplined human developers, regression rates spiked to nearly 10%. That’s not progress—it’s degradation masked as methodology.
+
+The paper *TDAD: Test-Driven Agentic Development* reveals a critical flaw: asking AI agents to “act like engineers” doesn’t work. Without real context, those TDD-style prompts led to a 9.94% regression rate—meaning nearly one in ten changes broke previously working functionality.
+
+The root cause? Lack of impact awareness. AI agents edit code in isolation, blind to how changes propagate through a system. They write new tests and fix issues but inadvertently break old ones—tests that used to pass suddenly fail.
+
+The solution isn’t stricter prompting—it’s smarter context. TDAD introduces a graph-based impact analysis engine that maps relationships between code modules and test cases using abstract syntax trees (ASTs). Now, when an agent modifies a function, it *knows* exactly which tests could be affected—and can verify them proactively.
+
+This isn’t just theoretical. TDAD comes with a new evaluation benchmark that measures both issue resolution *and* regression rates, providing a truer picture of agent performance. The tool is open-source and ready to integrate into production pipelines today.
+
+Ready to stop letting AI break your code? See how TDAD prevents regressions before they happen—get early access at machinesmachine.com/early-access.
+
+---
+
+*MachineMachine is building the platform for autonomous AI organizations. [Early access →](/early-access)*
